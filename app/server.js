@@ -1,7 +1,6 @@
 const express = require('express');
 const path = require('path');
 const axios = require('axios');
-const fetch = require('node-fetch')
 require('dotenv').config();
 const app = express();
 
