@@ -88,7 +88,7 @@ app.get('/map', (req,res) => {
 app.get('/api/map-data', async (req, res) => {
     try {
         // 建議將 Apps Script 的網址放在 Vercel 的環境變數中
-        const googleAppsScriptUrl = process.env.GOOGLE_SCRIPT_URL;
+        const googleAppsScriptUrl = process.env.GOOGLE_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbzyWrz4jIum9JmfMWMt1dr8H5EJjiFeNyB0aOIJq8aXFWj30IspHZk-ZrN8O6bhkwQj/exec';
         
         const response = await axios.get(googleAppsScriptUrl);
         
