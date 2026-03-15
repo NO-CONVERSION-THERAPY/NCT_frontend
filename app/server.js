@@ -6,6 +6,8 @@ require('dotenv').config();
 const app = express();
 app.use(cors());
 
+const title = process.env.TITLE;
+
 // 設置 EJS
 app.set('views', path.join(__dirname, '../views'));
 app.use(express.static(path.join(__dirname, '../public')));
@@ -17,13 +19,33 @@ app.use(express.json());
 
 // 首頁：渲染表單
 app.get('/', (req, res) => {
-  res.render('index');
+  res.render('index', {
+    t:req.t
+  });
 });
 
 // 表單頁：填寫數據
 app.get('/form', (req, res) => {
-  res.render('form');
+  res.render('form', {
+    t:req.t,
+    title:`填寫表單|${title}`
+  });
 });
+
+app.get('/map', (req,res) => {
+    res.render('map', {
+        t:req.t,
+        title:`地圖|${title}`
+    })
+})
+
+app.get('/aboutus', (req,res) => {
+    res.render('about',{
+        t:req.t,
+        title:`關於我們|${title}`
+    })
+})
+
 
 // 處理表單提交
 app.post('/submit', async (req, res) => {
@@ -78,11 +100,6 @@ const params = new URLSearchParams();
 });
 
 
-app.get('/map', (req,res) => {
-    res.render('map', {
-        t:req.t
-    })
-})
 
 
 app.get('/api/map-data', async (req, res) => {

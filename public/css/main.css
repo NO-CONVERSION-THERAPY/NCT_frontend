@@ -1,0 +1,224 @@
+/* 合併後的樣式表 - 優先保留 Form 樣式 */
+
+:root {
+    /* 優先採用 form.css 的配色 */
+    --primary: #3498db;
+    --bg: #f4f7f6;
+    --text: #2c3e50;
+    --white: #ffffff;
+    /* 保留 maps.css 特有的輔助色 */
+    --accent-color: #e63946;
+    --card-bg: #ffffff;
+}
+
+/* 全域設定 - 採用 form.css 的漸層背景與字體 */
+body {
+    font-family: "PingFang SC", "Microsoft YaHei", "PingFang TC", sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    margin: 0;
+    padding: 0 20px;
+    height: 100vh;
+    color: var(--text);
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 標題樣式 */
+h1 {
+    text-align: center;
+    color: var(--text);
+    margin-bottom: 30px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    animation: fadeInUp 0.8s ease-out both;
+}
+
+h3 {
+    border-left: 4px solid var(--primary);
+    padding-left: 15px;
+    margin-top: 30px;
+    color: var(--primary);
+}
+
+/* 容器與區塊佈局 */
+.container {
+    max-width: 650px;
+    width: 100%;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.div {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    margin: 20px;
+    animation: fadeInUp 0.8s ease-out 0.4s both;
+    overflow: hidden;
+}
+
+/* 表單組件樣式 (來自 form.css) */
+.form-group { margin-bottom: 20px; }
+label { display: block; margin-bottom: 8px; font-weight: bold; }
+label.required::after { content: " *"; color: #e74c3c; }
+
+input, select, textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+}
+
+.other-input {
+    margin-top: 10px;
+    display: none;
+    border-style: dashed;
+}
+
+.hint { font-size: 12px; color: #7f8c8d; margin-top: 5px; }
+
+button {
+    width: 100%;
+    padding: 15px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-top: 20px;
+}
+
+button:hover { background: #2980b9; }
+
+/* 地圖特有樣式 (來自 maps.css) */
+#map {
+    height: 70vh;
+    margin: 20px auto;
+    width: 70%;
+    border: 4px solid white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+#map:hover {
+    transform: translateY(-5px);
+}
+
+/* API 詳情與連結樣式 */
+details {
+    width: 70%;
+    margin-top: 20px;
+}
+
+details[open] {
+    box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+}
+details[open] .details-content {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+summary {
+    font-weight: bold;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+}
+
+summary::before {
+    content: "📘";
+    margin-right: 10px;
+}
+
+.api-link-highlight {
+    display: inline-block;
+    padding: 2px 8px;
+    background: linear-gradient(90deg, #3498db, #e63946);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: bold;
+    animation: pulse 2s infinite;
+}
+
+/* 連結與返回按鈕 */
+a {
+    color: var(--primary);
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+
+a:hover {
+    opacity: 0.7;
+    text-decoration: underline;
+}
+
+.back-link {
+    display: block;
+    text-align: center;
+    margin-top: 30px;
+    font-weight: 500;
+}
+
+/* 彈窗樣式 */
+.custom-popup b {
+    color: var(--accent-color);
+    font-size: 1.1rem;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.custom-popup small {
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #64748b;
+}
+
+address {
+    font-style: normal;
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-top: 8px;
+}
+
+/* 動畫定義 */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* 回應式設計 */
+@media (max-width: 480px) {
+    .container, #map, details { width: 95%; }
+    .container { padding: 20px; }
+}
