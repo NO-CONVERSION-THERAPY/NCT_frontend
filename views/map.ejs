@@ -32,9 +32,7 @@
         // 選用簡潔的底圖風格
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
 
-        const apiLabels = 'https://no-torsion.vercel.app/api/map-data';
-
-        fetch(apiLabels)
+        fetch('/api/map-data')
             .then(res => res.json())
             .then(data => {
                 data.forEach(item => {
