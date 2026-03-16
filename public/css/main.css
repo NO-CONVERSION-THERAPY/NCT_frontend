@@ -1,27 +1,25 @@
 /* 合併後的樣式表 - 優先保留 Form 樣式 */
 
 :root {
-    /* 優先採用 form.css 的配色 */
     --primary: #3498db;
     --bg: #f4f7f6;
     --text: #2c3e50;
     --white: #ffffff;
-    /* 保留 maps.css 特有的輔助色 */
     --accent-color: #e63946;
     --card-bg: #ffffff;
 }
 
-/* 全域設定 - 採用 form.css 的漸層背景與字體 */
+
+/* 全域設定 */
 body {
     font-family: "PingFang SC", "Microsoft YaHei", "PingFang TC", sans-serif;
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    margin: 0;
-    padding: 0 20px;
-    height: 100vh;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-size: cover;
     color: var(--text);
     line-height: 1.6;
     display: flex;
-    flex-direction: column;
     align-items: center;
 }
 
@@ -63,7 +61,7 @@ h3 {
     overflow: hidden;
 }
 
-/* 表單組件樣式 (來自 form.css) */
+/* 表單組件樣式 */
 .form-group { margin-bottom: 20px; }
 label { display: block; margin-bottom: 8px; font-weight: bold; }
 label.required::after { content: " *"; color: #e74c3c; }
@@ -107,7 +105,7 @@ button {
 
 button:hover { background: #2980b9; }
 
-/* 地圖特有樣式 (來自 maps.css) */
+/* 地圖特有樣式 */
 #map {
     height: 70vh;
     margin: 20px auto;
@@ -121,7 +119,7 @@ button:hover { background: #2980b9; }
     transform: translateY(-5px);
 }
 
-/* API 詳情與連結樣式 */
+/* API */
 details {
     width: 70%;
     margin-top: 20px;
@@ -199,7 +197,7 @@ address {
     margin-top: 8px;
 }
 
-/* 動畫定義 */
+/* 動畫 */
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -217,8 +215,7 @@ address {
     100% { transform: scale(1); }
 }
 
-/* 回應式設計 */
-@media (max-width: 480px) {
+@media (max-width: 650px) {
     .container, #map, details { width: 95%; }
     .container { padding: 20px; }
 }
