@@ -17,7 +17,6 @@ const agentData = [];  // 存放代理人填写数
 const map = L.map('map').setView([37.5, 109], 4); // 預設視角
 const CNprov = '/cn.json'
 
-// 選用簡潔的底圖風格
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     minZoom: 4
 }).addTo(map);
@@ -31,6 +30,8 @@ fetch(apiUrl)
     .then(res => res.json())
     .then(jsonResponse => {
         const data = jsonResponse.data;
+        const statistics = jsonResponse.statistics;
+        const avg_age = jsonResponse.avg_age;
 
         const provinceMap = {};
 

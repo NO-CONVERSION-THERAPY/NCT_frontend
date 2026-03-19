@@ -14,7 +14,8 @@ schoolInput.addEventListener('input', function() {
     debounceTimer = setTimeout(() => {
         fetch(window.API_URL) // 假设这里返回了所有数据
             .then(res => res.json())
-            .then(data => {
+            .then(JsonData => {
+                const data = JsonData.data;
                 const keyword = schoolInput.value.trim().toLowerCase();
                 
                 // 【核心逻辑】：只保留包含关键字的结果

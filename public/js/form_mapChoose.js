@@ -16,7 +16,6 @@ map.on('click', function(e) {
         map.removeLayer(currentMarker); // 如果已经有点了，先从地图移除
     }
 
-    console.log(`選取: ${lat}, ${lng}`);
     const ctAddr = document.getElementById('addr')
     ctAddr.value = `latlng${lat},${lng}`
 
