@@ -139,7 +139,8 @@ app.get('/api/map-data', async (req, res) => {
     }
     try {
         const googleAppsScriptUrl = process.env.GOOGLE_SCRIPT_URL;
-        const response = await axios.get(googleAppsScriptUrl);
+        const JSONresponse = await axios.get(googleAppsScriptUrl);
+        const response = JSONresponse.data;
         
         let rawData = response.data;
 

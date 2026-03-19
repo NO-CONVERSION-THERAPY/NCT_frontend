@@ -29,7 +29,8 @@ const apiUrl = window.API_URL
 let provList = Array.from({ length: 40 }, () => Array(2).fill());
 fetch(apiUrl)
     .then(res => res.json())
-    .then(data => {
+    .then(jsonResponse => {
+        const data = jsonResponse.data;
 
         const provinceMap = {};
 
