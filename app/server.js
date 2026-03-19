@@ -136,9 +136,11 @@ app.get('/api/map-data', async (req, res) => {
     
     // 檢查快取（快取現在應該存整個物件，包含 stats 和 data）
     if (cachedData && (now - lastFetchTime < 300000)) {
+        console.log('COOKIE~ OISHII~')
         return res.json(cachedData);
     }
     try {
+        console.log('GET API ING......')
         const googleAppsScriptUrl = process.env.GOOGLE_SCRIPT_URL;
         const response = await axios.get(googleAppsScriptUrl);
         
@@ -176,9 +178,9 @@ app.get('/api/map-data', async (req, res) => {
         // --- 組合最終結果 ---
         const finalResponse = {
             statistics: {
-                ...statistics, // 保留 GAS 傳來的統計
                 avg_age:response.data.avg_age,
-                last_synced: new Date().toISOString()
+                ...statistics, // 保留 GAS 傳來的統計
+                last_synced: response.data.LastSynced
             },
             data: cleanData
         };

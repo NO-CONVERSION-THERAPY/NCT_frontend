@@ -68,7 +68,10 @@ fetch(apiUrl)
         const distText = Object.entries(provinceMap)
             .map(([name, count]) => `<strong>${name}</strong>: ${count}`)
             .join(', ');
+        //document.getElementById('province-dist').innerHTML = distText;
         document.getElementById('province-dist').innerHTML = distText;
+        document.getElementById('lastSynced').innerHTML = jsonResponse.LastSynced;
+        document.getElementById('avgAge').innerHTML = jsonResponse.avg_age;
         
         document.getElementById('total-count').innerText = data.length;
         
