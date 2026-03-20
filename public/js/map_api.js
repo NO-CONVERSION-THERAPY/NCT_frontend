@@ -30,8 +30,6 @@ fetch(apiUrl)
     .then(res => res.json())
     .then(jsonResponse => {
         const data = jsonResponse.data;
-        const statistics = jsonResponse.statistics;
-
         const provinceMap = {};
 
         data.forEach(item => {
@@ -59,15 +57,14 @@ fetch(apiUrl)
                         };
                     }
                 }).addTo(map);
-                addMarkers(data);
+                //addMarkers(data);
             })
             .catch(err => console.error('加载地图数据失败:', err));
 
-        const distText = Object.entries(statistics)
-            .map(([name, count]) => `<strong>${name}</strong>: ${count}`)
+        const statistics = jsonResponse.statistics
+            .map(item => `<strong>${item.province}</strong>: ${item.count}`)
             .join(', ');
-        //document.getElementById('province-dist').innerHTML = distText;
-        document.getElementById('province-dist').innerHTML = distText;
+        document.getElementById('province-dist').innerHTML = statistics;
         document.getElementById('lastSynced').innerText = jsonResponse.last_synced;
         document.getElementById('avgAge').innerText = jsonResponse.avg_age;
     

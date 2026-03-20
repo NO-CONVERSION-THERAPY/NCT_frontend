@@ -31,7 +31,7 @@ flex-direction: column;
                 let scandalHtml = item.scandal ? `<div class="scandal">⚠️ ${item.scandal}</div>` : '';
 
                 card.innerHTML = `
-                    <summary><h2>${item.name}</h2></summary>
+                    <summary><h2>${item.name}</h2><br><small>填寫類型：${item.inputType}</small></summary>
                     <div class="div">
                         <p><strong>負責人：</strong>${item.HMaster}</p>
                         <p><strong>省份：</strong>${item.province}</p>

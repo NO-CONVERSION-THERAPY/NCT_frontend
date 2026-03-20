@@ -132,15 +132,15 @@ let cachedData = null;
 let lastFetchTime = 0;
 
 app.get('/api/map-data', async (req, res) => {
+    let last_synced = response.data.LastSynced;
     const now = Date.now();
     
     // 檢查快取（快取現在應該存整個物件，包含 stats 和 data）
     if (cachedData && (now - lastFetchTime < 300000)) {
-        console.log('COOKIE~ OISHII~')
         return res.json(cachedData);
     }
     try {
-        console.log('GET API ING......')
+        last_synced = 'NOW';
         const googleAppsScriptUrl = process.env.GOOGLE_SCRIPT_URL;
         const response = await axios.get(googleAppsScriptUrl);
         
@@ -171,14 +171,15 @@ app.get('/api/map-data', async (req, res) => {
                 experience: item['請問您在那裏都經歷了什麼？'],
                 HMaster: item['校長名字'] || "",
                 scandal: item['學校的醜聞'] || "",
-                contact: item['學校的聯繫方式'] || ""
+                contact: item['學校的聯繫方式'] || "",
+                inputType: item['請問您是什麽身份？'] || ""
             };
         });
 
         // --- 組合最終結果 ---
         const finalResponse = {
             avg_age:response.data.avg_age,
-            last_synced: response.data.LastSynced,
+            last_synced,
             statistics: statistics,
             data: cleanData
         };
