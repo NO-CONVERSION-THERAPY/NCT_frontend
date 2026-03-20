@@ -65,7 +65,7 @@ fetch(apiUrl)
             .map(item => `<strong>${item.province}</strong>: ${item.count}`)
             .join(', ');
         document.getElementById('province-dist').innerHTML = statistics;
-        document.getElementById('lastSynced').innerText = jsonResponse.last_synced;
+        document.getElementById('lastSynced').innerText = Date.now - jsonResponse.last_synced;
         document.getElementById('avgAge').innerText = jsonResponse.avg_age;
     
         document.getElementById('total-count').innerText = data.length;
