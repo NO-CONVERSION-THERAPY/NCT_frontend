@@ -7,12 +7,28 @@ flex-direction: column;
     <input type="text" name="school_name" id="school_input" placeholder="检索" required>
     <div id="results_list"></div>
 </div>
+
+<h3>標簽</h3>
+<div style="display: flex;     flex-direction: row;
+    justify-content: center;">
+    <div class="div">
+        <h3>填寫類型</h3>
+        <a href="/map">全部</a><br>
+        <a href="?inputType=受害者本人">受害者本人</a><br>
+        <a href="?inputType=受害者的代理人">受害者的代理人</a>
+    </div>
+</div>
+
 <div id="data-container" style="
 display: flex;
 flex-direction: column;
     align-items: center;"></div>
 
 <script>
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const inputType = urlParams.get('inputType')
+    
     async function loadData() {
         try {
             // 2. 獲取數據
@@ -24,6 +40,8 @@ flex-direction: column;
 
             // 3. 循環處理
             rawData.forEach(item => {
+                if(item.inputType != inputType && inputType) return;
+
                 const card = document.createElement('details');
                 card.className = 'div';
                 card.style.width = '100%'

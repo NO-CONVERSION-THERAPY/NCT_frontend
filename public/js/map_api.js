@@ -70,11 +70,12 @@ fetch(apiUrl)
         function timeUpdate() {
             const elapsed = Math.floor((Date.now() - lastSyncedTime) / 1000);
             let updButton = (elapsed > 300000) ? '，<button onclick="window.location.reload();">刷新</button>' : ''
+            console.log(updButton)
             document.getElementById('lastSynced').innerHTML = elapsed + ` 秒前${updButton}`;
         }
         setInterval(timeUpdate, 1000);
         
-        document.getElementById('avgAge').innerText = jsonResponse.avg_age;
+        document.getElementById('avgAge').innerText = jsonResponse.avg_age.toFixed(2);
     
         document.getElementById('total-count').innerText = data.length;
         

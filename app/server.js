@@ -26,6 +26,7 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.render('index', {
     t:req.t,
+    title: `主頁|${title}`,
     apiUrl
   });
 });
@@ -188,8 +189,8 @@ app.get('/api/map-data', async (req, res) => {
         res.json(finalResponse);
 
     } catch (error) {
-        console.error("API Error:", error.message);
         if (cachedData) return res.json(cachedData);
+        console.error("API Error:", error.message);
         res.status(500).json({ error: "無法取得地圖數據" });
     }
 });
