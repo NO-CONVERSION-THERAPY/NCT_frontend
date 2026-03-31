@@ -1,5 +1,10 @@
 const express = require('express');
+const fs = require('fs');
+const path = require('path');
+const marked = require('marked');
 const { loadFriends } = require('../services/friendsService');
+const { paths } = require('../../config/fileConfig');
+const { getPortTags } = require('../services/markedService');
 
 // 页面路由只负责渲染模板，不承载表单提交或 API 逻辑。
 function createPageRoutes({ apiUrl, areaOptions, formRules, title }) {
@@ -50,6 +55,50 @@ function createPageRoutes({ apiUrl, areaOptions, formRules, title }) {
       t: req.t,
       apiUrl
     });
+  });
+
+  router.get('/blog', (req,res) => {
+    const SavedTags = JSON.parse(fs.readFileSync(paths.blogData, 'utf-8'));
+    
+    const QTag = req.query.tag;//現在頁面的query tag是什麽
+    let filteredPort = SavedTags.Data;//篩選的數據
+
+    const AllTags = SavedTags.TagList;
+
+    if(QTag) filteredPort = SavedTags.Data.filter(p => p.tagid && p.tagid.includes(QTag));//篩選SavedTags裏面的tagid是Tag的
+
+    res.render('blog', {
+      SavedTags:filteredPort,//數據（已篩選）
+      QTag,//現在的query
+      AllTags,//所有tag的數據
+      t: req.t, 
+      apiUrl,
+      title:`博客|${title}`
+    })
+  })
+
+  router.get('/port/:id', (req, res) => {
+    const mdName = req.params.id;
+    const protDir = paths.blog;
+    const mdPath = path.join(protDir, `${mdName}.md`);
+    
+    if (!fs.existsSync(mdPath)) {
+      return res.status(404).send('文章不存在');
+    }
+    
+    const content = fs.readFileSync(mdPath, 'utf-8');
+    const [language, time, ...titleArr] = mdName.split('.');
+    const title_B = mdName;
+    const rawHtml = marked.parse(content);
+    
+    const report = {
+      language, 
+      time, 
+      title,
+      html: rawHtml
+    };
+    
+    res.render('blogs', { reports: [report], t: req.t, title:`${title_B}|${title}`});
   });
 
   return router;

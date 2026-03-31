@@ -4,6 +4,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const { apiUrl, formDryRun, googleFormUrl, googleScriptUrl, submitRateLimitMax, title } = require('../config/appConfig');
 const { areaOptions, formRules } = require('../config/formConfig');
+const { paths } = require('../config/fileConfig');
 const { helmetConfig, requestBodyLimits } = require('../config/security');
 const createApiRoutes = require('./routes/apiRoutes');
 const createFormRoutes = require('./routes/formRoutes');
@@ -17,8 +18,8 @@ app.use(cors());
 app.use(helmet(helmetConfig));
 
 // 模板与静态资源根目录。
-app.set('views', path.join(__dirname, '../views'));
-app.use(express.static(path.join(__dirname, '../public')));
+app.set('views', paths.views);
+app.use(express.static(paths.public));
 app.set('view engine', 'ejs');
 
 // 限制请求体大小，避免超大 payload 直接打进业务逻辑。
