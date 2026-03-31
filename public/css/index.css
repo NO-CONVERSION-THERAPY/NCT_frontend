@@ -31,7 +31,7 @@ p {
     margin-bottom: 2.5rem;
 }
 .btn {
-    margin: 10px;
+    margin: auto 10px;
     display: inline-block;
     padding: 15px 40px;
     background-color: var(--accent);

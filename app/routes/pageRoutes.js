@@ -1,14 +1,8 @@
 const express = require('express');
 const { loadFriends } = require('../services/friendsService');
-const fileService = require('../services/markedService');
 
 // 页面路由只负责渲染模板，不承载表单提交或 API 逻辑。
-function createPageRoutes({
-  apiUrl,
-  areaOptions,
-  formRules,
-  title
- }) {
+function createPageRoutes({ apiUrl, areaOptions, formRules, title }) {
   const router = express.Router();
 
   // 首頁：项目导航入口。
@@ -55,40 +49,6 @@ function createPageRoutes({
     res.render('debug', {
       t: req.t,
       apiUrl
-    });
-  });
-
-  //博客页面
-  router.get('/blog', (req, res) => {
-    const SavedTags = fileService.getPortTags();
-    const QTag = req.query.tag;
-    let filteredPort = SavedTags.Data;
-
-    // 有 tag 参数则过滤
-    if (QTag) {
-      filteredPort = SavedTags.Data.filter(p => p.tagid && p.tagid.includes(QTag));
-    }
-    res.render('blogs', {
-      SavedTags: filteredPort,
-      QTag,
-      title:`blog|${title}`,
-      AllTags: SavedTags.TagList,
-      apiUrl,
-      t: req.t
-    });
-  });
-  // 单篇报告页面
-  router.get('/blog/:id', (req, res) => {
-    const id = req.params.id;
-    const report = fileService.getSingleReport(id);
-
-    if (!report) return res.status(404).send('文章不存在');
-
-    res.render('blog', {
-      reports: [report],
-      t: req.t,
-      apiUrl,
-      title:`blog|${title}`
     });
   });
 
