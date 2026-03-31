@@ -1,0 +1,36 @@
+
+
+
+<%- include('partials/head') %>
+<html>
+<head>
+    <style>
+        body > * {
+            width: 70%;
+        }
+        #markdown h1,h2,h3,h4,h5,h6{
+            padding-bottom: 0.3em;
+            padding-top: 0.3em;
+        }
+        #markdown h1,h2,h3{
+            border-bottom: 1px solid #bcbcbc;
+        }
+        #markdown *{
+            margin: 10px auto;
+        }
+    </style>
+</head>
+<body>
+    <p><a href="/">返回首页</a></p>
+    <p><a href="/blog">所有文章</a></p>
+    <% reports.forEach(report => { %>
+        <main class="main">
+            <div class="DivStyle-Glass port" id="markdown">
+                <%- report.html %>
+            </div>
+        </main>
+    <% }) %>
+    <%- include('partials/foot') %>
+</body>
+</html>
+

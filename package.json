@@ -13,13 +13,17 @@
     "axios": "^1.13.5",
     "china-area-data": "^5.0.1",
     "cors": "^2.8.6",
+    "dompurify": "^3.3.3",
     "dotenv": "^17.3.1",
     "ejs": "^4.0.1",
     "express": "^5.2.1",
     "express-rate-limit": "^8.3.1",
     "fs": "^0.0.1-security",
     "helmet": "^8.1.0",
+    "jsdom": "^29.0.1",
+    "marked": "^17.0.5",
     "node-fetch": "^3.3.2",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "serverless-http": "^4.0.0"
   }
 }
