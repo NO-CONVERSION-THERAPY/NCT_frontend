@@ -420,7 +420,7 @@ window.getSharedMapData()
         });
         chartInstances.push(provinceChart);
 
-        const statisticsForm = jsonResponse.statistics;
+        const statisticsForm = jsonResponse.statisticsForm;
         const provinceChartForm = new Chart(document.getElementById('provForm'), {//提交的表單的各省數據
             type: 'pie',
             data: {
