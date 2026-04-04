@@ -103,23 +103,30 @@ npm test
 
 ### 常用環境變數
 
-| 變數 | 用途 | 建議 |
-| --- | --- | --- |
-| `TITLE` | 站點標題 | 一般填 `N·C·T` |
-| `DEBUG_MOD` | 是否開啓調試頁 | 本地 `true`，正式 `false` |
-| `FORM_DRY_RUN` | 是否只預覽提交、不真正送出 | 本地 `true`，正式 `false` |
-| `SITE_URL` | 站點正式網址 | 正式環境必填自己的域名 |
-| `SUBMIT_RATE_LIMIT_MAX` | 15 分鐘內單 IP 最多提交次數 | 正式環境建議保留或按需調整 |
-| `FORM_PROTECTION_SECRET` | 表單防刷簽名密鑰 | 正式環境強烈建議顯式設置 |
-| `FORM_PROTECTION_MIN_FILL_MS` | 最短填寫時間 | 預設 `3000` |
-| `FORM_PROTECTION_MAX_AGE_MS` | 表單 token 最長有效期 | 預設 `86400000` |
-| `FORM_ID` | Google Form ID | 不填則使用內建預設值 |
-| `GOOGLE_SCRIPT_URL` | 私有 Google Apps Script 資料源 | 有私有資料源時填寫 |
-| `PUBLIC_MAP_DATA_URL` | 公開地圖 API 地址 | 一般填你的 `/api/map-data` |
-| `GOOGLE_CLOUD_TRANSLATION_API_KEY` | Google Cloud Translation API Key | 啓用翻譯功能時必填 |
-| `TRANSLATION_PROVIDER_TIMEOUT_MS` | 翻譯請求超時 | 預設 `10000` |
-| `TRUST_PROXY` | 是否信任反向代理 | Workers / 代理環境建議啓用 |
-| `RATE_LIMIT_REDIS_URL` | 共享限流存儲 | 多實例部署強烈建議配置 |
+說明：
+
+- `必要`：正式部署建議顯式配置。
+- `按需`：只在啓用對應能力時必填。
+- `非必要`：留空時會使用默認值或降級行為。
+
+| 變數 | 是否必填 | 默認值 | 用途 / 備註 |
+| --- | --- | --- | --- |
+| `TITLE` | 非必要 | 空 | 站點標題；建議填 `N·C·T` |
+| `DEBUG_MOD` | 非必要 | `false` | 是否開啓調試頁；本地可設 `true` |
+| `FORM_DRY_RUN` | 非必要 | `false` | 是否只預覽提交、不真正送出 |
+| `SITE_URL` | 必要 | `https://nct.hosinoneko.me` | 站點正式網址，用於 `sitemap.xml`、`robots.txt` 等 |
+| `PORT` | 非必要 | `3000` | 本地 Node 啓動端口 |
+| `SUBMIT_RATE_LIMIT_MAX` | 非必要 | `5` | 15 分鐘內單 IP 最多提交次數 |
+| `FORM_PROTECTION_SECRET` | 非必要 | 自動派生 | 未配置時會根據 `FORM_ID`、`SITE_URL` 和 `TITLE` 派生一個值；正式環境建議顯式設置 |
+| `FORM_PROTECTION_MIN_FILL_MS` | 非必要 | `3000` | 最短填寫時間 |
+| `FORM_PROTECTION_MAX_AGE_MS` | 非必要 | `86400000` | 表單 token 最長有效期 |
+| `FORM_ID` | 非必要 | `1FAIpQLScggjQgYutXQrjQDrutyxL0eLaFMktTMRKsFWPffQGavUFspA` | Google Form ID |
+| `GOOGLE_SCRIPT_URL` | 非必要 | 空 | 私有 Google Apps Script 資料源；留空時回退公開資料源 |
+| `PUBLIC_MAP_DATA_URL` | 非必要 | `https://nct.hosinoneko.me/api/map-data` | 公開地圖 API 地址 |
+| `GOOGLE_CLOUD_TRANSLATION_API_KEY` | 按需 | 空 | Google Cloud Translation API Key；啓用翻譯功能時必填 |
+| `TRANSLATION_PROVIDER_TIMEOUT_MS` | 非必要 | `10000` | 翻譯請求超時，單位毫秒 |
+| `TRUST_PROXY` | 非必要 | `false` | 是否信任反向代理；Workers / 代理環境建議設為 `1` 或 `true` |
+| `RATE_LIMIT_REDIS_URL` | 非必要 | 空 | 共享限流存儲；留空時退回單實例記憶體限流 |
 
 ### 翻譯服務配置
 
