@@ -162,8 +162,6 @@ TRANSLATION_PROVIDER_TIMEOUT_MS="10000"
 
 ## 部署到 Cloudflare Workers
 
-本專案的正式部署流程只保留 **GitHub + Workers Builds**。
-
 倉庫根目錄已包含：
 
 - [worker.mjs](./worker.mjs)：Workers 入口
@@ -198,21 +196,13 @@ npm test
 Workers 本地開發時，建議把變數放進 `.dev.vars`。最小示例：
 
 ```bash
-TITLE="N·C·T"
-DEBUG_MOD="true"
-FORM_DRY_RUN="true"
 SITE_URL="http://127.0.0.1:8787"
-SUBMIT_RATE_LIMIT_MAX="5"
-FORM_PROTECTION_SECRET="請換成你自己的長隨機字串"
-FORM_PROTECTION_MIN_FILL_MS="3000"
-FORM_PROTECTION_MAX_AGE_MS="86400000"
-FORM_ID="1FAIpQLScggjQgYutXQrjQDrutyxL0eLaFMktTMRKsFWPffQGavUFspA"
-GOOGLE_SCRIPT_URL=""
-PUBLIC_MAP_DATA_URL="https://nct.hosinoneko.me/api/map-data"
+```
+
+如果你還想在本地測翻譯功能，再額外加上：
+
+```bash
 GOOGLE_CLOUD_TRANSLATION_API_KEY="換成你自己的正式 API Key"
-TRANSLATION_PROVIDER_TIMEOUT_MS="10000"
-TRUST_PROXY="1"
-RATE_LIMIT_REDIS_URL=""
 ```
 
 ### 2. 連接 GitHub 倉庫
@@ -239,6 +229,20 @@ RATE_LIMIT_REDIS_URL=""
 
 完成後點擊 **Save and Deploy**。
 
+#### Branch 切換注意事項
+
+- Workers Builds 初次建立專案時，通常會先跟隨 **GitHub 倉庫的默認分支**。如果你的 GitHub 默認分支還是 `main`，首次建立頁面裡看到 `main` 屬於正常現象。
+- 如果你之後想把正式部署分支改成別的分支，例如 `backendmodifi`，請到：
+  `Workers & Pages` -> 你的 Worker -> `Settings` -> `Build` -> `Branch control`
+- 在 `Branch control` 裡修改 `Production branch` 後，**只會影響之後的新提交**，不會把當前已上線版本立刻切到新分支。
+- 改完 `Production branch` 並點 `Save` 之後，請再向目標分支 **push 一次新 commit**，讓 Cloudflare 重新觸發正式部署。
+- 如果 Cloudflare 介面裡看起來還顯示舊分支，常見原因不是設定失敗，而是當前活動部署仍然是舊分支產生的版本。
+- 切換前請確認目標分支已經真實推送到 GitHub，不要只有本地存在。
+- `Builds for non-production branches`：
+  - 開啓後，非正式分支也會自動產生預覽構建。
+  - 關閉後，只有 `Production branch` 會自動部署。
+- 如果你希望 `main` 做正式環境、`dev` 或其他分支只做預覽，保留 `Builds for non-production branches` 即可；如果你希望別的分支成為正式環境，就必須在 `Branch control` 中把 `Production branch` 改過去。
+
 ### 4. 補齊 Variables 和 Secrets
 
 第一次部署完成後，請到：
@@ -253,19 +257,9 @@ RATE_LIMIT_REDIS_URL=""
 | `DEBUG_MOD` | Text | 正式環境填 `false` |
 | `FORM_DRY_RUN` | Text | 正式環境填 `false` |
 | `SITE_URL` | Text | 你的正式網址 |
-| `SUBMIT_RATE_LIMIT_MAX` | Text | 例如 `5` |
-| `FORM_PROTECTION_SECRET` | Secret | 強烈建議配置 |
-| `FORM_PROTECTION_MIN_FILL_MS` | Text | 例如 `3000` |
-| `FORM_PROTECTION_MAX_AGE_MS` | Text | 例如 `86400000` |
 | `FORM_ID` | Text | 你的 Google Form ID |
 | `GOOGLE_SCRIPT_URL` | Text 或 Secret | 有私有資料源時填 |
-| `PUBLIC_MAP_DATA_URL` | Text | 通常填你的 `/api/map-data` |
 | `GOOGLE_CLOUD_TRANSLATION_API_KEY` | Secret | 啓用翻譯功能時必填 |
-| `TRANSLATION_PROVIDER_TIMEOUT_MS` | Text | 例如 `10000` |
-| `TRUST_PROXY` | Text | 建議 `1` 或 `true` |
-| `RATE_LIMIT_REDIS_URL` | Secret | 有共享 Redis 時配置 |
-
-> 建議把 `FORM_PROTECTION_SECRET`、`GOOGLE_CLOUD_TRANSLATION_API_KEY` 與帶密碼的 `RATE_LIMIT_REDIS_URL` 設為 `Secret`，其餘非敏感值可設為 `Text`。
 
 補完變數後，重新觸發一次部署。
 
@@ -320,7 +314,6 @@ no-torsion
 
 - 模板、博客 Markdown 與 JSON 檔案會從 Workers 的 `/bundle` 讀取。
 - 翻譯服務已移除 `curl` 子進程兜底，現在固定使用 Google Cloud Translation API。
-- 若未配置正式翻譯服務，翻譯相關 API 會直接返回失敗，而不是回退原文。
 - `sitemap.xml` 在 Workers 上會優先使用文章元資料中的 `CreationDate` 作為 `lastmod`。
 - 若未配置共享 Redis，限流會退回單實例記憶體模式，跨實例一致性較弱。
 
@@ -328,9 +321,6 @@ no-torsion
 
 **Q: 本地 `npm start` 和 Workers 版本會衝突嗎？**  
 A: 不會。兩者只是不同的本地運行入口。
-
-**Q: 為什麼本地 `.env` 能跑，但上到 Workers 還要重新填變數？**  
-A: 因為 Cloudflare 線上環境不會讀你本地磁碟裡的 `.env`，必須在 Dashboard 中重新配置。
 
 **Q: 這個專案要不要額外跑前端 build？**  
 A: 目前不需要。Workers Builds 的 `Build command` 一般留空即可。
