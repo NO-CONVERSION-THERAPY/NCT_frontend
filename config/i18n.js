@@ -273,7 +273,8 @@ const messages = {
       },
       buttons: {
         openMap: '点击可直接在地图上选点',
-        submit: '确认并提交信息'
+        submit: '确认并提交信息',
+        submitting: '提交中...'
       },
       hints: {
         dateEnd: '若目前仍在校，可不填',
@@ -612,7 +613,8 @@ const messages = {
       },
       buttons: {
         openMap: '點擊可直接在地圖上選點',
-        submit: '確認並提交信息'
+        submit: '確認並提交信息',
+        submitting: '提交中...'
       },
       hints: {
         dateEnd: '若目前仍在校，可不填',
@@ -951,7 +953,8 @@ const messages = {
       },
       buttons: {
         openMap: 'Pick a point directly on the map',
-        submit: 'Confirm and Submit'
+        submit: 'Confirm and Submit',
+        submitting: 'Submitting...'
       },
       hints: {
         dateEnd: 'Leave blank if you are still enrolled',

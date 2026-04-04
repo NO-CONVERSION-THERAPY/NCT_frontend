@@ -1,4 +1,4 @@
-<%- include('partials/head') %>
+<%- include('partials/head', { includeLeafletCss: true }) %>
 <html>
 <head>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
@@ -49,8 +49,12 @@
     <h2 class="map-section-title"><%= t('map.sections.allData') %></h2>
     <%- include('partials/map_list') %>
     <button id="backToTop" type="button">↑</button>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="/js/map_api.js"></script>
-    <%- include('partials/foot') %>
+    <%- include('partials/foot', {
+        includeBackToTopScript: true,
+        includeQueryUpdScript: true
+    }) %>
 </body>
 </html>

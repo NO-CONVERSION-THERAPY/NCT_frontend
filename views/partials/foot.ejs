@@ -5,6 +5,12 @@
         <a href="/privacy"><%= t('navigation.privacy') %></a>
     </nav>
 </footer>
+<% if (typeof includeFormAutocompleteScript !== 'undefined' && includeFormAutocompleteScript) { %>
 <script src="/js/form_api.js"></script>
+<% } %>
+<% if (typeof includeBackToTopScript !== 'undefined' && includeBackToTopScript) { %>
 <script src="/js/map_backTop.js"></script>
+<% } %>
+<% if (typeof includeQueryUpdScript !== 'undefined' && includeQueryUpdScript) { %>
 <script src="/js/queryUpd.js"></script>
+<% } %>

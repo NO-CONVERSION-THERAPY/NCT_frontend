@@ -220,6 +220,9 @@ test('map page renders the record container and lazy-load sentinel', async () =>
   assert.match(response.body, /id="data-container"/);
   assert.match(response.body, /id="data-container-sentinel"/);
   assert.match(response.body, /\/js\/map_record_stats\.js/);
+  assert.match(response.body, /\/js\/map_backTop\.js/);
+  assert.match(response.body, /\/js\/queryUpd\.js/);
+  assert.match(response.body, /cdn\.jsdelivr\.net\/npm\/chart\.js/);
 });
 
 test('form page includes school name and address autocomplete hooks', async () => {
@@ -235,6 +238,11 @@ test('form page includes school name and address autocomplete hooks', async () =
   assert.match(response.body, /name="website"/);
   assert.match(response.body, /name="form_token"/);
   assert.match(response.body, /\/js\/map_data_store\.js/);
+  assert.match(response.body, /\/js\/form_api\.js/);
+  assert.doesNotMatch(response.body, /cdn\.jsdelivr\.net\/npm\/chart\.js/);
+  assert.doesNotMatch(response.body, /unpkg\.com\/leaflet@1\.9\.4\/dist\/leaflet\.js/);
+  assert.doesNotMatch(response.body, /\/js\/map_backTop\.js/);
+  assert.doesNotMatch(response.body, /\/js\/queryUpd\.js/);
 });
 
 test('area options API localizes city options for the current language', async () => {
@@ -251,6 +259,30 @@ test('area options API localizes city options for the current language', async (
     assert.match(payload.options[0].name, /^EN:/);
   } finally {
     restoreFetch();
+    clearProjectModules();
+  }
+});
+
+test('area options API returns local city options directly in zh-CN mode', async () => {
+  const originalFetch = global.fetch;
+  let fetchCalled = false;
+  global.fetch = async () => {
+    fetchCalled = true;
+    throw new Error('zh-CN area options should not trigger translation fetch');
+  };
+
+  try {
+    const app = loadApp({ DEBUG_MOD: 'false' });
+    const response = await requestPath(app, '/api/area-options?provinceCode=110000&lang=zh-CN');
+    const payload = JSON.parse(response.body);
+
+    assert.equal(response.statusCode, 200);
+    assert.ok(Array.isArray(payload.options));
+    assert.equal(payload.options[0].code, '110101');
+    assert.equal(payload.options[0].name, '东城区');
+    assert.equal(fetchCalled, false);
+  } finally {
+    global.fetch = originalFetch;
     clearProjectModules();
   }
 });
@@ -727,6 +759,31 @@ test('submit route still accepts a valid protected form in dry run mode', async 
   assert.match(response.body, /entry\.5034928/);
   assert.match(response.body, /测试学校/);
   clearProjectModules();
+});
+
+test('submitToGoogleForm stops at redirect responses instead of following them', async () => {
+  clearProjectModules();
+  const axios = require('axios');
+  const originalPost = axios.post;
+  const capturedCalls = [];
+
+  axios.post = async (...args) => {
+    capturedCalls.push(args);
+    return { status: 302 };
+  };
+
+  try {
+    const { submitToGoogleForm } = require(path.join(projectRoot, 'app/services/formService'));
+    await submitToGoogleForm('https://docs.google.com/forms/d/e/test/formResponse', 'entry.1=value');
+
+    assert.equal(capturedCalls.length, 1);
+    assert.equal(capturedCalls[0][2].maxRedirects, 0);
+    assert.equal(capturedCalls[0][2].validateStatus(302), true);
+    assert.equal(capturedCalls[0][2].validateStatus(400), false);
+  } finally {
+    axios.post = originalPost;
+    clearProjectModules();
+  }
 });
 
 test('map data service can bypass in-memory cache on force refresh', async () => {

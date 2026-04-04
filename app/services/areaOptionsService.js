@@ -14,13 +14,17 @@ function shouldTranslateAreaNames(language) {
   return language === 'en' || language === 'zh-TW';
 }
 
-async function localizeOptions(options, language) {
-  const normalizedOptions = Array.isArray(options)
+function normalizeOptions(options) {
+  return Array.isArray(options)
     ? options.map((option) => ({
       code: option.code,
       name: String(option.name || '')
     }))
     : [];
+}
+
+async function localizeOptions(options, language) {
+  const normalizedOptions = normalizeOptions(options);
 
   if (!shouldTranslateAreaNames(language) || normalizedOptions.length === 0) {
     return normalizedOptions;
@@ -57,11 +61,23 @@ async function localizeOptions(options, language) {
 }
 
 async function getLocalizedCityOptionsForProvince(provinceCode, language) {
-  return localizeOptions(cityOptionsByProvinceCode[provinceCode] || [], language);
+  const cityOptions = cityOptionsByProvinceCode[provinceCode] || [];
+
+  if (language === 'zh-CN') {
+    return normalizeOptions(cityOptions);
+  }
+
+  return localizeOptions(cityOptions, language);
 }
 
 async function getLocalizedCountyOptionsForCity(cityCode, language) {
-  return localizeOptions(countiesByCityCode[cityCode] || [], language);
+  const countyOptions = countiesByCityCode[cityCode] || [];
+
+  if (language === 'zh-CN') {
+    return normalizeOptions(countyOptions);
+  }
+
+  return localizeOptions(countyOptions, language);
 }
 
 module.exports = {

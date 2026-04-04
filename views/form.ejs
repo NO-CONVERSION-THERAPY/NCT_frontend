@@ -120,8 +120,8 @@
     </form>
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="/js/map_data_store.js"></script>
+<script src="/js/form_api.js"></script>
 <script>
     window.AREA_SELECTOR_DATA = <%- JSON.stringify(areaOptions) %>;
     window.FORM_RULES = <%- JSON.stringify(formRules) %>;
@@ -143,6 +143,7 @@
     const dateStartInput = document.getElementById('date_start');
     const dateEndInput = document.getElementById('date_end');
     const contactInformationInput = document.getElementById('contactInformationInput');
+    const submitButton = mainForm.querySelector('button[type="submit"]');
 
     function clearValidity(input) {
         input.setCustomValidity('');
@@ -230,6 +231,12 @@
         if (!mainForm.checkValidity()) {
             e.preventDefault();
             mainForm.reportValidity();
+            return;
+        }
+
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.textContent = i18n.form.buttons.submitting || i18n.common.loading;
         }
     });
 </script>

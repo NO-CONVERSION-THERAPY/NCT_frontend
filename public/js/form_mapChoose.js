@@ -2,6 +2,7 @@
     let currentMarker = null;
     let formMap = null;
     let formMapTileLayer = null;
+    let leafletAssetsPromise = null;
     const i18n = window.I18N;
     const openMapButton = document.getElementById('openMapButton');
     const themeMediaQuery = typeof window.matchMedia === 'function'
@@ -29,6 +30,54 @@
         });
     }
 
+    function ensureLeafletCss() {
+        if (document.querySelector('link[data-form-leaflet-css]')) {
+            return;
+        }
+
+        const stylesheet = document.createElement('link');
+        stylesheet.rel = 'stylesheet';
+        stylesheet.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+        stylesheet.setAttribute('data-form-leaflet-css', 'true');
+        document.head.appendChild(stylesheet);
+    }
+
+    function loadLeafletScript() {
+        return new Promise((resolve, reject) => {
+            const existingScript = document.querySelector('script[data-form-leaflet-script]');
+            if (existingScript) {
+                existingScript.addEventListener('load', resolve, { once: true });
+                existingScript.addEventListener('error', reject, { once: true });
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+            script.async = true;
+            script.setAttribute('data-form-leaflet-script', 'true');
+            script.addEventListener('load', resolve, { once: true });
+            script.addEventListener('error', reject, { once: true });
+            document.body.appendChild(script);
+        });
+    }
+
+    async function ensureLeafletAssets() {
+        if (typeof L !== 'undefined') {
+            return;
+        }
+
+        if (!leafletAssetsPromise) {
+            ensureLeafletCss();
+            leafletAssetsPromise = loadLeafletScript()
+                .catch((error) => {
+                    leafletAssetsPromise = null;
+                    throw error;
+                });
+        }
+
+        await leafletAssetsPromise;
+    }
+
     function mountFormMapTileLayer() {
         if (!formMap) {
             return;
@@ -42,10 +91,12 @@
         formMapTileLayer.addTo(formMap);
     }
 
-    function ensureFormMap() {
+    async function ensureFormMap() {
         if (formMap) {
             return formMap;
         }
+
+        await ensureLeafletAssets();
 
         const mapContainer = document.getElementById('map');
         if (!mapContainer || typeof L === 'undefined') {
@@ -80,7 +131,7 @@
         return formMap;
     }
 
-    window.openMap = function openMap() {
+    window.openMap = async function openMap() {
         const mapContainer = document.getElementById('map');
         if (!mapContainer) {
             return;
@@ -93,7 +144,20 @@
             return;
         }
 
-        const mapInstance = ensureFormMap();
+        if (openMapButton) {
+            openMapButton.disabled = true;
+        }
+
+        let mapInstance = null;
+
+        try {
+            mapInstance = await ensureFormMap();
+        } finally {
+            if (openMapButton) {
+                openMapButton.disabled = false;
+            }
+        }
+
         if (!mapInstance) {
             return;
         }
