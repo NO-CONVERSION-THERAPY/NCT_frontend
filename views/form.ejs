@@ -54,13 +54,18 @@
 
         <div class="form-group">
             <label class="required"><%= t('form.fields.schoolName') %></label>
-            <input type="text" name="school_name" id="school_input" placeholder="<%= t('form.placeholders.schoolName') %>" maxlength="<%= formRules.schoolName.maxLength %>" required>
-            <div id="results_list"></div>
+            <div class="autocomplete-field">
+                <input type="text" name="school_name" id="school_input" placeholder="<%= t('form.placeholders.schoolName') %>" maxlength="<%= formRules.schoolName.maxLength %>" autocomplete="off" required>
+                <div id="school_results_list" class="autocomplete-results" hidden></div>
+            </div>
         </div>
 
         <div class="form-group">
             <label><%= t('form.fields.schoolAddress') %></label>
-            <input type="text" name="school_address" placeholder="<%= t('form.placeholders.schoolAddress') %>" id="addr" maxlength="<%= formRules.schoolAddress.maxLength %>">
+            <div class="autocomplete-field">
+                <input type="text" name="school_address" placeholder="<%= t('form.placeholders.schoolAddress') %>" id="addr" maxlength="<%= formRules.schoolAddress.maxLength %>" autocomplete="off">
+                <div id="address_results_list" class="autocomplete-results" hidden></div>
+            </div>
             <button id="openMapButton" type="button"><%= t('form.buttons.openMap') %></button>
             <div id="map" style="display: none; width: 100%; height: 20em;"></div>
         </div>
@@ -110,6 +115,7 @@
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/js/map_data_store.js"></script>
 <script>
     window.AREA_SELECTOR_DATA = <%- JSON.stringify(areaOptions) %>;
     window.FORM_RULES = <%- JSON.stringify(formRules) %>;

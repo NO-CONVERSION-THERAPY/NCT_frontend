@@ -12,6 +12,7 @@ function getColor(d) {
 
 const i18n = window.I18N;
 const MAP_DATA_REFRESH_INTERVAL_SECONDS = 300;
+const { getElapsedSeconds, renderLastSyncedValue } = window.MapTimeUtils;
 const themeMediaQuery = typeof window.matchMedia === 'function'
     ? window.matchMedia('(prefers-color-scheme: dark)')
     : null;
@@ -164,46 +165,6 @@ function escapeHtml(value) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
-}
-
-function isValidTimestamp(value) {
-    return Number.isFinite(value) && value > 0;
-}
-
-function getElapsedSeconds(lastSyncedTime) {
-    if (!isValidTimestamp(lastSyncedTime)) {
-        return null;
-    }
-
-    return Math.max(0, Math.floor((Date.now() - lastSyncedTime) / 1000));
-}
-
-function renderLastSyncedValue(lastSyncedElement, { elapsedSeconds, refreshInProgress, onRefresh }) {
-    if (!lastSyncedElement) {
-        return;
-    }
-
-    lastSyncedElement.replaceChildren();
-
-    const valueElement = document.createElement('b');
-    valueElement.textContent = elapsedSeconds === null
-        ? i18n.common.loading
-        : formatMessage(i18n.map.stats.secondsAgo, { seconds: elapsedSeconds });
-    lastSyncedElement.appendChild(valueElement);
-
-    if (elapsedSeconds === null || elapsedSeconds <= MAP_DATA_REFRESH_INTERVAL_SECONDS) {
-        return;
-    }
-
-    lastSyncedElement.appendChild(document.createTextNode(', '));
-
-    const refreshButton = document.createElement('button');
-    refreshButton.type = 'button';
-    refreshButton.className = 'map-refresh-button';
-    refreshButton.textContent = refreshInProgress ? i18n.common.loading : i18n.map.stats.refresh;
-    refreshButton.disabled = refreshInProgress;
-    refreshButton.addEventListener('click', onRefresh);
-    lastSyncedElement.appendChild(refreshButton);
 }
 
 function showMapDataError(message) {
@@ -476,7 +437,9 @@ window.getSharedMapData()
             renderLastSyncedValue(lastSyncedElement, {
                 elapsedSeconds: elapsed,
                 refreshInProgress,
-                onRefresh: forceRefreshMapData
+                onRefresh: forceRefreshMapData,
+                i18n,
+                refreshIntervalSeconds: MAP_DATA_REFRESH_INTERVAL_SECONDS
             });
         }
 

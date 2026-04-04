@@ -136,12 +136,52 @@ function installTranslationFetchStub(prefix = 'EN:') {
   };
 }
 
+function createFakeNode(tagName, textContent = '') {
+  return {
+    tagName,
+    textContent,
+    children: [],
+    disabled: false,
+    type: '',
+    className: '',
+    listeners: new Map(),
+    appendChild(child) {
+      this.children.push(child);
+      return child;
+    },
+    replaceChildren(...children) {
+      this.children = [...children];
+    },
+    addEventListener(eventName, listener) {
+      this.listeners.set(eventName, listener);
+    }
+  };
+}
+
+function createFakeDocument() {
+  return {
+    createElement(tagName) {
+      return createFakeNode(tagName);
+    },
+    createTextNode(textContent) {
+      return createFakeNode('#text', textContent);
+    }
+  };
+}
+
+function collectNodeText(node) {
+  return [node.textContent, ...node.children.map((child) => collectNodeText(child))].join('');
+}
+
 test('root page renders successfully', async () => {
   const app = loadApp({ DEBUG_MOD: 'false' });
   const response = await requestPath(app, '/');
 
   assert.equal(response.statusCode, 200);
   assert.match(response.body, /NO CONVERSION THERAPY/i);
+  assert.match(response.body, /window\.API_URL = "/);
+  assert.match(response.body, /\/js\/map_data_store\.js/);
+  assert.match(response.body, /\/js\/map_preload\.js/);
 });
 
 test('map page renders the record container and lazy-load sentinel', async () => {
@@ -151,6 +191,16 @@ test('map page renders the record container and lazy-load sentinel', async () =>
   assert.equal(response.statusCode, 200);
   assert.match(response.body, /id="data-container"/);
   assert.match(response.body, /id="data-container-sentinel"/);
+});
+
+test('form page includes school name and address autocomplete hooks', async () => {
+  const app = loadApp({ DEBUG_MOD: 'false' });
+  const response = await requestPath(app, '/form');
+
+  assert.equal(response.statusCode, 200);
+  assert.match(response.body, /id="school_results_list"/);
+  assert.match(response.body, /id="address_results_list"/);
+  assert.match(response.body, /\/js\/map_data_store\.js/);
 });
 
 test('sitemap.xml lists static pages and blog articles', async () => {
@@ -375,6 +425,90 @@ test('map data service preserves valid upstream sync timestamps', () => {
   assert.equal(resolveLastSyncedTimestamp('1774925078387', 123), 1774925078387);
   assert.equal(resolveLastSyncedTimestamp(undefined, 123), 123);
   assert.equal(resolveLastSyncedTimestamp('-1', 123), 123);
+});
+
+test('map timer renders elapsed seconds and adds refresh control after the refresh interval', () => {
+  clearProjectModules();
+  const { getElapsedSeconds, renderLastSyncedValue } = require(path.join(projectRoot, 'public/js/map_time_utils'));
+  const documentRef = createFakeDocument();
+  const lastSyncedElement = createFakeNode('span');
+  let refreshTriggered = false;
+
+  renderLastSyncedValue(lastSyncedElement, {
+    elapsedSeconds: getElapsedSeconds(1000, 43000),
+    refreshInProgress: false,
+    onRefresh() {
+      refreshTriggered = true;
+    },
+    i18n: {
+      common: {
+        loading: '加载中...'
+      },
+      map: {
+        stats: {
+          secondsAgo: '{seconds} 秒前',
+          refresh: '刷新'
+        }
+      }
+    },
+    refreshIntervalSeconds: 300,
+    documentRef
+  });
+
+  assert.equal(collectNodeText(lastSyncedElement), '42 秒前');
+  assert.equal(lastSyncedElement.children.length, 1);
+
+  renderLastSyncedValue(lastSyncedElement, {
+    elapsedSeconds: getElapsedSeconds(1000, 306000),
+    refreshInProgress: false,
+    onRefresh() {
+      refreshTriggered = true;
+    },
+    i18n: {
+      common: {
+        loading: '加载中...'
+      },
+      map: {
+        stats: {
+          secondsAgo: '{seconds} 秒前',
+          refresh: '刷新'
+        }
+      }
+    },
+    refreshIntervalSeconds: 300,
+    documentRef
+  });
+
+  assert.equal(collectNodeText(lastSyncedElement), '305 秒前, 刷新');
+  assert.equal(lastSyncedElement.children.length, 3);
+
+  const refreshButton = lastSyncedElement.children[2];
+  assert.equal(refreshButton.tagName, 'button');
+  assert.equal(refreshButton.disabled, false);
+
+  refreshButton.listeners.get('click')();
+  assert.equal(refreshTriggered, true);
+});
+
+test('form autocomplete records are deduplicated and searchable by both school name and address', () => {
+  clearProjectModules();
+  const { buildAutocompleteRecords, getAutocompleteSuggestions } = require(path.join(projectRoot, 'public/js/form_api'));
+
+  const records = buildAutocompleteRecords([
+    { name: '青岛启明学校', addr: '山东省青岛市市南区香港中路 1 号' },
+    { name: '青岛启明学校', addr: '山东省青岛市市南区香港中路 1 号' },
+    { name: '济南晨光学校', addr: '山东省济南市历下区泉城路 8 号' }
+  ]);
+
+  assert.equal(records.length, 2);
+  assert.deepEqual(
+    getAutocompleteSuggestions(records, '启明', 'name').map((record) => record.name),
+    ['青岛启明学校']
+  );
+  assert.deepEqual(
+    getAutocompleteSuggestions(records, '泉城路', 'address').map((record) => record.addr),
+    ['山东省济南市历下区泉城路 8 号']
+  );
 });
 
 test('map data service can bypass in-memory cache on force refresh', async () => {

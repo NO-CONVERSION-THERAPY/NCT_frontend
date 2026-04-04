@@ -8,6 +8,7 @@
         <link rel="stylesheet" href="/css/index.css">
         <link rel="icon" href="/favicon.svg"/>
         <script>
+            window.API_URL = "<%= apiUrl %>";
             window.APP_LANG = "<%= lang %>";
             window.I18N = <%- JSON.stringify(clientMessages) %>;
         </script>
@@ -27,6 +28,8 @@
             </div>
         </div>
 
+        <script src="/js/map_data_store.js"></script>
+        <script src="/js/map_preload.js"></script>
         <script src="/js/language_switcher.js"></script>
         <%- include('partials/foot') %>
     </body>
