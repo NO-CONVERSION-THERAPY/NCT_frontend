@@ -73,6 +73,10 @@ GOOGLE_SCRIPT_URL=""
 
 # 公開地圖資料 API
 PUBLIC_MAP_DATA_URL="https://nct.hosinoneko.me/api/map-data"
+
+# 若部署在 Nginx / Caddy / Vercel 等反向代理後，可設為 1 或 true
+# 讓限流與審計正確識別用戶真實 IP。Vercel 會自動開啓。
+TRUST_PROXY="false"
 ```
 
 常見配置建議：
@@ -80,6 +84,7 @@ PUBLIC_MAP_DATA_URL="https://nct.hosinoneko.me/api/map-data"
 - 本地開發：保留 `DEBUG_MOD="true"` 與 `FORM_DRY_RUN="true"`。
 - 正式部署：將 `DEBUG_MOD="false"`、`FORM_DRY_RUN="false"`，並把 `SITE_URL` 改成你的正式網域。
 - 若你有自己的 Google Apps Script 資料源，請填入 `GOOGLE_SCRIPT_URL`；否則網站會退回使用 `PUBLIC_MAP_DATA_URL`。
+- 如果你把站點放在反向代理後面，自行部署時建議一併設置 `TRUST_PROXY="1"`。
 
 *一般來説 `TITLE` 填 `NO CONVERSION THERAPY` 就可以了。*
 

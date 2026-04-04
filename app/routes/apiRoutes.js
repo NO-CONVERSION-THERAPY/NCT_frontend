@@ -1,10 +1,41 @@
 const express = require('express');
+const cors = require('cors');
+const { createRateLimiter } = require('../../config/security');
 const { getMapData } = require('../services/mapDataService');
 const { translateDetailItems } = require('../services/textTranslationService');
 
 // API 路由只负责把 service 层返回的数据转成 HTTP 响应。
 function createApiRoutes({ googleScriptUrl, publicMapDataUrl }) {
   const router = express.Router();
+  const publicMapDataCors = cors({
+    origin: '*',
+    methods: ['GET'],
+    maxAge: 86400,
+    optionsSuccessStatus: 204
+  });
+  const refreshRateLimiter = createRateLimiter({
+    windowMs: 5 * 60 * 1000,
+    max: 3,
+    skip(req) {
+      return !shouldForceRefresh(req);
+    },
+    getMessage(req) {
+      return req.t('server.tooManyRequests');
+    },
+    sendLimitResponse(_req, res, statusCode, message) {
+      return res.status(statusCode).json({ error: message });
+    }
+  });
+  const translateRateLimiter = createRateLimiter({
+    windowMs: 15 * 60 * 1000,
+    max: 80,
+    getMessage(req) {
+      return req.t('server.tooManyRequests');
+    },
+    sendLimitResponse(_req, res, statusCode, message) {
+      return res.status(statusCode).json({ error: message });
+    }
+  });
 
   function shouldForceRefresh(req) {
     const value = req.query.refresh;
@@ -12,7 +43,9 @@ function createApiRoutes({ googleScriptUrl, publicMapDataUrl }) {
   }
 
   // 对外公开的地图数据接口。
-  router.get('/api/map-data', async (req, res) => {
+  router.options('/api/map-data', publicMapDataCors);
+
+  router.get('/api/map-data', publicMapDataCors, refreshRateLimiter, async (req, res) => {
     try {
       const mapData = await getMapData({
         forceRefresh: shouldForceRefresh(req),
@@ -26,7 +59,7 @@ function createApiRoutes({ googleScriptUrl, publicMapDataUrl }) {
     }
   });
 
-  router.post('/api/translate-text', async (req, res) => {
+  router.post('/api/translate-text', translateRateLimiter, async (req, res) => {
     try {
       const items = Array.isArray(req.body.items) ? req.body.items : [];
       const targetLanguage = req.body.targetLanguage;

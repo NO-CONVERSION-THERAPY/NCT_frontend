@@ -1,7 +1,10 @@
 // 地图数据缓存放在 service 层，避免每次请求都直打 Apps Script。
 let cachedData = null;
 let lastFetchTime = 0;
+let inFlightRequest = null;
+let lastForceRefreshTime = 0;
 const cacheDurationMs = 300000;
+const forceRefreshCooldownMs = 30000;
 
 function resolveLastSyncedTimestamp(lastSynced, fallbackTimestamp) {
   const numericLastSynced = Number(lastSynced);
@@ -59,40 +62,64 @@ async function getMapData({ forceRefresh = false, googleScriptUrl, publicMapData
     return cachedData;
   }
 
+  if (forceRefresh && cachedData && now - lastForceRefreshTime < forceRefreshCooldownMs) {
+    return cachedData;
+  }
+
+  if (inFlightRequest) {
+    return cachedData && !forceRefresh ? cachedData : inFlightRequest;
+  }
+
+  if (forceRefresh) {
+    lastForceRefreshTime = now;
+  }
+
+  const request = (async () => {
+    try {
+      const dataSourceUrl = resolveMapDataSource({ googleScriptUrl, publicMapDataUrl });
+      const response = await fetch(dataSourceUrl, {
+        signal: AbortSignal.timeout(10000)
+      });
+
+      if (!response.ok) {
+        throw new Error(`地圖數據源返回 ${response.status}`);
+      }
+
+      const responseBody = await response.json();
+      const rawData = normalizeRawData(responseBody.data);
+      const avgAge = Number(responseBody.avg_age);
+      const finalResponse = {
+        avg_age: Number.isFinite(avgAge) ? avgAge : 0,
+        last_synced: resolveLastSyncedTimestamp(responseBody.last_synced, now),
+        statistics: Array.isArray(responseBody.statistics) ? responseBody.statistics : [],
+        data: cleanMapData(rawData)
+      };
+
+      cachedData = finalResponse;
+      lastFetchTime = now;
+
+      return finalResponse;
+    } catch (error) {
+      if (cachedData) {
+        return cachedData;
+      }
+
+      if (error instanceof SyntaxError) {
+        throw new Error('數據解析失敗');
+      }
+
+      throw error;
+    }
+  })();
+
+  inFlightRequest = request;
+
   try {
-    const dataSourceUrl = resolveMapDataSource({ googleScriptUrl, publicMapDataUrl });
-    const response = await fetch(dataSourceUrl, {
-      signal: AbortSignal.timeout(10000)
-    });
-
-    if (!response.ok) {
-      throw new Error(`地圖數據源返回 ${response.status}`);
+    return await request;
+  } finally {
+    if (inFlightRequest === request) {
+      inFlightRequest = null;
     }
-
-    const responseBody = await response.json();
-    const rawData = normalizeRawData(responseBody.data);
-    const avgAge = Number(responseBody.avg_age);
-    const finalResponse = {
-      avg_age: Number.isFinite(avgAge) ? avgAge : 0,
-      last_synced: resolveLastSyncedTimestamp(responseBody.last_synced, now),
-      statistics: Array.isArray(responseBody.statistics) ? responseBody.statistics : [],
-      data: cleanMapData(rawData)
-    };
-
-    cachedData = finalResponse;
-    lastFetchTime = now;
-
-    return finalResponse;
-  } catch (error) {
-    if (cachedData) {
-      return cachedData;
-    }
-
-    if (error instanceof SyntaxError) {
-      throw new Error('數據解析失敗');
-    }
-
-    throw error;
   }
 }
 
@@ -101,6 +128,8 @@ module.exports = {
   resolveLastSyncedTimestamp,
   resetMapDataCache() {
     cachedData = null;
+    inFlightRequest = null;
     lastFetchTime = 0;
+    lastForceRefreshTime = 0;
   }
 };

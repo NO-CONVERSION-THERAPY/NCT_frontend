@@ -2,6 +2,8 @@ const { execFile } = require('child_process');
 const { promisify } = require('util');
 
 const translationCache = new Map();
+const translationCacheMaxEntries = 250;
+const translationCacheTtlMs = 6 * 60 * 60 * 1000;
 const execFileAsync = promisify(execFile);
 
 function normalizeTargetLanguage(targetLanguage) {
@@ -14,6 +16,53 @@ function normalizeTargetLanguage(targetLanguage) {
 
 function getCacheKey(targetLanguage, text) {
   return `${targetLanguage}::${text}`;
+}
+
+function pruneExpiredTranslations(now = Date.now()) {
+  for (const [cacheKey, entry] of translationCache.entries()) {
+    if (!entry || entry.expiresAt <= now) {
+      translationCache.delete(cacheKey);
+    }
+  }
+}
+
+function readCachedTranslation(cacheKey) {
+  const cacheEntry = translationCache.get(cacheKey);
+
+  if (!cacheEntry) {
+    return null;
+  }
+
+  if (cacheEntry.expiresAt <= Date.now()) {
+    translationCache.delete(cacheKey);
+    return null;
+  }
+
+  // 命中时刷新 LRU 顺序，避免热点翻译被过早淘汰。
+  translationCache.delete(cacheKey);
+  translationCache.set(cacheKey, cacheEntry);
+  return cacheEntry.value;
+}
+
+function writeCachedTranslation(cacheKey, translatedText) {
+  if (translationCache.has(cacheKey)) {
+    translationCache.delete(cacheKey);
+  }
+
+  translationCache.set(cacheKey, {
+    value: translatedText,
+    expiresAt: Date.now() + translationCacheTtlMs
+  });
+
+  while (translationCache.size > translationCacheMaxEntries) {
+    const oldestCacheKey = translationCache.keys().next().value;
+    if (!oldestCacheKey) {
+      break;
+    }
+    translationCache.delete(oldestCacheKey);
+  }
+
+  return translatedText;
 }
 
 function extractTranslatedText(responseBody) {
@@ -55,8 +104,10 @@ async function requestTranslationWithCurl(text, targetLanguage) {
 
 async function translateSingleText(text, targetLanguage) {
   const cacheKey = getCacheKey(targetLanguage, text);
-  if (translationCache.has(cacheKey)) {
-    return translationCache.get(cacheKey);
+  const cachedTranslation = readCachedTranslation(cacheKey);
+
+  if (cachedTranslation) {
+    return cachedTranslation;
   }
 
   const translateUrl = new URL('https://translate.googleapis.com/translate_a/single');
@@ -89,8 +140,7 @@ async function translateSingleText(text, targetLanguage) {
   }
 
   const normalizedTranslatedText = normalizeTranslatedText(translatedText, targetLanguage);
-  translationCache.set(cacheKey, normalizedTranslatedText);
-  return normalizedTranslatedText;
+  return writeCachedTranslation(cacheKey, normalizedTranslatedText);
 }
 
 async function translateDetailItems({ items, targetLanguage }) {
@@ -117,5 +167,13 @@ async function translateDetailItems({ items, targetLanguage }) {
 }
 
 module.exports = {
-  translateDetailItems
+  getTranslationCacheSize() {
+    pruneExpiredTranslations();
+    return translationCache.size;
+  },
+  resetTranslationCache() {
+    translationCache.clear();
+  },
+  translateDetailItems,
+  translationCacheMaxEntries
 };

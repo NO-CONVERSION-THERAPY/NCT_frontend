@@ -1,9 +1,17 @@
 const express = require('express');
-const path = require('path');
-const cors = require('cors');
 const helmet = require('helmet');
-const { apiUrl, debugMod, formDryRun, googleFormUrl, googleScriptUrl, publicMapDataUrl, siteUrl, submitRateLimitMax, title } = require('../config/appConfig');
-const { areaOptions, formRules } = require('../config/formConfig');
+const {
+  apiUrl,
+  debugMod,
+  formDryRun,
+  googleFormUrl,
+  googleScriptUrl,
+  publicMapDataUrl,
+  siteUrl,
+  submitRateLimitMax,
+  title,
+  trustProxy
+} = require('../config/appConfig');
 const { paths } = require('../config/fileConfig');
 const { helmetConfig, requestBodyLimits } = require('../config/security');
 const { createI18nMiddleware } = require('./middleware/i18n');
@@ -15,7 +23,7 @@ const createPageRoutes = require('./routes/pageRoutes');
 const app = express();
 
 app.disable('x-powered-by');
-app.use(cors());
+app.set('trust proxy', trustProxy);
 app.use(helmet(helmetConfig));
 app.use(createI18nMiddleware());
 

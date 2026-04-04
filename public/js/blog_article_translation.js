@@ -4,6 +4,7 @@
     }
 
     const translationNodes = Array.from(document.querySelectorAll('[data-blog-translation-source]'));
+    const REQUEST_BATCH_SIZE = 6;
 
     if (translationNodes.length === 0) {
         return;
@@ -41,7 +42,17 @@
         node.dataset.translationState = 'loaded';
     }
 
-    async function requestTranslation(sourceText, fieldKey) {
+    function chunkEntries(entries, size) {
+        const chunks = [];
+
+        for (let index = 0; index < entries.length; index += size) {
+            chunks.push(entries.slice(index, index + size));
+        }
+
+        return chunks;
+    }
+
+    async function requestTranslations(items) {
         const response = await window.fetch('/api/translate-text', {
             method: 'POST',
             headers: {
@@ -49,10 +60,7 @@
             },
             body: JSON.stringify({
                 targetLanguage: window.APP_LANG,
-                items: [{
-                    fieldKey,
-                    text: sourceText
-                }]
+                items
             })
         });
 
@@ -62,48 +70,75 @@
             throw new Error(payload.error || 'Translation unavailable');
         }
 
-        const [translation] = Array.isArray(payload.translations) ? payload.translations : [];
-        return translation && typeof translation.translatedText === 'string'
-            ? translation.translatedText.trim()
-            : '';
+        return Array.isArray(payload.translations) ? payload.translations : [];
     }
 
-    async function hydrateTranslationNode(node, index) {
-        const sourceText = String(node.dataset.blogTranslationSource || '').trim();
+    async function hydrateTranslationNodes(nodes) {
+        const pendingEntries = [];
 
-        if (!sourceText) {
-            return;
-        }
+        nodes.forEach((node, index) => {
+            const sourceText = String(node.dataset.blogTranslationSource || '').trim();
 
-        const cachedTranslation = readTranslationCache(window.APP_LANG, sourceText);
-
-        if (cachedTranslation) {
-            revealTranslation(node, cachedTranslation);
-            return;
-        }
-
-        node.dataset.translationState = 'loading';
-
-        try {
-            const translatedText = await requestTranslation(sourceText, String(index));
-
-            if (!translatedText) {
-                node.dataset.translationState = 'empty';
+            if (!sourceText) {
                 return;
             }
 
-            writeTranslationCache(window.APP_LANG, sourceText, translatedText);
-            revealTranslation(node, translatedText);
-        } catch (error) {
-            console.error('博客段落翻译失败:', error);
-            node.dataset.translationState = 'error';
+            const cachedTranslation = readTranslationCache(window.APP_LANG, sourceText);
+
+            if (cachedTranslation) {
+                revealTranslation(node, cachedTranslation);
+                return;
+            }
+
+            node.dataset.translationState = 'loading';
+            pendingEntries.push({
+                fieldKey: String(index),
+                node,
+                sourceText
+            });
+        });
+
+        for (const entryChunk of chunkEntries(pendingEntries, REQUEST_BATCH_SIZE)) {
+            try {
+                const translations = await requestTranslations(entryChunk.map((entry) => ({
+                    fieldKey: entry.fieldKey,
+                    text: entry.sourceText
+                })));
+                const translatedTextByFieldKey = Object.create(null);
+
+                translations.forEach((entry) => {
+                    if (!entry || typeof entry.fieldKey !== 'string') {
+                        return;
+                    }
+
+                    translatedTextByFieldKey[entry.fieldKey] = typeof entry.translatedText === 'string'
+                        ? entry.translatedText.trim()
+                        : '';
+                });
+
+                entryChunk.forEach(({ fieldKey, node, sourceText }) => {
+                    const translatedText = translatedTextByFieldKey[fieldKey] || '';
+
+                    if (!translatedText) {
+                        node.dataset.translationState = 'empty';
+                        return;
+                    }
+
+                    writeTranslationCache(window.APP_LANG, sourceText, translatedText);
+                    revealTranslation(node, translatedText);
+                });
+            } catch (error) {
+                console.error('博客段落翻译失败:', error);
+                entryChunk.forEach(({ node }) => {
+                    node.dataset.translationState = 'error';
+                });
+            }
+
+            await new Promise((resolve) => window.setTimeout(resolve, 0));
         }
     }
 
     (async () => {
-        for (const [index, node] of translationNodes.entries()) {
-            await hydrateTranslationNode(node, index);
-            await new Promise((resolve) => window.setTimeout(resolve, 0));
-        }
+        await hydrateTranslationNodes(translationNodes);
     })();
 })();

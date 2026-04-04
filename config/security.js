@@ -23,27 +23,49 @@ const requestBodyLimits = {
   urlencoded: '50kb'
 };
 
-// 表单提交限流单独封装，方便在 route 层直接创建并接审计回调。
-function createSubmitRateLimiter({ max, onLimit, getMessage }) {
+function createRateLimiter({
+  windowMs = 15 * 60 * 1000,
+  max,
+  onLimit,
+  getMessage,
+  sendLimitResponse,
+  skip
+}) {
   return rateLimit({
-    windowMs: 15 * 60 * 1000,
+    windowMs,
     max: Number.isFinite(max) && max > 0 ? max : 5,
+    skip,
     standardHeaders: true,
     legacyHeaders: false,
     handler(req, res, _next, options) {
       const message = typeof getMessage === 'function'
         ? getMessage(req)
-        : '提交過於頻繁，請稍後再試。';
+        : '請求過於頻繁，請稍後再試。';
 
       if (typeof onLimit === 'function') {
         onLimit(req, options.statusCode, message);
       }
-      res.status(options.statusCode).send(message);
+
+      if (typeof sendLimitResponse === 'function') {
+        return sendLimitResponse(req, res, options.statusCode, message);
+      }
+
+      return res.status(options.statusCode).send(message);
     }
   });
 }
 
+// 表单提交限流单独封装，方便在 route 层直接创建并接审计回调。
+function createSubmitRateLimiter({ max, onLimit, getMessage }) {
+  return createRateLimiter({
+    max,
+    onLimit,
+    getMessage
+  });
+}
+
 module.exports = {
+  createRateLimiter,
   createSubmitRateLimiter,
   helmetConfig,
   requestBodyLimits

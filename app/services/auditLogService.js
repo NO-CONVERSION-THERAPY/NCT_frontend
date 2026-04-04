@@ -1,11 +1,16 @@
-// 优先取反向代理透传的 IP，没有时再退回到 Express / socket 提供的地址。
-function getClientIp(req) {
-  const forwardedFor = req.headers['x-forwarded-for'];
-  if (typeof forwardedFor === 'string' && forwardedFor.trim()) {
-    return forwardedFor.split(',')[0].trim();
+function normalizeIp(value) {
+  const normalizedValue = String(value || '').trim();
+
+  if (!normalizedValue) {
+    return 'unknown';
   }
 
-  return req.ip || req.socket?.remoteAddress || 'unknown';
+  return normalizedValue.replace(/^::ffff:/, '');
+}
+
+// 只使用 Express 已解析过的客户端地址，避免直接信任可伪造的代理头。
+function getClientIp(req) {
+  return normalizeIp(req.ip || req.socket?.remoteAddress || 'unknown');
 }
 
 // 审计日志只记录提交行为的关键元信息，不直接打印整份表单内容。
@@ -23,5 +28,6 @@ function logAuditEvent(req, event, details = {}) {
 }
 
 module.exports = {
+  getClientIp,
   logAuditEvent
 };
