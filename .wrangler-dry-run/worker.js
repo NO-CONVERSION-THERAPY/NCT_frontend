@@ -38,24 +38,9 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   mod
 ));
 
-// wrangler-modules-watch:wrangler:modules-watch
-var init_wrangler_modules_watch = __esm({
-  "wrangler-modules-watch:wrangler:modules-watch"() {
-    init_modules_watch_stub();
-  }
-});
-
-// ../../.npm/_npx/32026684e21afda6/node_modules/wrangler/templates/modules-watch-stub.js
-var init_modules_watch_stub = __esm({
-  "../../.npm/_npx/32026684e21afda6/node_modules/wrangler/templates/modules-watch-stub.js"() {
-    init_wrangler_modules_watch();
-  }
-});
-
 // node_modules/ms/index.js
 var require_ms = __commonJS({
   "node_modules/ms/index.js"(exports, module) {
-    init_modules_watch_stub();
     var s = 1e3;
     var m = s * 60;
     var h = m * 60;
@@ -176,7 +161,6 @@ var require_ms = __commonJS({
 // node_modules/debug/src/common.js
 var require_common = __commonJS({
   "node_modules/debug/src/common.js"(exports, module) {
-    init_modules_watch_stub();
     function setup(env) {
       createDebug.debug = createDebug;
       createDebug.default = createDebug;
@@ -365,7 +349,6 @@ var require_common = __commonJS({
 // node_modules/debug/src/browser.js
 var require_browser = __commonJS({
   "node_modules/debug/src/browser.js"(exports, module) {
-    init_modules_watch_stub();
     exports.formatArgs = formatArgs;
     exports.save = save;
     exports.load = load;
@@ -542,7 +525,6 @@ var require_browser = __commonJS({
 var require_browser2 = __commonJS({
   "node_modules/depd/lib/browser/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = depd;
     function depd(namespace) {
       if (!namespace) {
@@ -588,7 +570,6 @@ var require_browser2 = __commonJS({
 var require_setprototypeof = __commonJS({
   "node_modules/setprototypeof/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = Object.setPrototypeOf || ({ __proto__: [] } instanceof Array ? setProtoOf : mixinProperties);
     function setProtoOf(obj, proto) {
       obj.__proto__ = proto;
@@ -682,7 +663,6 @@ var require_codes = __commonJS({
 var require_statuses = __commonJS({
   "node_modules/statuses/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var codes = require_codes();
     module.exports = status;
     status.message = codes;
@@ -764,7 +744,6 @@ import { inherits } from "node:util";
 var inherits_default;
 var init_inherits = __esm({
   "../../.npm/_npx/32026684e21afda6/node_modules/unenv/dist/runtime/npm/inherits.mjs"() {
-    init_modules_watch_stub();
     inherits_default = inherits;
   }
 });
@@ -772,7 +751,6 @@ var init_inherits = __esm({
 // required-unenv-alias:inherits
 var require_inherits = __commonJS({
   "required-unenv-alias:inherits"(exports, module) {
-    init_modules_watch_stub();
     init_inherits();
     module.exports = Object.entries(inherits_exports).filter(([k]) => k !== "default").reduce(
       (cjs, [k, value]) => Object.defineProperty(cjs, k, { value, enumerable: true }),
@@ -785,7 +763,6 @@ var require_inherits = __commonJS({
 var require_toidentifier = __commonJS({
   "node_modules/toidentifier/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = toIdentifier;
     function toIdentifier(str) {
       return str.split(" ").map(function(token) {
@@ -800,7 +777,6 @@ var require_toidentifier = __commonJS({
 var require_http_errors = __commonJS({
   "node_modules/http-errors/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var deprecate = require_browser2()("http-errors");
     var setPrototypeOf = require_setprototypeof();
     var statuses = require_statuses();
@@ -977,7 +953,6 @@ var require_http_errors = __commonJS({
 var require_bytes = __commonJS({
   "node_modules/bytes/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = bytes;
     module.exports.format = format;
     module.exports.parse = parse;
@@ -1070,7 +1045,6 @@ var require_bytes = __commonJS({
 import libDefault from "buffer";
 var require_buffer = __commonJS({
   "node-built-in-modules:buffer"(exports, module) {
-    init_modules_watch_stub();
     module.exports = libDefault;
   }
 });
@@ -1079,7 +1053,6 @@ var require_buffer = __commonJS({
 var require_safer = __commonJS({
   "node_modules/safer-buffer/safer.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var buffer = require_buffer();
     var Buffer2 = buffer.Buffer;
     var safer = {};
@@ -1148,7 +1121,6 @@ var require_safer = __commonJS({
 var require_bom_handling = __commonJS({
   "node_modules/iconv-lite/lib/bom-handling.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var BOMChar = "\uFEFF";
     exports.PrependBOM = PrependBOMWrapper;
     function PrependBOMWrapper(encoder, options) {
@@ -1197,7 +1169,6 @@ var require_bom_handling = __commonJS({
 var require_merge_exports = __commonJS({
   "node_modules/iconv-lite/lib/helpers/merge-exports.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var hasOwn = typeof Object.hasOwn === "undefined" ? Function.call.bind(Object.prototype.hasOwnProperty) : Object.hasOwn;
     function mergeModules(target, module2) {
       for (var key in module2) {
@@ -1215,7 +1186,6 @@ var require_merge_exports = __commonJS({
 import libDefault2 from "string_decoder";
 var require_string_decoder = __commonJS({
   "node-built-in-modules:string_decoder"(exports, module) {
-    init_modules_watch_stub();
     module.exports = libDefault2;
   }
 });
@@ -1224,7 +1194,6 @@ var require_string_decoder = __commonJS({
 var require_internal = __commonJS({
   "node_modules/iconv-lite/encodings/internal.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var Buffer2 = require_safer().Buffer;
     module.exports = {
       // Encodings
@@ -1413,7 +1382,6 @@ var require_internal = __commonJS({
 var require_utf32 = __commonJS({
   "node_modules/iconv-lite/encodings/utf32.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var Buffer2 = require_safer().Buffer;
     exports._utf32 = Utf32Codec;
     function Utf32Codec(codecOptions, iconv) {
@@ -1653,7 +1621,6 @@ var require_utf32 = __commonJS({
 var require_utf16 = __commonJS({
   "node_modules/iconv-lite/encodings/utf16.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var Buffer2 = require_safer().Buffer;
     exports.utf16be = Utf16BECodec;
     function Utf16BECodec() {
@@ -1804,7 +1771,6 @@ var require_utf16 = __commonJS({
 var require_utf7 = __commonJS({
   "node_modules/iconv-lite/encodings/utf7.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var Buffer2 = require_safer().Buffer;
     exports.utf7 = Utf7Codec;
     exports.unicode11utf7 = "utf7";
@@ -2029,7 +1995,6 @@ var require_utf7 = __commonJS({
 var require_sbcs_codec = __commonJS({
   "node_modules/iconv-lite/encodings/sbcs-codec.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var Buffer2 = require_safer().Buffer;
     exports._sbcs = SBCSCodec;
     function SBCSCodec(codecOptions, iconv) {
@@ -2095,7 +2060,6 @@ var require_sbcs_codec = __commonJS({
 var require_sbcs_data = __commonJS({
   "node_modules/iconv-lite/encodings/sbcs-data.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = {
       // Not supported by iconv, not sure why.
       10029: "maccenteuro",
@@ -2249,7 +2213,6 @@ var require_sbcs_data = __commonJS({
 var require_sbcs_data_generated = __commonJS({
   "node_modules/iconv-lite/encodings/sbcs-data-generated.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = {
       "437": "cp437",
       "737": "cp737",
@@ -2705,7 +2668,6 @@ var require_sbcs_data_generated = __commonJS({
 var require_dbcs_codec = __commonJS({
   "node_modules/iconv-lite/encodings/dbcs-codec.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var Buffer2 = require_safer().Buffer;
     exports._dbcs = DBCSCodec;
     var UNASSIGNED = -1;
@@ -4418,7 +4380,6 @@ var require_big5_added = __commonJS({
 var require_dbcs_data = __commonJS({
   "node_modules/iconv-lite/encodings/dbcs-data.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = {
       // == Japanese/ShiftJIS ====================================================
       // All japanese encodings are based on JIS X set of standards:
@@ -4666,7 +4627,6 @@ var require_dbcs_data = __commonJS({
 var require_encodings = __commonJS({
   "node_modules/iconv-lite/encodings/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var mergeModules = require_merge_exports();
     var modules = [
       require_internal(),
@@ -4692,7 +4652,6 @@ var require_encodings = __commonJS({
 var require_streams = __commonJS({
   "node_modules/iconv-lite/lib/streams.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var Buffer2 = require_safer().Buffer;
     module.exports = function(streamModule) {
       var Transform = streamModule.Transform;
@@ -4792,7 +4751,6 @@ var require_streams = __commonJS({
 import libDefault3 from "stream";
 var require_stream = __commonJS({
   "node-built-in-modules:stream"(exports, module) {
-    init_modules_watch_stub();
     module.exports = libDefault3;
   }
 });
@@ -4801,7 +4759,6 @@ var require_stream = __commonJS({
 var require_lib = __commonJS({
   "node_modules/iconv-lite/lib/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var Buffer2 = require_safer().Buffer;
     var bomHandling = require_bom_handling();
     var mergeModules = require_merge_exports();
@@ -4934,7 +4891,6 @@ var require_lib = __commonJS({
 var require_unpipe = __commonJS({
   "node_modules/unpipe/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = unpipe;
     function hasPipeDataListeners(stream) {
       var listeners = stream.listeners("data");
@@ -4975,7 +4931,6 @@ var require_unpipe = __commonJS({
 import libDefault4 from "async_hooks";
 var require_async_hooks = __commonJS({
   "node-built-in-modules:async_hooks"(exports, module) {
-    init_modules_watch_stub();
     module.exports = libDefault4;
   }
 });
@@ -4984,7 +4939,6 @@ var require_async_hooks = __commonJS({
 var require_raw_body = __commonJS({
   "node_modules/raw-body/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var asyncHooks = tryRequireAsyncHooks();
     var bytes = require_bytes();
     var createError = require_http_errors();
@@ -5186,7 +5140,6 @@ var require_raw_body = __commonJS({
 var require_ee_first = __commonJS({
   "node_modules/ee-first/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = first;
     function first(stuff, done) {
       if (!Array.isArray(stuff))
@@ -5248,7 +5201,6 @@ var require_ee_first = __commonJS({
 var require_on_finished = __commonJS({
   "node_modules/on-finished/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = onFinished;
     module.exports.isFinished = isFinished;
     var asyncHooks = tryRequireAsyncHooks();
@@ -5364,7 +5316,6 @@ var require_on_finished = __commonJS({
 import libDefault5 from "node:zlib";
 var require_node_zlib = __commonJS({
   "node-built-in-modules:node:zlib"(exports, module) {
-    init_modules_watch_stub();
     module.exports = libDefault5;
   }
 });
@@ -5373,7 +5324,6 @@ var require_node_zlib = __commonJS({
 var require_content_type = __commonJS({
   "node_modules/content-type/index.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var PARAM_REGEXP = /; *([!#$%&'*+.^_`|~0-9A-Za-z-]+) *= *("(?:[\u000b\u0020\u0021\u0023-\u005b\u005d-\u007e\u0080-\u00ff]|\\[\u000b\u0020-\u00ff])*"|[!#$%&'*+.^_`|~0-9A-Za-z-]+) */g;
     var TEXT_REGEXP = /^[\u000b\u0020-\u007e\u0080-\u00ff]+$/;
     var TOKEN_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
@@ -14830,7 +14780,6 @@ var require_db = __commonJS({
 // node_modules/mime-db/index.js
 var require_mime_db = __commonJS({
   "node_modules/mime-db/index.js"(exports, module) {
-    init_modules_watch_stub();
     module.exports = require_db();
   }
 });
@@ -14839,7 +14788,6 @@ var require_mime_db = __commonJS({
 import libDefault6 from "path";
 var require_path = __commonJS({
   "node-built-in-modules:path"(exports, module) {
-    init_modules_watch_stub();
     module.exports = libDefault6;
   }
 });
@@ -14847,7 +14795,6 @@ var require_path = __commonJS({
 // node_modules/mime-types/mimeScore.js
 var require_mimeScore = __commonJS({
   "node_modules/mime-types/mimeScore.js"(exports, module) {
-    init_modules_watch_stub();
     var FACET_SCORES = {
       "prs.": 100,
       "x-": 200,
@@ -14893,7 +14840,6 @@ var require_mimeScore = __commonJS({
 var require_mime_types = __commonJS({
   "node_modules/mime-types/index.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var db = require_mime_db();
     var extname = require_path().extname;
     var mimeScore = require_mimeScore();
@@ -15007,7 +14953,6 @@ var require_mime_types = __commonJS({
 var require_media_typer = __commonJS({
   "node_modules/media-typer/index.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var SUBTYPE_NAME_REGEXP = /^[A-Za-z0-9][A-Za-z0-9!#$&^_.-]{0,126}$/;
     var TYPE_NAME_REGEXP = /^[A-Za-z0-9][A-Za-z0-9!#$&^_-]{0,126}$/;
     var TYPE_REGEXP = /^ *([A-Za-z0-9][A-Za-z0-9!#$&^_-]{0,126})\/([A-Za-z0-9][A-Za-z0-9!#$&^_.+-]{0,126}) *$/;
@@ -15082,7 +15027,6 @@ var require_media_typer = __commonJS({
 var require_type_is = __commonJS({
   "node_modules/type-is/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var contentType = require_content_type();
     var mime = require_mime_types();
     var typer = require_media_typer();
@@ -15184,7 +15128,6 @@ var require_type_is = __commonJS({
 var require_utils = __commonJS({
   "node_modules/body-parser/lib/utils.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var bytes = require_bytes();
     var contentType = require_content_type();
     var typeis = require_type_is();
@@ -15240,7 +15183,6 @@ var require_utils = __commonJS({
 var require_read = __commonJS({
   "node_modules/body-parser/lib/read.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var createError = require_http_errors();
     var getBody = require_raw_body();
     var iconv = require_lib();
@@ -15403,7 +15345,6 @@ var require_read = __commonJS({
 var require_json = __commonJS({
   "node_modules/body-parser/lib/types/json.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var debug = require_browser()("body-parser:json");
     var read = require_read();
     var { normalizeOptions } = require_utils();
@@ -15491,7 +15432,6 @@ var require_json = __commonJS({
 var require_raw = __commonJS({
   "node_modules/body-parser/lib/types/raw.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var debug = require_browser()("body-parser:raw");
     var read = require_read();
     var { normalizeOptions, passthrough } = require_utils();
@@ -15515,7 +15455,6 @@ var require_raw = __commonJS({
 var require_text = __commonJS({
   "node_modules/body-parser/lib/types/text.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var debug = require_browser()("body-parser:text");
     var read = require_read();
     var { normalizeOptions, passthrough } = require_utils();
@@ -15534,7 +15473,6 @@ var require_text = __commonJS({
 var require_type = __commonJS({
   "node_modules/es-errors/type.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = TypeError;
   }
 });
@@ -15542,14 +15480,12 @@ var require_type = __commonJS({
 // (disabled):node_modules/object-inspect/util.inspect
 var require_util = __commonJS({
   "(disabled):node_modules/object-inspect/util.inspect"() {
-    init_modules_watch_stub();
   }
 });
 
 // node_modules/object-inspect/index.js
 var require_object_inspect = __commonJS({
   "node_modules/object-inspect/index.js"(exports, module) {
-    init_modules_watch_stub();
     var hasMap = typeof Map === "function" && Map.prototype;
     var mapSizeDescriptor = Object.getOwnPropertyDescriptor && hasMap ? Object.getOwnPropertyDescriptor(Map.prototype, "size") : null;
     var mapSize = hasMap && mapSizeDescriptor && typeof mapSizeDescriptor.get === "function" ? mapSizeDescriptor.get : null;
@@ -16115,7 +16051,6 @@ var require_object_inspect = __commonJS({
 var require_side_channel_list = __commonJS({
   "node_modules/side-channel-list/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var inspect = require_object_inspect();
     var $TypeError = require_type();
     var listGetNode = /* @__PURE__ */ __name(function(list, key, isDelete) {
@@ -16210,7 +16145,6 @@ var require_side_channel_list = __commonJS({
 var require_es_object_atoms = __commonJS({
   "node_modules/es-object-atoms/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = Object;
   }
 });
@@ -16219,7 +16153,6 @@ var require_es_object_atoms = __commonJS({
 var require_es_errors = __commonJS({
   "node_modules/es-errors/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = Error;
   }
 });
@@ -16228,7 +16161,6 @@ var require_es_errors = __commonJS({
 var require_eval = __commonJS({
   "node_modules/es-errors/eval.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = EvalError;
   }
 });
@@ -16237,7 +16169,6 @@ var require_eval = __commonJS({
 var require_range = __commonJS({
   "node_modules/es-errors/range.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = RangeError;
   }
 });
@@ -16246,7 +16177,6 @@ var require_range = __commonJS({
 var require_ref = __commonJS({
   "node_modules/es-errors/ref.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = ReferenceError;
   }
 });
@@ -16255,7 +16185,6 @@ var require_ref = __commonJS({
 var require_syntax = __commonJS({
   "node_modules/es-errors/syntax.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = SyntaxError;
   }
 });
@@ -16264,7 +16193,6 @@ var require_syntax = __commonJS({
 var require_uri = __commonJS({
   "node_modules/es-errors/uri.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = URIError;
   }
 });
@@ -16273,7 +16201,6 @@ var require_uri = __commonJS({
 var require_abs = __commonJS({
   "node_modules/math-intrinsics/abs.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = Math.abs;
   }
 });
@@ -16282,7 +16209,6 @@ var require_abs = __commonJS({
 var require_floor = __commonJS({
   "node_modules/math-intrinsics/floor.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = Math.floor;
   }
 });
@@ -16291,7 +16217,6 @@ var require_floor = __commonJS({
 var require_max = __commonJS({
   "node_modules/math-intrinsics/max.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = Math.max;
   }
 });
@@ -16300,7 +16225,6 @@ var require_max = __commonJS({
 var require_min = __commonJS({
   "node_modules/math-intrinsics/min.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = Math.min;
   }
 });
@@ -16309,7 +16233,6 @@ var require_min = __commonJS({
 var require_pow = __commonJS({
   "node_modules/math-intrinsics/pow.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = Math.pow;
   }
 });
@@ -16318,7 +16241,6 @@ var require_pow = __commonJS({
 var require_round = __commonJS({
   "node_modules/math-intrinsics/round.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = Math.round;
   }
 });
@@ -16327,7 +16249,6 @@ var require_round = __commonJS({
 var require_isNaN = __commonJS({
   "node_modules/math-intrinsics/isNaN.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = Number.isNaN || /* @__PURE__ */ __name(function isNaN2(a) {
       return a !== a;
     }, "isNaN");
@@ -16338,7 +16259,6 @@ var require_isNaN = __commonJS({
 var require_sign = __commonJS({
   "node_modules/math-intrinsics/sign.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var $isNaN = require_isNaN();
     module.exports = /* @__PURE__ */ __name(function sign(number) {
       if ($isNaN(number) || number === 0) {
@@ -16353,7 +16273,6 @@ var require_sign = __commonJS({
 var require_gOPD = __commonJS({
   "node_modules/gopd/gOPD.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = Object.getOwnPropertyDescriptor;
   }
 });
@@ -16362,7 +16281,6 @@ var require_gOPD = __commonJS({
 var require_gopd = __commonJS({
   "node_modules/gopd/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var $gOPD = require_gOPD();
     if ($gOPD) {
       try {
@@ -16379,7 +16297,6 @@ var require_gopd = __commonJS({
 var require_es_define_property = __commonJS({
   "node_modules/es-define-property/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var $defineProperty = Object.defineProperty || false;
     if ($defineProperty) {
       try {
@@ -16396,7 +16313,6 @@ var require_es_define_property = __commonJS({
 var require_shams = __commonJS({
   "node_modules/has-symbols/shams.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = /* @__PURE__ */ __name(function hasSymbols() {
       if (typeof Symbol !== "function" || typeof Object.getOwnPropertySymbols !== "function") {
         return false;
@@ -16452,7 +16368,6 @@ var require_shams = __commonJS({
 var require_has_symbols = __commonJS({
   "node_modules/has-symbols/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var origSymbol = typeof Symbol !== "undefined" && Symbol;
     var hasSymbolSham = require_shams();
     module.exports = /* @__PURE__ */ __name(function hasNativeSymbols() {
@@ -16477,7 +16392,6 @@ var require_has_symbols = __commonJS({
 var require_Reflect_getPrototypeOf = __commonJS({
   "node_modules/get-proto/Reflect.getPrototypeOf.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = typeof Reflect !== "undefined" && Reflect.getPrototypeOf || null;
   }
 });
@@ -16486,7 +16400,6 @@ var require_Reflect_getPrototypeOf = __commonJS({
 var require_Object_getPrototypeOf = __commonJS({
   "node_modules/get-proto/Object.getPrototypeOf.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var $Object = require_es_object_atoms();
     module.exports = $Object.getPrototypeOf || null;
   }
@@ -16496,7 +16409,6 @@ var require_Object_getPrototypeOf = __commonJS({
 var require_implementation = __commonJS({
   "node_modules/function-bind/implementation.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var ERROR_MESSAGE = "Function.prototype.bind called on incompatible ";
     var toStr = Object.prototype.toString;
     var max = Math.max;
@@ -16573,7 +16485,6 @@ var require_implementation = __commonJS({
 var require_function_bind = __commonJS({
   "node_modules/function-bind/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var implementation = require_implementation();
     module.exports = Function.prototype.bind || implementation;
   }
@@ -16583,7 +16494,6 @@ var require_function_bind = __commonJS({
 var require_functionCall = __commonJS({
   "node_modules/call-bind-apply-helpers/functionCall.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = Function.prototype.call;
   }
 });
@@ -16592,7 +16502,6 @@ var require_functionCall = __commonJS({
 var require_functionApply = __commonJS({
   "node_modules/call-bind-apply-helpers/functionApply.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = Function.prototype.apply;
   }
 });
@@ -16601,7 +16510,6 @@ var require_functionApply = __commonJS({
 var require_reflectApply = __commonJS({
   "node_modules/call-bind-apply-helpers/reflectApply.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = typeof Reflect !== "undefined" && Reflect && Reflect.apply;
   }
 });
@@ -16610,7 +16518,6 @@ var require_reflectApply = __commonJS({
 var require_actualApply = __commonJS({
   "node_modules/call-bind-apply-helpers/actualApply.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var bind = require_function_bind();
     var $apply = require_functionApply();
     var $call = require_functionCall();
@@ -16623,7 +16530,6 @@ var require_actualApply = __commonJS({
 var require_call_bind_apply_helpers = __commonJS({
   "node_modules/call-bind-apply-helpers/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var bind = require_function_bind();
     var $TypeError = require_type();
     var $call = require_functionCall();
@@ -16641,7 +16547,6 @@ var require_call_bind_apply_helpers = __commonJS({
 var require_get = __commonJS({
   "node_modules/dunder-proto/get.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var callBind = require_call_bind_apply_helpers();
     var gOPD = require_gopd();
     var hasProtoAccessor;
@@ -16673,7 +16578,6 @@ var require_get = __commonJS({
 var require_get_proto = __commonJS({
   "node_modules/get-proto/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var reflectGetProto = require_Reflect_getPrototypeOf();
     var originalGetProto = require_Object_getPrototypeOf();
     var getDunderProto = require_get();
@@ -16694,7 +16598,6 @@ var require_get_proto = __commonJS({
 var require_hasown = __commonJS({
   "node_modules/hasown/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var call = Function.prototype.call;
     var $hasOwn = Object.prototype.hasOwnProperty;
     var bind = require_function_bind();
@@ -16706,7 +16609,6 @@ var require_hasown = __commonJS({
 var require_get_intrinsic = __commonJS({
   "node_modules/get-intrinsic/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var undefined2;
     var $Object = require_es_object_atoms();
     var $Error = require_es_errors();
@@ -17038,7 +16940,6 @@ var require_get_intrinsic = __commonJS({
 var require_call_bound = __commonJS({
   "node_modules/call-bound/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var GetIntrinsic = require_get_intrinsic();
     var callBindBasic = require_call_bind_apply_helpers();
     var $indexOf = callBindBasic([GetIntrinsic("%String.prototype.indexOf%")]);
@@ -17062,7 +16963,6 @@ var require_call_bound = __commonJS({
 var require_side_channel_map = __commonJS({
   "node_modules/side-channel-map/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var GetIntrinsic = require_get_intrinsic();
     var callBound = require_call_bound();
     var inspect = require_object_inspect();
@@ -17119,7 +17019,6 @@ var require_side_channel_map = __commonJS({
 var require_side_channel_weakmap = __commonJS({
   "node_modules/side-channel-weakmap/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var GetIntrinsic = require_get_intrinsic();
     var callBound = require_call_bound();
     var inspect = require_object_inspect();
@@ -17193,7 +17092,6 @@ var require_side_channel_weakmap = __commonJS({
 var require_side_channel = __commonJS({
   "node_modules/side-channel/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var $TypeError = require_type();
     var inspect = require_object_inspect();
     var getSideChannelList = require_side_channel_list();
@@ -17233,7 +17131,6 @@ var require_side_channel = __commonJS({
 var require_formats = __commonJS({
   "node_modules/qs/lib/formats.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var replace = String.prototype.replace;
     var percentTwenties = /%20/g;
     var Format = {
@@ -17260,7 +17157,6 @@ var require_formats = __commonJS({
 var require_utils2 = __commonJS({
   "node_modules/qs/lib/utils.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var formats = require_formats();
     var getSideChannel = require_side_channel();
     var has = Object.prototype.hasOwnProperty;
@@ -17525,7 +17421,6 @@ var require_utils2 = __commonJS({
 var require_stringify = __commonJS({
   "node_modules/qs/lib/stringify.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var getSideChannel = require_side_channel();
     var utils = require_utils2();
     var formats = require_formats();
@@ -17809,7 +17704,6 @@ var require_stringify = __commonJS({
 var require_parse = __commonJS({
   "node_modules/qs/lib/parse.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var utils = require_utils2();
     var has = Object.prototype.hasOwnProperty;
     var isArray = Array.isArray;
@@ -18109,7 +18003,6 @@ var require_parse = __commonJS({
 var require_lib2 = __commonJS({
   "node_modules/qs/lib/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var stringify = require_stringify();
     var parse = require_parse();
     var formats = require_formats();
@@ -18125,7 +18018,6 @@ var require_lib2 = __commonJS({
 var require_urlencoded = __commonJS({
   "node_modules/body-parser/lib/types/urlencoded.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var createError = require_http_errors();
     var debug = require_browser()("body-parser:urlencoded");
     var read = require_read();
@@ -18218,7 +18110,6 @@ var require_urlencoded = __commonJS({
 var require_body_parser = __commonJS({
   "node_modules/body-parser/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     exports = module.exports = bodyParser;
     Object.defineProperty(exports, "json", {
       configurable: true,
@@ -18251,7 +18142,6 @@ var require_body_parser = __commonJS({
 import libDefault7 from "node:events";
 var require_node_events = __commonJS({
   "node-built-in-modules:node:events"(exports, module) {
-    init_modules_watch_stub();
     module.exports = libDefault7;
   }
 });
@@ -18260,7 +18150,6 @@ var require_node_events = __commonJS({
 var require_merge_descriptors = __commonJS({
   "node_modules/merge-descriptors/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     function mergeDescriptors(destination, source, overwrite = true) {
       if (!destination) {
         throw new TypeError("The `destination` argument is required.");
@@ -18286,7 +18175,6 @@ var require_merge_descriptors = __commonJS({
 var require_encodeurl = __commonJS({
   "node_modules/encodeurl/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = encodeUrl;
     var ENCODE_CHARS_REGEXP = /(?:[^\x21\x23-\x3B\x3D\x3F-\x5F\x61-\x7A\x7C\x7E]|%(?:[^0-9A-Fa-f]|[0-9A-Fa-f][^0-9A-Fa-f]|$))+/g;
     var UNMATCHED_SURROGATE_PAIR_REGEXP = /(^|[^\uD800-\uDBFF])[\uDC00-\uDFFF]|[\uD800-\uDBFF]([^\uDC00-\uDFFF]|$)/g;
@@ -18302,7 +18190,6 @@ var require_encodeurl = __commonJS({
 var require_escape_html = __commonJS({
   "node_modules/escape-html/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var matchHtmlRegExp = /["'&<>]/;
     module.exports = escapeHtml;
     function escapeHtml(string) {
@@ -18351,7 +18238,6 @@ var require_escape_html = __commonJS({
 import libDefault8 from "url";
 var require_url = __commonJS({
   "node-built-in-modules:url"(exports, module) {
-    init_modules_watch_stub();
     module.exports = libDefault8;
   }
 });
@@ -18360,7 +18246,6 @@ var require_url = __commonJS({
 var require_parseurl = __commonJS({
   "node_modules/parseurl/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var url = require_url();
     var parse = url.parse;
     var Url = url.Url;
@@ -18449,7 +18334,6 @@ var require_parseurl = __commonJS({
 var require_finalhandler = __commonJS({
   "node_modules/finalhandler/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var debug = require_browser()("finalhandler");
     var encodeUrl = require_encodeurl();
     var escapeHtml = require_escape_html();
@@ -18465,7 +18349,7 @@ var require_finalhandler = __commonJS({
     module.exports = finalhandler;
     function finalhandler(req, res, options) {
       var opts = options || {};
-      var env = opts.env || "development";
+      var env = opts.env || "production";
       var onerror = opts.onerror;
       return function(err) {
         var headers;
@@ -18586,7 +18470,6 @@ var require_finalhandler = __commonJS({
 import libDefault9 from "node:path";
 var require_node_path = __commonJS({
   "node-built-in-modules:node:path"(exports, module) {
-    init_modules_watch_stub();
     module.exports = libDefault9;
   }
 });
@@ -18595,7 +18478,6 @@ var require_node_path = __commonJS({
 import libDefault10 from "node:fs";
 var require_node_fs = __commonJS({
   "node-built-in-modules:node:fs"(exports, module) {
-    init_modules_watch_stub();
     module.exports = libDefault10;
   }
 });
@@ -18604,7 +18486,6 @@ var require_node_fs = __commonJS({
 var require_view = __commonJS({
   "node_modules/express/lib/view.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var debug = require_browser()("express:view");
     var path = require_node_path();
     var fs = require_node_fs();
@@ -18701,7 +18582,6 @@ var require_view = __commonJS({
 import libDefault11 from "node:http";
 var require_node_http = __commonJS({
   "node-built-in-modules:node:http"(exports, module) {
-    init_modules_watch_stub();
     module.exports = libDefault11;
   }
 });
@@ -18710,7 +18590,6 @@ var require_node_http = __commonJS({
 import libDefault12 from "crypto";
 var require_crypto = __commonJS({
   "node-built-in-modules:crypto"(exports, module) {
-    init_modules_watch_stub();
     module.exports = libDefault12;
   }
 });
@@ -18719,7 +18598,6 @@ var require_crypto = __commonJS({
 import libDefault13 from "fs";
 var require_fs = __commonJS({
   "node-built-in-modules:fs"(exports, module) {
-    init_modules_watch_stub();
     module.exports = libDefault13;
   }
 });
@@ -18728,7 +18606,6 @@ var require_fs = __commonJS({
 var require_etag = __commonJS({
   "node_modules/etag/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = etag;
     var crypto = require_crypto();
     var Stats = require_fs().Stats;
@@ -18775,7 +18652,6 @@ var require_etag = __commonJS({
 var require_forwarded = __commonJS({
   "node_modules/forwarded/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = forwarded;
     function forwarded(req) {
       if (!req) {
@@ -18825,7 +18701,6 @@ var require_forwarded = __commonJS({
 // node_modules/ipaddr.js/lib/ipaddr.js
 var require_ipaddr = __commonJS({
   "node_modules/ipaddr.js/lib/ipaddr.js"(exports, module) {
-    init_modules_watch_stub();
     (function() {
       var expandIPv6, ipaddr, ipv4Part, ipv4Regexes, ipv6Part, ipv6Regexes, matchCIDR, root, zoneIndex;
       ipaddr = {};
@@ -19451,7 +19326,6 @@ var require_ipaddr = __commonJS({
 var require_proxy_addr = __commonJS({
   "node_modules/proxy-addr/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = proxyaddr;
     module.exports.all = alladdrs;
     module.exports.compile = compile;
@@ -19621,7 +19495,6 @@ var require_proxy_addr = __commonJS({
 import libDefault14 from "node:querystring";
 var require_node_querystring = __commonJS({
   "node-built-in-modules:node:querystring"(exports, module) {
-    init_modules_watch_stub();
     module.exports = libDefault14;
   }
 });
@@ -19630,7 +19503,6 @@ var require_node_querystring = __commonJS({
 import libDefault15 from "node:buffer";
 var require_node_buffer = __commonJS({
   "node-built-in-modules:node:buffer"(exports, module) {
-    init_modules_watch_stub();
     module.exports = libDefault15;
   }
 });
@@ -19639,7 +19511,6 @@ var require_node_buffer = __commonJS({
 var require_utils3 = __commonJS({
   "node_modules/express/lib/utils.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var { METHODS } = require_node_http();
     var contentType = require_content_type();
     var etag = require_etag();
@@ -19769,7 +19640,6 @@ var require_utils3 = __commonJS({
 // node_modules/wrappy/wrappy.js
 var require_wrappy = __commonJS({
   "node_modules/wrappy/wrappy.js"(exports, module) {
-    init_modules_watch_stub();
     module.exports = wrappy;
     function wrappy(fn, cb) {
       if (fn && cb) return wrappy(fn)(cb);
@@ -19802,7 +19672,6 @@ var require_wrappy = __commonJS({
 // node_modules/once/once.js
 var require_once = __commonJS({
   "node_modules/once/once.js"(exports, module) {
-    init_modules_watch_stub();
     var wrappy = require_wrappy();
     module.exports = wrappy(once);
     module.exports.strict = wrappy(onceStrict);
@@ -19849,7 +19718,6 @@ var require_once = __commonJS({
 // node_modules/is-promise/index.js
 var require_is_promise = __commonJS({
   "node_modules/is-promise/index.js"(exports, module) {
-    init_modules_watch_stub();
     module.exports = isPromise;
     module.exports.default = isPromise;
     function isPromise(obj) {
@@ -19863,7 +19731,6 @@ var require_is_promise = __commonJS({
 var require_dist = __commonJS({
   "node_modules/path-to-regexp/dist/index.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PathError = exports.TokenData = void 0;
     exports.parse = parse;
@@ -20285,7 +20152,6 @@ var require_dist = __commonJS({
 var require_layer = __commonJS({
   "node_modules/router/lib/layer.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var isPromise = require_is_promise();
     var pathRegexp = require_dist();
     var debug = require_browser()("router:layer");
@@ -20440,7 +20306,6 @@ var require_layer = __commonJS({
 var require_route = __commonJS({
   "node_modules/router/lib/route.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var debug = require_browser()("router:route");
     var Layer = require_layer();
     var { METHODS } = require_node_http();
@@ -20563,7 +20428,6 @@ var require_route = __commonJS({
 var require_router = __commonJS({
   "node_modules/router/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var isPromise = require_is_promise();
     var Layer = require_layer();
     var { METHODS } = require_node_http();
@@ -20979,7 +20843,6 @@ var require_router = __commonJS({
 var require_application = __commonJS({
   "node_modules/express/lib/application.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var finalhandler = require_finalhandler();
     var debug = require_browser()("express:application");
     var View = require_view();
@@ -21016,7 +20879,7 @@ var require_application = __commonJS({
       });
     }, "init");
     app2.defaultConfiguration = /* @__PURE__ */ __name(function defaultConfiguration() {
-      var env = "development";
+      var env = "production";
       this.enable("x-powered-by");
       this.set("etag", "weak");
       this.set("env", env);
@@ -21243,7 +21106,6 @@ var require_application = __commonJS({
 var require_charset = __commonJS({
   "node_modules/negotiator/lib/charset.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = preferredCharsets;
     module.exports.preferredCharsets = preferredCharsets;
     var simpleCharsetRegExp = /^\s*([^\s;]+)\s*(?:;(.*))?$/;
@@ -21339,7 +21201,6 @@ var require_charset = __commonJS({
 var require_encoding = __commonJS({
   "node_modules/negotiator/lib/encoding.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = preferredEncodings;
     module.exports.preferredEncodings = preferredEncodings;
     var simpleEncodingRegExp = /^\s*([^\s;]+)\s*(?:;(.*))?$/;
@@ -21461,7 +21322,6 @@ var require_encoding = __commonJS({
 var require_language = __commonJS({
   "node_modules/negotiator/lib/language.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = preferredLanguages;
     module.exports.preferredLanguages = preferredLanguages;
     var simpleLanguageRegExp = /^\s*([^\s\-;]+)(?:-([^\s;]+))?\s*(?:;(.*))?$/;
@@ -21565,7 +21425,6 @@ var require_language = __commonJS({
 var require_mediaType = __commonJS({
   "node_modules/negotiator/lib/mediaType.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = preferredMediaTypes;
     module.exports.preferredMediaTypes = preferredMediaTypes;
     var simpleMediaTypeRegExp = /^\s*([^\s\/;]+)\/([^;\s]+)\s*(?:;(.*))?$/;
@@ -21740,7 +21599,6 @@ var require_mediaType = __commonJS({
 var require_negotiator = __commonJS({
   "node_modules/negotiator/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var preferredCharsets = require_charset();
     var preferredEncodings = require_encoding();
     var preferredLanguages = require_language();
@@ -21798,7 +21656,6 @@ var require_negotiator = __commonJS({
 var require_accepts = __commonJS({
   "node_modules/accepts/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var Negotiator = require_negotiator();
     var mime = require_mime_types();
     module.exports = Accepts;
@@ -21883,7 +21740,6 @@ var require_accepts = __commonJS({
 import libDefault16 from "node:net";
 var require_node_net = __commonJS({
   "node-built-in-modules:node:net"(exports, module) {
-    init_modules_watch_stub();
     module.exports = libDefault16;
   }
 });
@@ -21892,7 +21748,6 @@ var require_node_net = __commonJS({
 var require_fresh = __commonJS({
   "node_modules/fresh/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var CACHE_CONTROL_NO_CACHE_REGEXP = /(?:^|,)\s*?no-cache\s*?(?:,|$)/;
     module.exports = fresh;
     function fresh(reqHeaders, resHeaders) {
@@ -21968,7 +21823,6 @@ var require_fresh = __commonJS({
 var require_range_parser = __commonJS({
   "node_modules/range-parser/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = rangeParser;
     function rangeParser(size, str, options) {
       if (typeof str !== "string") {
@@ -22056,7 +21910,6 @@ var require_range_parser = __commonJS({
 var require_request = __commonJS({
   "node_modules/express/lib/request.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var accepts = require_accepts();
     var isIP = require_node_net().isIP;
     var typeis = require_type_is();
@@ -22206,7 +22059,6 @@ var require_request = __commonJS({
 var require_content_disposition = __commonJS({
   "node_modules/content-disposition/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = contentDisposition;
     module.exports.parse = parse;
     var basename = require_path().basename;
@@ -22380,7 +22232,6 @@ var require_content_disposition = __commonJS({
 // node_modules/cookie-signature/index.js
 var require_cookie_signature = __commonJS({
   "node_modules/cookie-signature/index.js"(exports) {
-    init_modules_watch_stub();
     var crypto = require_crypto();
     exports.sign = function(val, secret) {
       if ("string" != typeof val) throw new TypeError("Cookie value must be provided as a string.");
@@ -22400,7 +22251,6 @@ var require_cookie_signature = __commonJS({
 var require_cookie = __commonJS({
   "node_modules/cookie/index.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     exports.parse = parse;
     exports.serialize = serialize;
     var __toString = Object.prototype.toString;
@@ -22574,7 +22424,6 @@ var require_cookie = __commonJS({
 import libDefault17 from "util";
 var require_util2 = __commonJS({
   "node-built-in-modules:util"(exports, module) {
-    init_modules_watch_stub();
     module.exports = libDefault17;
   }
 });
@@ -22583,7 +22432,6 @@ var require_util2 = __commonJS({
 var require_send = __commonJS({
   "node_modules/send/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var createError = require_http_errors();
     var debug = require_browser()("send");
     var encodeUrl = require_encodeurl();
@@ -23084,7 +22932,6 @@ var require_send = __commonJS({
 var require_vary = __commonJS({
   "node_modules/vary/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = vary;
     module.exports.append = append;
     var FIELD_NAME_REGEXP = /^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$/;
@@ -23161,7 +23008,6 @@ var require_vary = __commonJS({
 var require_response = __commonJS({
   "node_modules/express/lib/response.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var contentDisposition = require_content_disposition();
     var createError = require_http_errors();
     var deprecate = require_browser2()("express");
@@ -23641,7 +23487,6 @@ var require_response = __commonJS({
 var require_serve_static = __commonJS({
   "node_modules/serve-static/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var encodeUrl = require_encodeurl();
     var escapeHtml = require_escape_html();
     var parseUrl = require_parseurl();
@@ -23751,7 +23596,6 @@ var require_serve_static = __commonJS({
 var require_express = __commonJS({
   "node_modules/express/lib/express.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var bodyParser = require_body_parser();
     var EventEmitter = require_node_events().EventEmitter;
     var mixin = require_merge_descriptors();
@@ -23793,7 +23637,6 @@ var require_express = __commonJS({
 var require_express2 = __commonJS({
   "node_modules/express/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     module.exports = require_express();
   }
 });
@@ -23802,7 +23645,6 @@ var require_express2 = __commonJS({
 var require_utils4 = __commonJS({
   "node_modules/ejs/lib/cjs/utils.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var utils = {};
     var regExpChars = /[|\\{}()[\]^$+*?.]/g;
@@ -23945,7 +23787,6 @@ function encode_char(c) {
 var require_ejs = __commonJS({
   "node_modules/ejs/lib/cjs/ejs.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -24504,7 +24345,6 @@ var require_ejs = __commonJS({
 var require_helmet = __commonJS({
   "node_modules/helmet/index.cjs"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperties(exports, { __esModule: { value: true }, [Symbol.toStringTag]: { value: "Module" } });
     var dangerouslyDisableDefaultSrc = /* @__PURE__ */ Symbol("dangerouslyDisableDefaultSrc");
     var SHOULD_BE_QUOTED = /* @__PURE__ */ new Set(["none", "self", "strict-dynamic", "report-sample", "inline-speculation-rules", "unsafe-inline", "unsafe-eval", "unsafe-hashes", "wasm-unsafe-eval"]);
@@ -25101,7 +24941,6 @@ var require_helmet = __commonJS({
 // config/runtimeConfig.js
 var require_runtimeConfig = __commonJS({
   "config/runtimeConfig.js"(exports, module) {
-    init_modules_watch_stub();
     var path = require_path();
     function normalizeRuntimeTarget(value) {
       return String(value || "").trim().toLowerCase();
@@ -25138,7 +24977,6 @@ var require_runtimeConfig = __commonJS({
 import libDefault18 from "os";
 var require_os = __commonJS({
   "node-built-in-modules:os"(exports, module) {
-    init_modules_watch_stub();
     module.exports = libDefault18;
   }
 });
@@ -25214,7 +25052,6 @@ var require_package = __commonJS({
 // node_modules/dotenv/lib/main.js
 var require_main = __commonJS({
   "node_modules/dotenv/lib/main.js"(exports, module) {
-    init_modules_watch_stub();
     var fs = require_fs();
     var path = require_path();
     var os = require_os();
@@ -25559,7 +25396,6 @@ var require_main = __commonJS({
 // config/appConfig.js
 var require_appConfig = __commonJS({
   "config/appConfig.js"(exports, module) {
-    init_modules_watch_stub();
     var crypto = require_crypto();
     var { isWorkersRuntime } = require_runtimeConfig();
     if (!isWorkersRuntime()) {
@@ -25677,7 +25513,6 @@ var require_appConfig = __commonJS({
 // config/fileConfig.js
 var require_fileConfig = __commonJS({
   "config/fileConfig.js"(exports, module) {
-    init_modules_watch_stub();
     var { resolveProjectPath } = require_runtimeConfig();
     var paths = {
       views: resolveProjectPath("views"),
@@ -25696,7 +25531,6 @@ var require_fileConfig = __commonJS({
 var require_common2 = __commonJS({
   "node_modules/ip-address/dist/common.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.isInSubnet = isInSubnet;
     exports.isCorrect = isCorrect;
@@ -25749,7 +25583,6 @@ var require_common2 = __commonJS({
 var require_constants = __commonJS({
   "node_modules/ip-address/dist/v4/constants.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.RE_SUBNET_STRING = exports.RE_ADDRESS = exports.GROUPS = exports.BITS = void 0;
     exports.BITS = 32;
@@ -25763,7 +25596,6 @@ var require_constants = __commonJS({
 var require_address_error = __commonJS({
   "node_modules/ip-address/dist/address-error.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.AddressError = void 0;
     var AddressError = class extends Error {
@@ -25784,7 +25616,6 @@ var require_address_error = __commonJS({
 var require_ipv4 = __commonJS({
   "node_modules/ip-address/dist/ipv4.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -26131,7 +25962,6 @@ var require_ipv4 = __commonJS({
 var require_constants2 = __commonJS({
   "node_modules/ip-address/dist/v6/constants.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.RE_URL_WITH_PORT = exports.RE_URL = exports.RE_ZONE_STRING = exports.RE_SUBNET_STRING = exports.RE_BAD_ADDRESS = exports.RE_BAD_CHARACTERS = exports.TYPES = exports.SCOPES = exports.GROUPS = exports.BITS = void 0;
     exports.BITS = 128;
@@ -26183,7 +26013,6 @@ var require_constants2 = __commonJS({
 var require_helpers = __commonJS({
   "node_modules/ip-address/dist/v6/helpers.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.spanAllZeroes = spanAllZeroes;
     exports.spanAll = spanAll;
@@ -26224,7 +26053,6 @@ var require_helpers = __commonJS({
 var require_regular_expressions = __commonJS({
   "node_modules/ip-address/dist/v6/regular-expressions.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -26321,7 +26149,6 @@ var require_regular_expressions = __commonJS({
 var require_ipv6 = __commonJS({
   "node_modules/ip-address/dist/ipv6.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -27245,7 +27072,6 @@ var require_ipv6 = __commonJS({
 var require_ip_address = __commonJS({
   "node_modules/ip-address/dist/ip-address.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -27296,7 +27122,6 @@ var require_ip_address = __commonJS({
 import libDefault19 from "node:crypto";
 var require_node_crypto = __commonJS({
   "node-built-in-modules:node:crypto"(exports, module) {
-    init_modules_watch_stub();
     module.exports = libDefault19;
   }
 });
@@ -27305,7 +27130,6 @@ var require_node_crypto = __commonJS({
 var require_dist2 = __commonJS({
   "node_modules/express-rate-limit/dist/index.cjs"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var __defProp2 = Object.defineProperty;
     var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
     var __getOwnPropNames2 = Object.getOwnPropertyNames;
@@ -28253,7 +28077,6 @@ var require_dist2 = __commonJS({
 var require_dist3 = __commonJS({
   "node_modules/rate-limit-redis/dist/index.cjs"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var scripts = {
       increment: `
@@ -28483,7 +28306,6 @@ var require_dist3 = __commonJS({
 var require_verbatim_string = __commonJS({
   "node_modules/@redis/client/dist/lib/RESP/verbatim-string.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.VerbatimString = void 0;
     var VerbatimString = class extends String {
@@ -28504,7 +28326,6 @@ var require_verbatim_string = __commonJS({
 var require_errors = __commonJS({
   "node_modules/@redis/client/dist/lib/errors.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.MultiErrorReply = exports.CommandTimeoutDuringMaintenanceError = exports.SocketTimeoutDuringMaintenanceError = exports.TimeoutError = exports.BlobError = exports.SimpleError = exports.ErrorReply = exports.ReconnectStrategyError = exports.RootNodesUnavailableError = exports.SocketClosedUnexpectedlyError = exports.DisconnectsClientError = exports.ClientOfflineError = exports.ClientClosedError = exports.SocketTimeoutError = exports.ConnectionTimeoutError = exports.WatchError = exports.AbortError = void 0;
     var AbortError = class extends Error {
@@ -28668,7 +28489,6 @@ var require_errors = __commonJS({
 var require_decoder = __commonJS({
   "node_modules/@redis/client/dist/lib/RESP/decoder.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var _a;
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Decoder = exports.PUSH_TYPE_MAPPING = exports.RESP_TYPES = void 0;
@@ -29368,7 +29188,6 @@ var require_decoder = __commonJS({
 var require_lua_script = __commonJS({
   "node_modules/@redis/client/dist/lib/lua-script.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.scriptSha1 = exports.defineScript = void 0;
     var node_crypto_1 = require_node_crypto();
@@ -29392,7 +29211,6 @@ var require_lua_script = __commonJS({
 var require_digest = __commonJS({
   "node_modules/@redis/client/dist/lib/utils/digest.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.digest = void 0;
     var xxh3Cache = null;
@@ -29423,7 +29241,6 @@ var require_digest = __commonJS({
 var require_ACL_CAT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ACL_CAT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -29448,7 +29265,6 @@ var require_ACL_CAT = __commonJS({
 var require_ACL_DELUSER = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ACL_DELUSER.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -29471,7 +29287,6 @@ var require_ACL_DELUSER = __commonJS({
 var require_ACL_DRYRUN = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ACL_DRYRUN.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -29494,7 +29309,6 @@ var require_ACL_DRYRUN = __commonJS({
 var require_ACL_GENPASS = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ACL_GENPASS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -29519,7 +29333,6 @@ var require_ACL_GENPASS = __commonJS({
 var require_ACL_GETUSER = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ACL_GETUSER.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -29558,7 +29371,6 @@ var require_ACL_GETUSER = __commonJS({
 var require_ACL_LIST = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ACL_LIST.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -29579,7 +29391,6 @@ var require_ACL_LIST = __commonJS({
 var require_ACL_LOAD = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ACL_LOAD.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -29600,7 +29411,6 @@ var require_ACL_LOAD = __commonJS({
 var require_parser = __commonJS({
   "node_modules/@redis/client/dist/lib/client/parser.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.BasicCommandParser = void 0;
     var BasicCommandParser = class {
@@ -29686,7 +29496,6 @@ var require_parser = __commonJS({
 var require_generic_transformers = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/generic-transformers.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.transformRedisJsonNullReply = exports.transformRedisJsonReply = exports.transformRedisJsonArgument = exports.transformStreamsMessagesReplyResp3 = exports.transformStreamsMessagesReplyResp2 = exports.transformStreamMessagesReply = exports.transformStreamMessageNullReply = exports.transformStreamMessageReply = exports.parseArgs = exports.parseZKeysArguments = exports.transformRangeReply = exports.parseSlotRangesArguments = exports.transformFunctionListItemReply = exports.RedisFunctionFlags = exports.transformCommandReply = exports.CommandCategories = exports.CommandFlags = exports.parseOptionalVariadicArgument = exports.pushVariadicArgument = exports.pushVariadicNumberArguments = exports.pushVariadicArguments = exports.pushEvalArguments = exports.evalFirstKeyIndex = exports.transformPXAT = exports.transformEXAT = exports.transformSortedSetReply = exports.transformTuplesReply = exports.createTransformTuplesReplyFunc = exports.transformTuplesToMap = exports.transformNullableDoubleReply = exports.createTransformNullableDoubleReplyResp2Func = exports.transformDoubleArrayReply = exports.createTransformDoubleReplyResp2Func = exports.transformDoubleReply = exports.transformStringDoubleArgument = exports.transformDoubleArgument = exports.transformBooleanArrayReply = exports.transformBooleanReply = exports.isArrayReply = exports.isNullReply = void 0;
     var parser_1 = require_parser();
@@ -30199,7 +30008,6 @@ var require_generic_transformers = __commonJS({
 var require_ACL_LOG = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ACL_LOG.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -30244,7 +30052,6 @@ var require_ACL_LOG = __commonJS({
 var require_ACL_LOG_RESET = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ACL_LOG_RESET.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -30269,7 +30076,6 @@ var require_ACL_LOG_RESET = __commonJS({
 var require_ACL_SAVE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ACL_SAVE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -30290,7 +30096,6 @@ var require_ACL_SAVE = __commonJS({
 var require_ACL_SETUSER = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ACL_SETUSER.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -30314,7 +30119,6 @@ var require_ACL_SETUSER = __commonJS({
 var require_ACL_USERS = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ACL_USERS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -30335,7 +30139,6 @@ var require_ACL_USERS = __commonJS({
 var require_ACL_WHOAMI = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ACL_WHOAMI.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -30356,7 +30159,6 @@ var require_ACL_WHOAMI = __commonJS({
 var require_APPEND = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/APPEND.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -30378,7 +30180,6 @@ var require_APPEND = __commonJS({
 var require_ASKING = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ASKING.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ASKING_CMD = void 0;
     exports.ASKING_CMD = "ASKING";
@@ -30401,7 +30202,6 @@ var require_ASKING = __commonJS({
 var require_AUTH = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/AUTH.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -30429,7 +30229,6 @@ var require_AUTH = __commonJS({
 var require_BGREWRITEAOF = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/BGREWRITEAOF.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -30450,7 +30249,6 @@ var require_BGREWRITEAOF = __commonJS({
 var require_BGSAVE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/BGSAVE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -30476,7 +30274,6 @@ var require_BGSAVE = __commonJS({
 var require_BITCOUNT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/BITCOUNT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -30510,7 +30307,6 @@ var require_BITCOUNT = __commonJS({
 var require_BITFIELD_RO = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/BITFIELD_RO.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -30539,7 +30335,6 @@ var require_BITFIELD_RO = __commonJS({
 var require_BITFIELD = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/BITFIELD.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -30578,7 +30373,6 @@ var require_BITFIELD = __commonJS({
 var require_BITOP = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/BITOP.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -30603,7 +30397,6 @@ var require_BITOP = __commonJS({
 var require_BITPOS = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/BITPOS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -30640,7 +30433,6 @@ var require_BITPOS = __commonJS({
 var require_BLMOVE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/BLMOVE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -30667,7 +30459,6 @@ var require_BLMOVE = __commonJS({
 var require_LMPOP = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/LMPOP.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.parseLMPopArguments = void 0;
     function parseLMPopArguments(parser, keys, side, options) {
@@ -30701,7 +30492,6 @@ var require_LMPOP = __commonJS({
 var require_BLMPOP = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/BLMPOP.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -30752,7 +30542,6 @@ var require_BLMPOP = __commonJS({
 var require_BLPOP = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/BLPOP.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -30783,7 +30572,6 @@ var require_BLPOP = __commonJS({
 var require_BRPOP = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/BRPOP.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -30811,7 +30599,6 @@ var require_BRPOP = __commonJS({
 var require_BRPOPLPUSH = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/BRPOPLPUSH.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -30836,7 +30623,6 @@ var require_BRPOPLPUSH = __commonJS({
 var require_ZMPOP = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZMPOP.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.parseZMPopArguments = void 0;
     var generic_transformers_1 = require_generic_transformers();
@@ -30890,7 +30676,6 @@ var require_ZMPOP = __commonJS({
 var require_BZMPOP = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/BZMPOP.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -30941,7 +30726,6 @@ var require_BZMPOP = __commonJS({
 var require_BZPOPMAX = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/BZPOPMAX.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -30981,7 +30765,6 @@ var require_BZPOPMAX = __commonJS({
 var require_BZPOPMIN = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/BZPOPMIN.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -31009,7 +30792,6 @@ var require_BZPOPMIN = __commonJS({
 var require_CLIENT_CACHING = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLIENT_CACHING.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -31031,7 +30813,6 @@ var require_CLIENT_CACHING = __commonJS({
 var require_CLIENT_GETNAME = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLIENT_GETNAME.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -31052,7 +30833,6 @@ var require_CLIENT_GETNAME = __commonJS({
 var require_CLIENT_GETREDIR = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLIENT_GETREDIR.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -31073,7 +30853,6 @@ var require_CLIENT_GETREDIR = __commonJS({
 var require_CLIENT_ID = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLIENT_ID.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -31094,7 +30873,6 @@ var require_CLIENT_ID = __commonJS({
 var require_CLIENT_INFO = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLIENT_INFO.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var CLIENT_INFO_REGEX = /([^\s=]+)=([^\s]*)/g;
     exports.default = {
@@ -31162,7 +30940,6 @@ var require_CLIENT_INFO = __commonJS({
 var require_CLIENT_KILL = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLIENT_KILL.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.CLIENT_KILL_FILTERS = void 0;
     exports.CLIENT_KILL_FILTERS = {
@@ -31232,7 +31009,6 @@ var require_CLIENT_KILL = __commonJS({
 var require_CLIENT_LIST = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLIENT_LIST.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -31272,7 +31048,6 @@ var require_CLIENT_LIST = __commonJS({
 var require_CLIENT_NO_EVICT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLIENT_NO-EVICT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -31294,7 +31069,6 @@ var require_CLIENT_NO_EVICT = __commonJS({
 var require_CLIENT_NO_TOUCH = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLIENT_NO-TOUCH.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -31316,7 +31090,6 @@ var require_CLIENT_NO_TOUCH = __commonJS({
 var require_CLIENT_PAUSE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLIENT_PAUSE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -31342,7 +31115,6 @@ var require_CLIENT_PAUSE = __commonJS({
 var require_CLIENT_SETNAME = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLIENT_SETNAME.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -31364,7 +31136,6 @@ var require_CLIENT_SETNAME = __commonJS({
 var require_CLIENT_TRACKING = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLIENT_TRACKING.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -31423,7 +31194,6 @@ var require_CLIENT_TRACKING = __commonJS({
 var require_CLIENT_TRACKINGINFO = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLIENT_TRACKINGINFO.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -31451,7 +31221,6 @@ var require_CLIENT_TRACKINGINFO = __commonJS({
 var require_CLIENT_UNPAUSE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLIENT_UNPAUSE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -31472,7 +31241,6 @@ var require_CLIENT_UNPAUSE = __commonJS({
 var require_CLUSTER_ADDSLOTS = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLUSTER_ADDSLOTS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -31495,7 +31263,6 @@ var require_CLUSTER_ADDSLOTS = __commonJS({
 var require_CLUSTER_ADDSLOTSRANGE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLUSTER_ADDSLOTSRANGE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -31519,7 +31286,6 @@ var require_CLUSTER_ADDSLOTSRANGE = __commonJS({
 var require_CLUSTER_BUMPEPOCH = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLUSTER_BUMPEPOCH.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -31540,7 +31306,6 @@ var require_CLUSTER_BUMPEPOCH = __commonJS({
 var require_CLUSTER_COUNT_FAILURE_REPORTS = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLUSTER_COUNT-FAILURE-REPORTS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -31562,7 +31327,6 @@ var require_CLUSTER_COUNT_FAILURE_REPORTS = __commonJS({
 var require_CLUSTER_COUNTKEYSINSLOT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLUSTER_COUNTKEYSINSLOT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -31584,7 +31348,6 @@ var require_CLUSTER_COUNTKEYSINSLOT = __commonJS({
 var require_CLUSTER_DELSLOTS = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLUSTER_DELSLOTS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -31607,7 +31370,6 @@ var require_CLUSTER_DELSLOTS = __commonJS({
 var require_CLUSTER_DELSLOTSRANGE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLUSTER_DELSLOTSRANGE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -31631,7 +31393,6 @@ var require_CLUSTER_DELSLOTSRANGE = __commonJS({
 var require_CLUSTER_FAILOVER = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLUSTER_FAILOVER.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.FAILOVER_MODES = void 0;
     exports.FAILOVER_MODES = {
@@ -31661,7 +31422,6 @@ var require_CLUSTER_FAILOVER = __commonJS({
 var require_CLUSTER_FLUSHSLOTS = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLUSTER_FLUSHSLOTS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -31682,7 +31442,6 @@ var require_CLUSTER_FLUSHSLOTS = __commonJS({
 var require_CLUSTER_FORGET = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLUSTER_FORGET.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -31704,7 +31463,6 @@ var require_CLUSTER_FORGET = __commonJS({
 var require_CLUSTER_GETKEYSINSLOT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLUSTER_GETKEYSINSLOT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -31727,7 +31485,6 @@ var require_CLUSTER_GETKEYSINSLOT = __commonJS({
 var require_CLUSTER_INFO = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLUSTER_INFO.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -31748,7 +31505,6 @@ var require_CLUSTER_INFO = __commonJS({
 var require_CLUSTER_KEYSLOT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLUSTER_KEYSLOT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -31770,7 +31526,6 @@ var require_CLUSTER_KEYSLOT = __commonJS({
 var require_CLUSTER_LINKS = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLUSTER_LINKS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -31804,7 +31559,6 @@ var require_CLUSTER_LINKS = __commonJS({
 var require_CLUSTER_MEET = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLUSTER_MEET.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -31827,7 +31581,6 @@ var require_CLUSTER_MEET = __commonJS({
 var require_CLUSTER_MYID = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLUSTER_MYID.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -31848,7 +31601,6 @@ var require_CLUSTER_MYID = __commonJS({
 var require_CLUSTER_MYSHARDID = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLUSTER_MYSHARDID.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -31869,7 +31621,6 @@ var require_CLUSTER_MYSHARDID = __commonJS({
 var require_CLUSTER_NODES = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLUSTER_NODES.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -31890,7 +31641,6 @@ var require_CLUSTER_NODES = __commonJS({
 var require_CLUSTER_REPLICAS = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLUSTER_REPLICAS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -31912,7 +31662,6 @@ var require_CLUSTER_REPLICAS = __commonJS({
 var require_CLUSTER_REPLICATE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLUSTER_REPLICATE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -31934,7 +31683,6 @@ var require_CLUSTER_REPLICATE = __commonJS({
 var require_CLUSTER_RESET = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLUSTER_RESET.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -31959,7 +31707,6 @@ var require_CLUSTER_RESET = __commonJS({
 var require_CLUSTER_SAVECONFIG = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLUSTER_SAVECONFIG.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -31980,7 +31727,6 @@ var require_CLUSTER_SAVECONFIG = __commonJS({
 var require_CLUSTER_SET_CONFIG_EPOCH = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLUSTER_SET-CONFIG-EPOCH.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -32002,7 +31748,6 @@ var require_CLUSTER_SET_CONFIG_EPOCH = __commonJS({
 var require_CLUSTER_SETSLOT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLUSTER_SETSLOT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.CLUSTER_SLOT_STATES = void 0;
     exports.CLUSTER_SLOT_STATES = {
@@ -32036,7 +31781,6 @@ var require_CLUSTER_SETSLOT = __commonJS({
 var require_CLUSTER_SLOTS = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CLUSTER_SLOTS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -32073,7 +31817,6 @@ var require_CLUSTER_SLOTS = __commonJS({
 var require_COMMAND_COUNT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/COMMAND_COUNT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -32094,7 +31837,6 @@ var require_COMMAND_COUNT = __commonJS({
 var require_COMMAND_GETKEYS = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/COMMAND_GETKEYS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -32117,7 +31859,6 @@ var require_COMMAND_GETKEYS = __commonJS({
 var require_COMMAND_GETKEYSANDFLAGS = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/COMMAND_GETKEYSANDFLAGS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -32148,7 +31889,6 @@ var require_COMMAND_GETKEYSANDFLAGS = __commonJS({
 var require_COMMAND_INFO = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/COMMAND_INFO.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -32174,7 +31914,6 @@ var require_COMMAND_INFO = __commonJS({
 var require_COMMAND_LIST = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/COMMAND_LIST.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.COMMAND_LIST_FILTER_BY = void 0;
     exports.COMMAND_LIST_FILTER_BY = {
@@ -32205,7 +31944,6 @@ var require_COMMAND_LIST = __commonJS({
 var require_COMMAND = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/COMMAND.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -32230,7 +31968,6 @@ var require_COMMAND = __commonJS({
 var require_CONFIG_GET = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CONFIG_GET.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -32257,7 +31994,6 @@ var require_CONFIG_GET = __commonJS({
 var require_CONFIG_RESETSTAT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CONFIG_RESETSTAT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -32278,7 +32014,6 @@ var require_CONFIG_RESETSTAT = __commonJS({
 var require_CONFIG_REWRITE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CONFIG_REWRITE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -32299,7 +32034,6 @@ var require_CONFIG_REWRITE = __commonJS({
 var require_CONFIG_SET = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/CONFIG_SET.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -32329,7 +32063,6 @@ var require_CONFIG_SET = __commonJS({
 var require_COPY = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/COPY.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -32359,7 +32092,6 @@ var require_COPY = __commonJS({
 var require_DBSIZE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/DBSIZE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -32380,7 +32112,6 @@ var require_DBSIZE = __commonJS({
 var require_DECR = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/DECR.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -32401,7 +32132,6 @@ var require_DECR = __commonJS({
 var require_DECRBY = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/DECRBY.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -32424,7 +32154,6 @@ var require_DECRBY = __commonJS({
 var require_DEL = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/DEL.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -32446,7 +32175,6 @@ var require_DEL = __commonJS({
 var require_DELEX = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/DELEX.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.DelexCondition = void 0;
     exports.DelexCondition = {
@@ -32495,7 +32223,6 @@ var require_DELEX = __commonJS({
 var require_DIGEST = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/DIGEST.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -32521,7 +32248,6 @@ var require_DIGEST = __commonJS({
 var require_DUMP = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/DUMP.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -32543,7 +32269,6 @@ var require_DUMP = __commonJS({
 var require_ECHO = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ECHO.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -32565,7 +32290,6 @@ var require_ECHO = __commonJS({
 var require_EVAL = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/EVAL.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.parseEvalArguments = void 0;
     function parseEvalArguments(parser, script, options) {
@@ -32602,7 +32326,6 @@ var require_EVAL = __commonJS({
 var require_EVAL_RO = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/EVAL_RO.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -32653,7 +32376,6 @@ var require_EVAL_RO = __commonJS({
 var require_EVALSHA_RO = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/EVALSHA_RO.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -32704,7 +32426,6 @@ var require_EVALSHA_RO = __commonJS({
 var require_EVALSHA = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/EVALSHA.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -32755,7 +32476,6 @@ var require_EVALSHA = __commonJS({
 var require_GEOADD = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/GEOADD.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -32800,7 +32520,6 @@ var require_GEOADD = __commonJS({
 var require_GEODIST = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/GEODIST.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -32832,7 +32551,6 @@ var require_GEODIST = __commonJS({
 var require_GEOHASH = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/GEOHASH.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -32857,7 +32575,6 @@ var require_GEOHASH = __commonJS({
 var require_GEOPOS = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/GEOPOS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -32890,7 +32607,6 @@ var require_GEOPOS = __commonJS({
 var require_GEOSEARCH = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/GEOSEARCH.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.parseGeoSearchOptions = exports.parseGeoSearchArguments = void 0;
     function parseGeoSearchArguments(parser, key, from, by, options) {
@@ -32949,7 +32665,6 @@ var require_GEOSEARCH = __commonJS({
 var require_GEORADIUS = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/GEORADIUS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.parseGeoRadiusArguments = void 0;
     var GEOSEARCH_1 = require_GEOSEARCH();
@@ -32984,7 +32699,6 @@ var require_GEORADIUS = __commonJS({
 var require_GEOSEARCH_WITH = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/GEOSEARCH_WITH.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -33045,7 +32759,6 @@ var require_GEOSEARCH_WITH = __commonJS({
 var require_GEORADIUS_WITH = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/GEORADIUS_WITH.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -33112,7 +32825,6 @@ var require_GEORADIUS_WITH = __commonJS({
 var require_GEORADIUS_RO_WITH = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/GEORADIUS_RO_WITH.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -33145,7 +32857,6 @@ var require_GEORADIUS_RO_WITH = __commonJS({
 var require_GEORADIUS_RO = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/GEORADIUS_RO.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -33200,7 +32911,6 @@ var require_GEORADIUS_RO = __commonJS({
 var require_GEORADIUS_STORE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/GEORADIUS_STORE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -33262,7 +32972,6 @@ var require_GEORADIUS_STORE = __commonJS({
 var require_GEORADIUSBYMEMBER = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/GEORADIUSBYMEMBER.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.parseGeoRadiusByMemberArguments = void 0;
     var GEOSEARCH_1 = require_GEOSEARCH();
@@ -33297,7 +33006,6 @@ var require_GEORADIUSBYMEMBER = __commonJS({
 var require_GEORADIUSBYMEMBER_WITH = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/GEORADIUSBYMEMBER_WITH.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -33340,7 +33048,6 @@ var require_GEORADIUSBYMEMBER_WITH = __commonJS({
 var require_GEORADIUSBYMEMBER_RO_WITH = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/GEORADIUSBYMEMBER_RO_WITH.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -33396,7 +33103,6 @@ var require_GEORADIUSBYMEMBER_RO_WITH = __commonJS({
 var require_GEORADIUSBYMEMBER_RO = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/GEORADIUSBYMEMBER_RO.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -33452,7 +33158,6 @@ var require_GEORADIUSBYMEMBER_RO = __commonJS({
 var require_GEORADIUSBYMEMBER_STORE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/GEORADIUSBYMEMBER_STORE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -33514,7 +33219,6 @@ var require_GEORADIUSBYMEMBER_STORE = __commonJS({
 var require_GEOSEARCHSTORE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/GEOSEARCHSTORE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var GEOSEARCH_1 = require_GEOSEARCH();
     exports.default = {
@@ -33547,7 +33251,6 @@ var require_GEOSEARCHSTORE = __commonJS({
 var require_GET = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/GET.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -33570,7 +33273,6 @@ var require_GET = __commonJS({
 var require_GETBIT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/GETBIT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -33595,7 +33297,6 @@ var require_GETBIT = __commonJS({
 var require_GETDEL = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/GETDEL.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -33617,7 +33318,6 @@ var require_GETDEL = __commonJS({
 var require_GETEX = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/GETEX.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -33668,7 +33368,6 @@ var require_GETEX = __commonJS({
 var require_GETRANGE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/GETRANGE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -33694,7 +33393,6 @@ var require_GETRANGE = __commonJS({
 var require_GETSET = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/GETSET.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -33718,7 +33416,6 @@ var require_GETSET = __commonJS({
 var require_EXISTS = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/EXISTS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -33741,7 +33438,6 @@ var require_EXISTS = __commonJS({
 var require_EXPIRE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/EXPIRE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -33768,7 +33464,6 @@ var require_EXPIRE = __commonJS({
 var require_EXPIREAT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/EXPIREAT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -33796,7 +33491,6 @@ var require_EXPIREAT = __commonJS({
 var require_EXPIRETIME = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/EXPIRETIME.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -33818,7 +33512,6 @@ var require_EXPIRETIME = __commonJS({
 var require_FLUSHALL = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/FLUSHALL.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.REDIS_FLUSH_MODES = void 0;
     exports.REDIS_FLUSH_MODES = {
@@ -33848,7 +33541,6 @@ var require_FLUSHALL = __commonJS({
 var require_FLUSHDB = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/FLUSHDB.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -33873,7 +33565,6 @@ var require_FLUSHDB = __commonJS({
 var require_FCALL = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/FCALL.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -33924,7 +33615,6 @@ var require_FCALL = __commonJS({
 var require_FCALL_RO = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/FCALL_RO.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -33975,7 +33665,6 @@ var require_FCALL_RO = __commonJS({
 var require_FUNCTION_DELETE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/FUNCTION_DELETE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -33997,7 +33686,6 @@ var require_FUNCTION_DELETE = __commonJS({
 var require_FUNCTION_DUMP = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/FUNCTION_DUMP.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -34018,7 +33706,6 @@ var require_FUNCTION_DUMP = __commonJS({
 var require_FUNCTION_FLUSH = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/FUNCTION_FLUSH.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -34043,7 +33730,6 @@ var require_FUNCTION_FLUSH = __commonJS({
 var require_FUNCTION_KILL = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/FUNCTION_KILL.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -34064,7 +33750,6 @@ var require_FUNCTION_KILL = __commonJS({
 var require_FUNCTION_LIST = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/FUNCTION_LIST.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -34108,7 +33793,6 @@ var require_FUNCTION_LIST = __commonJS({
 var require_FUNCTION_LIST_WITHCODE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/FUNCTION_LIST_WITHCODE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -34155,7 +33839,6 @@ var require_FUNCTION_LIST_WITHCODE = __commonJS({
 var require_FUNCTION_LOAD = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/FUNCTION_LOAD.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -34182,7 +33865,6 @@ var require_FUNCTION_LOAD = __commonJS({
 var require_FUNCTION_RESTORE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/FUNCTION_RESTORE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -34208,7 +33890,6 @@ var require_FUNCTION_RESTORE = __commonJS({
 var require_FUNCTION_STATS = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/FUNCTION_STATS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -34263,7 +33944,6 @@ var require_FUNCTION_STATS = __commonJS({
 var require_HDEL = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HDEL.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -34286,7 +33966,6 @@ var require_HDEL = __commonJS({
 var require_HELLO = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HELLO.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -34327,7 +34006,6 @@ var require_HELLO = __commonJS({
 var require_HEXISTS = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HEXISTS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -34352,7 +34030,6 @@ var require_HEXISTS = __commonJS({
 var require_HEXPIRE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HEXPIRE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.HASH_EXPIRATION = void 0;
     exports.HASH_EXPIRATION = {
@@ -34393,7 +34070,6 @@ var require_HEXPIRE = __commonJS({
 var require_HEXPIREAT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HEXPIREAT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -34424,7 +34100,6 @@ var require_HEXPIREAT = __commonJS({
 var require_HEXPIRETIME = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HEXPIRETIME.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.HASH_EXPIRATION_TIME = void 0;
     exports.HASH_EXPIRATION_TIME = {
@@ -34456,7 +34131,6 @@ var require_HEXPIRETIME = __commonJS({
 var require_HGET = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HGET.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -34481,7 +34155,6 @@ var require_HGET = __commonJS({
 var require_HGETALL = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HGETALL.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -34509,7 +34182,6 @@ var require_HGETALL = __commonJS({
 var require_HGETDEL = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HGETDEL.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -34533,7 +34205,6 @@ var require_HGETDEL = __commonJS({
 var require_HGETEX = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HGETEX.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -34567,7 +34238,6 @@ var require_HGETEX = __commonJS({
 var require_HINCRBY = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HINCRBY.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -34591,7 +34261,6 @@ var require_HINCRBY = __commonJS({
 var require_HINCRBYFLOAT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HINCRBYFLOAT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -34615,7 +34284,6 @@ var require_HINCRBYFLOAT = __commonJS({
 var require_HKEYS = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HKEYS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -34638,7 +34306,6 @@ var require_HKEYS = __commonJS({
 var require_HLEN = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HLEN.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -34661,7 +34328,6 @@ var require_HLEN = __commonJS({
 var require_HMGET = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HMGET.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -34686,7 +34352,6 @@ var require_HMGET = __commonJS({
 var require_HPERSIST = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HPERSIST.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -34710,7 +34375,6 @@ var require_HPERSIST = __commonJS({
 var require_HPEXPIRE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HPEXPIRE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -34741,7 +34405,6 @@ var require_HPEXPIRE = __commonJS({
 var require_HPEXPIREAT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HPEXPIREAT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -34774,7 +34437,6 @@ var require_HPEXPIREAT = __commonJS({
 var require_HPEXPIRETIME = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HPEXPIRETIME.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -34801,7 +34463,6 @@ var require_HPEXPIRETIME = __commonJS({
 var require_HPTTL = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HPTTL.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -34828,7 +34489,6 @@ var require_HPTTL = __commonJS({
 var require_HRANDFIELD_COUNT_WITHVALUES = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HRANDFIELD_COUNT_WITHVALUES.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -34875,7 +34535,6 @@ var require_HRANDFIELD_COUNT_WITHVALUES = __commonJS({
 var require_HRANDFIELD_COUNT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HRANDFIELD_COUNT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -34901,7 +34560,6 @@ var require_HRANDFIELD_COUNT = __commonJS({
 var require_HRANDFIELD = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HRANDFIELD.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -34925,7 +34583,6 @@ var require_HRANDFIELD = __commonJS({
 var require_SCAN = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SCAN.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.pushScanArguments = exports.parseScanArguments = void 0;
     function parseScanArguments(parser, cursor, options) {
@@ -34989,7 +34646,6 @@ var require_SCAN = __commonJS({
 var require_HSCAN = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HSCAN.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var SCAN_1 = require_SCAN();
     exports.default = {
@@ -35030,7 +34686,6 @@ var require_HSCAN = __commonJS({
 var require_HSCAN_NOVALUES = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HSCAN_NOVALUES.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -35063,7 +34718,6 @@ var require_HSCAN_NOVALUES = __commonJS({
 var require_HSET = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HSET.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -35123,7 +34777,6 @@ var require_HSET = __commonJS({
 var require_HSETEX = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HSETEX.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var parser_1 = require_parser();
     exports.default = {
@@ -35211,7 +34864,6 @@ var require_HSETEX = __commonJS({
 var require_HSETNX = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HSETNX.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -35238,7 +34890,6 @@ var require_HSETNX = __commonJS({
 var require_HSTRLEN = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HSTRLEN.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -35265,7 +34916,6 @@ var require_HSTRLEN = __commonJS({
 var require_HTTL = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HTTL.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -35290,7 +34940,6 @@ var require_HTTL = __commonJS({
 var require_HVALS = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HVALS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -35313,7 +34962,6 @@ var require_HVALS = __commonJS({
 var require_HOTKEYS_GET = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HOTKEYS_GET.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     function parseHotkeysList(arr) {
       const result = [];
@@ -35431,7 +35079,6 @@ var require_HOTKEYS_GET = __commonJS({
 var require_HOTKEYS_RESET = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HOTKEYS_RESET.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -35454,7 +35101,6 @@ var require_HOTKEYS_RESET = __commonJS({
 var require_HOTKEYS_START = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HOTKEYS_START.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.HOTKEYS_METRICS = void 0;
     exports.HOTKEYS_METRICS = {
@@ -35504,7 +35150,6 @@ var require_HOTKEYS_START = __commonJS({
 var require_HOTKEYS_STOP = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/HOTKEYS_STOP.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -35527,7 +35172,6 @@ var require_HOTKEYS_STOP = __commonJS({
 var require_INCR = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/INCR.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -35550,7 +35194,6 @@ var require_INCR = __commonJS({
 var require_INCRBY = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/INCRBY.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -35575,7 +35218,6 @@ var require_INCRBY = __commonJS({
 var require_INCRBYFLOAT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/INCRBYFLOAT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -35600,7 +35242,6 @@ var require_INCRBYFLOAT = __commonJS({
 var require_INFO = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/INFO.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -35627,7 +35268,6 @@ var require_INFO = __commonJS({
 var require_KEYS = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/KEYS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -35651,7 +35291,6 @@ var require_KEYS = __commonJS({
 var require_LASTSAVE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/LASTSAVE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -35674,7 +35313,6 @@ var require_LASTSAVE = __commonJS({
 var require_LATENCY_DOCTOR = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/LATENCY_DOCTOR.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -35697,7 +35335,6 @@ var require_LATENCY_DOCTOR = __commonJS({
 var require_LATENCY_GRAPH = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/LATENCY_GRAPH.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.LATENCY_EVENTS = void 0;
     exports.LATENCY_EVENTS = {
@@ -35740,7 +35377,6 @@ var require_LATENCY_GRAPH = __commonJS({
 var require_LATENCY_HISTORY = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/LATENCY_HISTORY.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -35764,7 +35400,6 @@ var require_LATENCY_HISTORY = __commonJS({
 var require_LATENCY_LATEST = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/LATENCY_LATEST.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -35787,7 +35422,6 @@ var require_LATENCY_LATEST = __commonJS({
 var require_LATENCY_RESET = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/LATENCY_RESET.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.LATENCY_EVENTS = void 0;
     var LATENCY_GRAPH_1 = require_LATENCY_GRAPH();
@@ -35819,7 +35453,6 @@ var require_LATENCY_RESET = __commonJS({
 var require_LCS = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/LCS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -35844,7 +35477,6 @@ var require_LCS = __commonJS({
 var require_LCS_IDX = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/LCS_IDX.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -35883,7 +35515,6 @@ var require_LCS_IDX = __commonJS({
 var require_LCS_IDX_WITHMATCHLEN = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/LCS_IDX_WITHMATCHLEN.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -35917,7 +35548,6 @@ var require_LCS_IDX_WITHMATCHLEN = __commonJS({
 var require_LCS_LEN = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/LCS_LEN.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -35945,7 +35575,6 @@ var require_LCS_LEN = __commonJS({
 var require_LINDEX = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/LINDEX.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -35972,7 +35601,6 @@ var require_LINDEX = __commonJS({
 var require_LINSERT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/LINSERT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -36000,7 +35628,6 @@ var require_LINSERT = __commonJS({
 var require_LLEN = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/LLEN.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -36025,7 +35652,6 @@ var require_LLEN = __commonJS({
 var require_LMOVE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/LMOVE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -36053,7 +35679,6 @@ var require_LMOVE = __commonJS({
 var require_LOLWUT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/LOLWUT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -36082,7 +35707,6 @@ var require_LOLWUT = __commonJS({
 var require_LPOP = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/LPOP.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -36105,7 +35729,6 @@ var require_LPOP = __commonJS({
 var require_LPOP_COUNT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/LPOP_COUNT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -36134,7 +35757,6 @@ var require_LPOP_COUNT = __commonJS({
 var require_LPOS = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/LPOS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -36168,7 +35790,6 @@ var require_LPOS = __commonJS({
 var require_LPOS_COUNT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/LPOS_COUNT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -36200,7 +35821,6 @@ var require_LPOS_COUNT = __commonJS({
 var require_LPUSH = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/LPUSH.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -36225,7 +35845,6 @@ var require_LPUSH = __commonJS({
 var require_LPUSHX = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/LPUSHX.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -36250,7 +35869,6 @@ var require_LPUSHX = __commonJS({
 var require_LRANGE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/LRANGE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -36278,7 +35896,6 @@ var require_LRANGE = __commonJS({
 var require_LREM = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/LREM.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -36306,7 +35923,6 @@ var require_LREM = __commonJS({
 var require_LSET = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/LSET.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -36333,7 +35949,6 @@ var require_LSET = __commonJS({
 var require_LTRIM = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/LTRIM.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -36359,7 +35974,6 @@ var require_LTRIM = __commonJS({
 var require_MEMORY_DOCTOR = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/MEMORY_DOCTOR.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -36382,7 +35996,6 @@ var require_MEMORY_DOCTOR = __commonJS({
 var require_MEMORY_MALLOC_STATS = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/MEMORY_MALLOC-STATS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -36405,7 +36018,6 @@ var require_MEMORY_MALLOC_STATS = __commonJS({
 var require_MEMORY_PURGE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/MEMORY_PURGE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -36428,7 +36040,6 @@ var require_MEMORY_PURGE = __commonJS({
 var require_MEMORY_STATS = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/MEMORY_STATS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -36473,7 +36084,6 @@ var require_MEMORY_STATS = __commonJS({
 var require_MEMORY_USAGE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/MEMORY_USAGE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -36501,7 +36111,6 @@ var require_MEMORY_USAGE = __commonJS({
 var require_MGET = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/MGET.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -36526,7 +36135,6 @@ var require_MGET = __commonJS({
 var require_MIGRATE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/MIGRATE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -36578,7 +36186,6 @@ var require_MIGRATE = __commonJS({
 var require_MODULE_LIST = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/MODULE_LIST.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -36612,7 +36219,6 @@ var require_MODULE_LIST = __commonJS({
 var require_MODULE_LOAD = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/MODULE_LOAD.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -36640,7 +36246,6 @@ var require_MODULE_LOAD = __commonJS({
 var require_MODULE_UNLOAD = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/MODULE_UNLOAD.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -36664,7 +36269,6 @@ var require_MODULE_UNLOAD = __commonJS({
 var require_MOVE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/MOVE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -36689,7 +36293,6 @@ var require_MOVE = __commonJS({
 var require_MSET = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/MSET.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.parseMSetArguments = void 0;
     function parseMSetArguments(parser, toSet) {
@@ -36740,7 +36343,6 @@ var require_MSET = __commonJS({
 var require_MSETEX = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/MSETEX.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.parseMSetExArguments = exports.ExpirationMode = exports.SetMode = void 0;
     var generic_transformers_1 = require_generic_transformers();
@@ -36847,7 +36449,6 @@ var require_MSETEX = __commonJS({
 var require_MSETNX = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/MSETNX.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var MSET_1 = require_MSET();
     exports.default = {
@@ -36872,7 +36473,6 @@ var require_MSETNX = __commonJS({
 var require_OBJECT_ENCODING = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/OBJECT_ENCODING.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -36896,7 +36496,6 @@ var require_OBJECT_ENCODING = __commonJS({
 var require_OBJECT_FREQ = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/OBJECT_FREQ.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -36920,7 +36519,6 @@ var require_OBJECT_FREQ = __commonJS({
 var require_OBJECT_IDLETIME = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/OBJECT_IDLETIME.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -36944,7 +36542,6 @@ var require_OBJECT_IDLETIME = __commonJS({
 var require_OBJECT_REFCOUNT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/OBJECT_REFCOUNT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -36968,7 +36565,6 @@ var require_OBJECT_REFCOUNT = __commonJS({
 var require_PERSIST = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/PERSIST.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -36991,7 +36587,6 @@ var require_PERSIST = __commonJS({
 var require_PEXPIRE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/PEXPIRE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -37021,7 +36616,6 @@ var require_PEXPIRE = __commonJS({
 var require_PEXPIREAT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/PEXPIREAT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -37052,7 +36646,6 @@ var require_PEXPIREAT = __commonJS({
 var require_PEXPIRETIME = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/PEXPIRETIME.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -37076,7 +36669,6 @@ var require_PEXPIRETIME = __commonJS({
 var require_PFADD = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/PFADD.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -37104,7 +36696,6 @@ var require_PFADD = __commonJS({
 var require_PFCOUNT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/PFCOUNT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -37128,7 +36719,6 @@ var require_PFCOUNT = __commonJS({
 var require_PFMERGE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/PFMERGE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -37155,7 +36745,6 @@ var require_PFMERGE = __commonJS({
 var require_PING = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/PING.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -37182,7 +36771,6 @@ var require_PING = __commonJS({
 var require_PSETEX = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/PSETEX.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -37208,7 +36796,6 @@ var require_PSETEX = __commonJS({
 var require_PTTL = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/PTTL.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -37232,7 +36819,6 @@ var require_PTTL = __commonJS({
 var require_PUBLISH = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/PUBLISH.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -37258,7 +36844,6 @@ var require_PUBLISH = __commonJS({
 var require_PUBSUB_CHANNELS = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/PUBSUB_CHANNELS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -37285,7 +36870,6 @@ var require_PUBSUB_CHANNELS = __commonJS({
 var require_PUBSUB_NUMPAT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/PUBSUB_NUMPAT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -37308,7 +36892,6 @@ var require_PUBSUB_NUMPAT = __commonJS({
 var require_PUBSUB_NUMSUB = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/PUBSUB_NUMSUB.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -37348,7 +36931,6 @@ var require_PUBSUB_NUMSUB = __commonJS({
 var require_PUBSUB_SHARDNUMSUB = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/PUBSUB_SHARDNUMSUB.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -37386,7 +36968,6 @@ var require_PUBSUB_SHARDNUMSUB = __commonJS({
 var require_PUBSUB_SHARDCHANNELS = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/PUBSUB_SHARDCHANNELS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -37413,7 +36994,6 @@ var require_PUBSUB_SHARDCHANNELS = __commonJS({
 var require_RANDOMKEY = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/RANDOMKEY.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -37436,7 +37016,6 @@ var require_RANDOMKEY = __commonJS({
 var require_READONLY = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/READONLY.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -37459,7 +37038,6 @@ var require_READONLY = __commonJS({
 var require_RENAME = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/RENAME.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -37484,7 +37062,6 @@ var require_RENAME = __commonJS({
 var require_RENAMENX = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/RENAMENX.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -37509,7 +37086,6 @@ var require_RENAMENX = __commonJS({
 var require_REPLICAOF = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/REPLICAOF.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -37534,7 +37110,6 @@ var require_REPLICAOF = __commonJS({
 var require_RESTORE_ASKING = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/RESTORE-ASKING.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -37557,7 +37132,6 @@ var require_RESTORE_ASKING = __commonJS({
 var require_RESTORE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/RESTORE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -37597,7 +37171,6 @@ var require_RESTORE = __commonJS({
 var require_ROLE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ROLE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -37663,7 +37236,6 @@ var require_ROLE = __commonJS({
 var require_RPOP_COUNT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/RPOP_COUNT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -37688,7 +37260,6 @@ var require_RPOP_COUNT = __commonJS({
 var require_RPOP = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/RPOP.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -37711,7 +37282,6 @@ var require_RPOP = __commonJS({
 var require_RPOPLPUSH = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/RPOPLPUSH.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -37735,7 +37305,6 @@ var require_RPOPLPUSH = __commonJS({
 var require_RPUSH = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/RPUSH.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -37760,7 +37329,6 @@ var require_RPUSH = __commonJS({
 var require_RPUSHX = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/RPUSHX.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -37785,7 +37353,6 @@ var require_RPUSHX = __commonJS({
 var require_SADD = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SADD.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -37810,7 +37377,6 @@ var require_SADD = __commonJS({
 var require_SCARD = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SCARD.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -37835,7 +37401,6 @@ var require_SCARD = __commonJS({
 var require_SCRIPT_DEBUG = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SCRIPT_DEBUG.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -37859,7 +37424,6 @@ var require_SCRIPT_DEBUG = __commonJS({
 var require_SCRIPT_EXISTS = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SCRIPT_EXISTS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -37884,7 +37448,6 @@ var require_SCRIPT_EXISTS = __commonJS({
 var require_SCRIPT_FLUSH = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SCRIPT_FLUSH.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -37911,7 +37474,6 @@ var require_SCRIPT_FLUSH = __commonJS({
 var require_SCRIPT_KILL = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SCRIPT_KILL.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -37934,7 +37496,6 @@ var require_SCRIPT_KILL = __commonJS({
 var require_SCRIPT_LOAD = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SCRIPT_LOAD.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -37958,7 +37519,6 @@ var require_SCRIPT_LOAD = __commonJS({
 var require_SDIFF = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SDIFF.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -37983,7 +37543,6 @@ var require_SDIFF = __commonJS({
 var require_SDIFFSTORE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SDIFFSTORE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -38008,7 +37567,6 @@ var require_SDIFFSTORE = __commonJS({
 var require_SET = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SET.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -38066,7 +37624,6 @@ var require_SET = __commonJS({
 var require_SETBIT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SETBIT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -38093,7 +37650,6 @@ var require_SETBIT = __commonJS({
 var require_SETEX = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SETEX.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -38119,7 +37675,6 @@ var require_SETEX = __commonJS({
 var require_SETNX = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SETNX.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -38144,7 +37699,6 @@ var require_SETNX = __commonJS({
 var require_SETRANGE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SETRANGE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -38170,7 +37724,6 @@ var require_SETRANGE = __commonJS({
 var require_SINTER = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SINTER.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -38195,7 +37748,6 @@ var require_SINTER = __commonJS({
 var require_SINTERCARD = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SINTERCARD.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -38225,7 +37777,6 @@ var require_SINTERCARD = __commonJS({
 var require_SINTERSTORE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SINTERSTORE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -38251,7 +37802,6 @@ var require_SINTERSTORE = __commonJS({
 var require_SISMEMBER = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SISMEMBER.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -38278,7 +37828,6 @@ var require_SISMEMBER = __commonJS({
 var require_SMEMBERS = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SMEMBERS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -38306,7 +37855,6 @@ var require_SMEMBERS = __commonJS({
 var require_SMISMEMBER = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SMISMEMBER.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -38333,7 +37881,6 @@ var require_SMISMEMBER = __commonJS({
 var require_SMOVE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SMOVE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -38360,7 +37907,6 @@ var require_SMOVE = __commonJS({
 var require_SORT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SORT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.parseSortArguments = void 0;
     function parseSortArguments(parser, key, options) {
@@ -38412,7 +37958,6 @@ var require_SORT = __commonJS({
 var require_SORT_RO = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SORT_RO.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -38462,7 +38007,6 @@ var require_SORT_RO = __commonJS({
 var require_SORT_STORE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SORT_STORE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -38490,7 +38034,6 @@ var require_SORT_STORE = __commonJS({
 var require_SPOP_COUNT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SPOP_COUNT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -38516,7 +38059,6 @@ var require_SPOP_COUNT = __commonJS({
 var require_SPOP = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SPOP.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -38540,7 +38082,6 @@ var require_SPOP = __commonJS({
 var require_SPUBLISH = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SPUBLISH.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -38566,7 +38107,6 @@ var require_SPUBLISH = __commonJS({
 var require_SRANDMEMBER = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SRANDMEMBER.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -38590,7 +38130,6 @@ var require_SRANDMEMBER = __commonJS({
 var require_SRANDMEMBER_COUNT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SRANDMEMBER_COUNT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -38619,7 +38158,6 @@ var require_SRANDMEMBER_COUNT = __commonJS({
 var require_SREM = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SREM.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -38646,7 +38184,6 @@ var require_SREM = __commonJS({
 var require_SSCAN = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SSCAN.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var SCAN_1 = require_SCAN();
     exports.default = {
@@ -38687,7 +38224,6 @@ var require_SSCAN = __commonJS({
 var require_STRLEN = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/STRLEN.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -38713,7 +38249,6 @@ var require_STRLEN = __commonJS({
 var require_SUNION = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SUNION.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -38739,7 +38274,6 @@ var require_SUNION = __commonJS({
 var require_SUNIONSTORE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SUNIONSTORE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -38766,7 +38300,6 @@ var require_SUNIONSTORE = __commonJS({
 var require_SWAPDB = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/SWAPDB.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -38789,7 +38322,6 @@ var require_SWAPDB = __commonJS({
 var require_TIME = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/TIME.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -38813,7 +38345,6 @@ var require_TIME = __commonJS({
 var require_TOUCH = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/TOUCH.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -38838,7 +38369,6 @@ var require_TOUCH = __commonJS({
 var require_TTL = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/TTL.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -38863,7 +38393,6 @@ var require_TTL = __commonJS({
 var require_TYPE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/TYPE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -38889,7 +38418,6 @@ var require_TYPE = __commonJS({
 var require_UNLINK = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/UNLINK.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -38914,7 +38442,6 @@ var require_UNLINK = __commonJS({
 var require_WAIT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/WAIT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -38940,7 +38467,6 @@ var require_WAIT = __commonJS({
 var require_XACK = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/XACK.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -38969,7 +38495,6 @@ var require_XACK = __commonJS({
 var require_XACKDEL = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/XACKDEL.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -39003,7 +38528,6 @@ var require_XACKDEL = __commonJS({
 var require_XADD = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/XADD.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.parseXAddArguments = void 0;
     function parseXAddArguments(optional, parser, key, id, message, options) {
@@ -39067,7 +38591,6 @@ var require_XADD = __commonJS({
 var require_XADD_NOMKSTREAM = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/XADD_NOMKSTREAM.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var XADD_1 = require_XADD();
     exports.default = {
@@ -39091,7 +38614,6 @@ var require_XADD_NOMKSTREAM = __commonJS({
 var require_XAUTOCLAIM = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/XAUTOCLAIM.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -39140,7 +38662,6 @@ var require_XAUTOCLAIM = __commonJS({
 var require_XAUTOCLAIM_JUSTID = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/XAUTOCLAIM_JUSTID.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -39181,7 +38702,6 @@ var require_XAUTOCLAIM_JUSTID = __commonJS({
 var require_XCLAIM = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/XCLAIM.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -39239,7 +38759,6 @@ var require_XCLAIM = __commonJS({
 var require_XCLAIM_JUSTID = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/XCLAIM_JUSTID.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -39273,7 +38792,6 @@ var require_XCLAIM_JUSTID = __commonJS({
 var require_XCFGSET = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/XCFGSET.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -39307,7 +38825,6 @@ var require_XCFGSET = __commonJS({
 var require_XDEL = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/XDEL.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -39334,7 +38851,6 @@ var require_XDEL = __commonJS({
 var require_XDELEX = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/XDELEX.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -39366,7 +38882,6 @@ var require_XDELEX = __commonJS({
 var require_XGROUP_CREATE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/XGROUP_CREATE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -39401,7 +38916,6 @@ var require_XGROUP_CREATE = __commonJS({
 var require_XGROUP_CREATECONSUMER = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/XGROUP_CREATECONSUMER.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -39429,7 +38943,6 @@ var require_XGROUP_CREATECONSUMER = __commonJS({
 var require_XGROUP_DELCONSUMER = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/XGROUP_DELCONSUMER.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -39457,7 +38970,6 @@ var require_XGROUP_DELCONSUMER = __commonJS({
 var require_XGROUP_DESTROY = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/XGROUP_DESTROY.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -39484,7 +38996,6 @@ var require_XGROUP_DESTROY = __commonJS({
 var require_XGROUP_SETID = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/XGROUP_SETID.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -39516,7 +39027,6 @@ var require_XGROUP_SETID = __commonJS({
 var require_XINFO_CONSUMERS = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/XINFO_CONSUMERS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -39562,7 +39072,6 @@ var require_XINFO_CONSUMERS = __commonJS({
 var require_XINFO_GROUPS = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/XINFO_GROUPS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -39614,7 +39123,6 @@ var require_XINFO_GROUPS = __commonJS({
 var require_XINFO_STREAM = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/XINFO_STREAM.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -39683,7 +39191,6 @@ var require_XINFO_STREAM = __commonJS({
 var require_XLEN = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/XLEN.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -39709,7 +39216,6 @@ var require_XLEN = __commonJS({
 var require_XPENDING_RANGE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/XPENDING_RANGE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -39764,7 +39270,6 @@ var require_XPENDING_RANGE = __commonJS({
 var require_XPENDING = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/XPENDING.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -39812,7 +39317,6 @@ var require_XPENDING = __commonJS({
 var require_XRANGE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/XRANGE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.xRangeArguments = void 0;
     var generic_transformers_1 = require_generic_transformers();
@@ -39861,7 +39365,6 @@ var require_XRANGE = __commonJS({
 var require_XREAD = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/XREAD.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.pushXReadStreams = void 0;
     var generic_transformers_1 = require_generic_transformers();
@@ -39918,7 +39421,6 @@ var require_XREAD = __commonJS({
 var require_XREADGROUP = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/XREADGROUP.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var XREAD_1 = require_XREAD();
     var generic_transformers_1 = require_generic_transformers();
@@ -39966,7 +39468,6 @@ var require_XREADGROUP = __commonJS({
 var require_XREVRANGE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/XREVRANGE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -40022,7 +39523,6 @@ var require_XREVRANGE = __commonJS({
 var require_XSETID = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/XSETID.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -40046,7 +39546,6 @@ var require_XSETID = __commonJS({
 var require_XTRIM = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/XTRIM.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -40085,7 +39584,6 @@ var require_XTRIM = __commonJS({
 var require_ZADD = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZADD.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.pushMembers = void 0;
     var generic_transformers_1 = require_generic_transformers();
@@ -40146,7 +39644,6 @@ var require_ZADD = __commonJS({
 var require_ZADD_INCR = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZADD_INCR.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var ZADD_1 = require_ZADD();
     var generic_transformers_1 = require_generic_transformers();
@@ -40185,7 +39682,6 @@ var require_ZADD_INCR = __commonJS({
 var require_ZCARD = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZCARD.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -40211,7 +39707,6 @@ var require_ZCARD = __commonJS({
 var require_ZCOUNT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZCOUNT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -40238,7 +39733,6 @@ var require_ZCOUNT = __commonJS({
 var require_ZDIFF = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZDIFF.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -40260,7 +39754,6 @@ var require_ZDIFF = __commonJS({
 var require_ZDIFF_WITHSCORES = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZDIFF_WITHSCORES.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -40287,7 +39780,6 @@ var require_ZDIFF_WITHSCORES = __commonJS({
 var require_ZDIFFSTORE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZDIFFSTORE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -40311,7 +39803,6 @@ var require_ZDIFFSTORE = __commonJS({
 var require_ZINCRBY = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZINCRBY.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -40336,7 +39827,6 @@ var require_ZINCRBY = __commonJS({
 var require_ZINTER = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZINTER.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.parseZInterArguments = void 0;
     var generic_transformers_1 = require_generic_transformers();
@@ -40369,7 +39859,6 @@ var require_ZINTER = __commonJS({
 var require_ZINTER_WITHSCORES = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZINTER_WITHSCORES.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -40395,7 +39884,6 @@ var require_ZINTER_WITHSCORES = __commonJS({
 var require_ZINTERCARD = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZINTERCARD.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -40423,7 +39911,6 @@ var require_ZINTERCARD = __commonJS({
 var require_ZINTERSTORE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZINTERSTORE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var ZINTER_1 = require_ZINTER();
     exports.default = {
@@ -40449,7 +39936,6 @@ var require_ZINTERSTORE = __commonJS({
 var require_ZLEXCOUNT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZLEXCOUNT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -40476,7 +39962,6 @@ var require_ZLEXCOUNT = __commonJS({
 var require_ZMSCORE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZMSCORE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -40507,7 +39992,6 @@ var require_ZMSCORE = __commonJS({
 var require_ZPOPMAX_COUNT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZPOPMAX_COUNT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -40532,7 +40016,6 @@ var require_ZPOPMAX_COUNT = __commonJS({
 var require_ZPOPMAX = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZPOPMAX.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -40572,7 +40055,6 @@ var require_ZPOPMAX = __commonJS({
 var require_ZPOPMIN_COUNT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZPOPMIN_COUNT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -40597,7 +40079,6 @@ var require_ZPOPMIN_COUNT = __commonJS({
 var require_ZPOPMIN = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZPOPMIN.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -40623,7 +40104,6 @@ var require_ZPOPMIN = __commonJS({
 var require_ZRANDMEMBER = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZRANDMEMBER.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -40645,7 +40125,6 @@ var require_ZRANDMEMBER = __commonJS({
 var require_ZRANDMEMBER_COUNT = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZRANDMEMBER_COUNT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -40672,7 +40151,6 @@ var require_ZRANDMEMBER_COUNT = __commonJS({
 var require_ZRANDMEMBER_COUNT_WITHSCORES = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZRANDMEMBER_COUNT_WITHSCORES.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -40700,7 +40178,6 @@ var require_ZRANDMEMBER_COUNT_WITHSCORES = __commonJS({
 var require_ZRANGE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZRANGE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.zRangeArgument = void 0;
     var generic_transformers_1 = require_generic_transformers();
@@ -40752,7 +40229,6 @@ var require_ZRANGE = __commonJS({
 var require_ZRANGE_WITHSCORES = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZRANGE_WITHSCORES.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -40780,7 +40256,6 @@ var require_ZRANGE_WITHSCORES = __commonJS({
 var require_ZRANGEBYLEX = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZRANGEBYLEX.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -40811,7 +40286,6 @@ var require_ZRANGEBYLEX = __commonJS({
 var require_ZRANGEBYSCORE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZRANGEBYSCORE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -40842,7 +40316,6 @@ var require_ZRANGEBYSCORE = __commonJS({
 var require_ZRANGEBYSCORE_WITHSCORES = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZRANGEBYSCORE_WITHSCORES.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -40870,7 +40343,6 @@ var require_ZRANGEBYSCORE_WITHSCORES = __commonJS({
 var require_ZRANGESTORE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZRANGESTORE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -40913,7 +40385,6 @@ var require_ZRANGESTORE = __commonJS({
 var require_ZREMRANGEBYSCORE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZREMRANGEBYSCORE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -40939,7 +40410,6 @@ var require_ZREMRANGEBYSCORE = __commonJS({
 var require_ZRANK = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZRANK.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -40964,7 +40434,6 @@ var require_ZRANK = __commonJS({
 var require_ZRANK_WITHSCORE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZRANK_WITHSCORE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -41008,7 +40477,6 @@ var require_ZRANK_WITHSCORE = __commonJS({
 var require_ZREM = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZREM.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -41032,7 +40500,6 @@ var require_ZREM = __commonJS({
 var require_ZREMRANGEBYLEX = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZREMRANGEBYLEX.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -41058,7 +40525,6 @@ var require_ZREMRANGEBYLEX = __commonJS({
 var require_ZREMRANGEBYRANK = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZREMRANGEBYRANK.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -41083,7 +40549,6 @@ var require_ZREMRANGEBYRANK = __commonJS({
 var require_ZREVRANK = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZREVRANK.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       CACHEABLE: true,
@@ -41108,7 +40573,6 @@ var require_ZREVRANK = __commonJS({
 var require_ZSCAN = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZSCAN.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var SCAN_1 = require_SCAN();
     var generic_transformers_1 = require_generic_transformers();
@@ -41140,7 +40604,6 @@ var require_ZSCAN = __commonJS({
 var require_ZSCORE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZSCORE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -41166,7 +40629,6 @@ var require_ZSCORE = __commonJS({
 var require_ZUNION = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZUNION.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -41193,7 +40655,6 @@ var require_ZUNION = __commonJS({
 var require_ZUNION_WITHSCORES = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZUNION_WITHSCORES.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -41220,7 +40681,6 @@ var require_ZUNION_WITHSCORES = __commonJS({
 var require_ZUNIONSTORE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/ZUNIONSTORE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -41249,7 +40709,6 @@ var require_ZUNIONSTORE = __commonJS({
 var require_VADD = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/VADD.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -41297,7 +40756,6 @@ var require_VADD = __commonJS({
 var require_VCARD = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/VCARD.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -41321,7 +40779,6 @@ var require_VCARD = __commonJS({
 var require_VDIM = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/VDIM.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -41345,7 +40802,6 @@ var require_VDIM = __commonJS({
 var require_VEMB = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/VEMB.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -41372,7 +40828,6 @@ var require_VEMB = __commonJS({
 var require_VEMB_RAW = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/VEMB_RAW.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -41420,7 +40875,6 @@ var require_VEMB_RAW = __commonJS({
 var require_VGETATTR = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/VGETATTR.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -41447,7 +40901,6 @@ var require_VGETATTR = __commonJS({
 var require_VINFO = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/VINFO.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -41480,7 +40933,6 @@ var require_VINFO = __commonJS({
 var require_VLINKS = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/VLINKS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -41506,7 +40958,6 @@ var require_VLINKS = __commonJS({
 var require_VLINKS_WITHSCORES = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/VLINKS_WITHSCORES.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -41551,7 +41002,6 @@ var require_VLINKS_WITHSCORES = __commonJS({
 var require_VRANDMEMBER = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/VRANDMEMBER.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -41579,7 +41029,6 @@ var require_VRANDMEMBER = __commonJS({
 var require_VRANGE = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/VRANGE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -41616,7 +41065,6 @@ var require_VRANGE = __commonJS({
 var require_VREM = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/VREM.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -41642,7 +41090,6 @@ var require_VREM = __commonJS({
 var require_VSETATTR = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/VSETATTR.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -41674,7 +41121,6 @@ var require_VSETATTR = __commonJS({
 var require_VSIM = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/VSIM.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -41730,7 +41176,6 @@ var require_VSIM = __commonJS({
 var require_VSIM_WITHSCORES = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/VSIM_WITHSCORES.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -41768,7 +41213,6 @@ var require_VSIM_WITHSCORES = __commonJS({
 var require_LATENCY_HISTOGRAM = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/LATENCY_HISTOGRAM.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     var id = /* @__PURE__ */ __name((n) => n, "id");
@@ -41813,7 +41257,6 @@ var require_LATENCY_HISTOGRAM = __commonJS({
 var require_commands = __commonJS({
   "node_modules/@redis/client/dist/lib/commands/index.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -42991,7 +42434,6 @@ var require_commands = __commonJS({
 import libDefault20 from "node:tls";
 var require_node_tls = __commonJS({
   "node-built-in-modules:node:tls"(exports, module) {
-    init_modules_watch_stub();
     module.exports = libDefault20;
   }
 });
@@ -43000,7 +42442,6 @@ var require_node_tls = __commonJS({
 import libDefault21 from "node:timers/promises";
 var require_promises = __commonJS({
   "node-built-in-modules:node:timers/promises"(exports, module) {
-    init_modules_watch_stub();
     module.exports = libDefault21;
   }
 });
@@ -43009,7 +42450,6 @@ var require_promises = __commonJS({
 import libDefault22 from "net";
 var require_net = __commonJS({
   "node-built-in-modules:net"(exports, module) {
-    init_modules_watch_stub();
     module.exports = libDefault22;
   }
 });
@@ -43018,7 +42458,6 @@ var require_net = __commonJS({
 import libDefault23 from "dns/promises";
 var require_promises2 = __commonJS({
   "node-built-in-modules:dns/promises"(exports, module) {
-    init_modules_watch_stub();
     module.exports = libDefault23;
   }
 });
@@ -43027,7 +42466,6 @@ var require_promises2 = __commonJS({
 import libDefault24 from "node:assert";
 var require_node_assert = __commonJS({
   "node-built-in-modules:node:assert"(exports, module) {
-    init_modules_watch_stub();
     module.exports = libDefault24;
   }
 });
@@ -43036,7 +42474,6 @@ var require_node_assert = __commonJS({
 import libDefault25 from "node:diagnostics_channel";
 var require_node_diagnostics_channel = __commonJS({
   "node-built-in-modules:node:diagnostics_channel"(exports, module) {
-    init_modules_watch_stub();
     module.exports = libDefault25;
   }
 });
@@ -43045,7 +42482,6 @@ var require_node_diagnostics_channel = __commonJS({
 var require_enterprise_maintenance_manager = __commonJS({
   "node_modules/@redis/client/dist/lib/client/enterprise-maintenance-manager.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -43401,7 +42837,6 @@ var require_enterprise_maintenance_manager = __commonJS({
 var require_socket = __commonJS({
   "node_modules/@redis/client/dist/lib/client/socket.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -43704,7 +43139,6 @@ var require_socket = __commonJS({
 var require_token = __commonJS({
   "node_modules/@redis/client/dist/lib/authx/token.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Token = void 0;
     var Token = class {
@@ -43738,7 +43172,6 @@ var require_token = __commonJS({
 var require_token_manager = __commonJS({
   "node_modules/@redis/client/dist/lib/authx/token-manager.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TokenManager = exports.IDPError = void 0;
     var token_1 = require_token();
@@ -43917,7 +43350,6 @@ var require_token_manager = __commonJS({
 var require_credentials_provider = __commonJS({
   "node_modules/@redis/client/dist/lib/authx/credentials-provider.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.UnableToObtainNewCredentialsError = exports.CredentialsError = void 0;
     var CredentialsError = class extends Error {
@@ -43947,7 +43379,6 @@ var require_credentials_provider = __commonJS({
 var require_authx = __commonJS({
   "node_modules/@redis/client/dist/lib/authx/index.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Token = exports.CredentialsError = exports.UnableToObtainNewCredentialsError = exports.IDPError = exports.TokenManager = void 0;
     var token_manager_1 = require_token_manager();
@@ -43975,7 +43406,6 @@ var require_authx = __commonJS({
 import libDefault26 from "events";
 var require_events = __commonJS({
   "node-built-in-modules:events"(exports, module) {
-    init_modules_watch_stub();
     module.exports = libDefault26;
   }
 });
@@ -43984,7 +43414,6 @@ var require_events = __commonJS({
 var require_linked_list = __commonJS({
   "node_modules/@redis/client/dist/lib/client/linked-list.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -44203,7 +43632,6 @@ var require_linked_list = __commonJS({
 var require_encoder = __commonJS({
   "node_modules/@redis/client/dist/lib/RESP/encoder.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var CRLF = "\r\n";
     function encodeCommand(args) {
@@ -44231,7 +43659,6 @@ var require_encoder = __commonJS({
 // node_modules/cluster-key-slot/lib/index.js
 var require_lib3 = __commonJS({
   "node_modules/cluster-key-slot/lib/index.js"(exports, module) {
-    init_modules_watch_stub();
     var lookup = [
       0,
       4129,
@@ -44556,7 +43983,6 @@ var require_lib3 = __commonJS({
 var require_pub_sub = __commonJS({
   "node_modules/@redis/client/dist/lib/client/pub-sub.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -44894,7 +44320,6 @@ var require_pub_sub = __commonJS({
 var require_commands_queue = __commonJS({
   "node_modules/@redis/client/dist/lib/client/commands-queue.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -45361,7 +44786,6 @@ var require_commands_queue = __commonJS({
 var require_commander = __commonJS({
   "node_modules/@redis/client/dist/lib/commander.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.scriptArgumentsPrefix = exports.functionArgumentsPrefix = exports.getTransformReply = exports.attachConfig = void 0;
     function throwResp3SearchModuleUnstableError() {
@@ -45464,7 +44888,6 @@ var require_commander = __commonJS({
 import libDefault27 from "node:url";
 var require_node_url = __commonJS({
   "node-built-in-modules:node:url"(exports, module) {
-    init_modules_watch_stub();
     module.exports = libDefault27;
   }
 });
@@ -45473,7 +44896,6 @@ var require_node_url = __commonJS({
 var require_multi_command = __commonJS({
   "node_modules/@redis/client/dist/lib/multi-command.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var errors_1 = require_errors();
     var RedisMultiCommand = class {
@@ -45529,7 +44951,6 @@ var require_multi_command = __commonJS({
 var require_multi_command2 = __commonJS({
   "node_modules/@redis/client/dist/lib/client/multi-command.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -45644,7 +45065,6 @@ var require_multi_command2 = __commonJS({
 var require_legacy_mode = __commonJS({
   "node_modules/@redis/client/dist/lib/client/legacy-mode.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -45765,7 +45185,6 @@ var require_legacy_mode = __commonJS({
 var require_cache = __commonJS({
   "node_modules/@redis/client/dist/lib/client/cache.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PooledNoRedirectClientSideCache = exports.BasicPooledClientSideCache = exports.PooledClientSideCacheProvider = exports.BasicClientSideCache = exports.ClientSideCacheProvider = exports.CacheStats = void 0;
     var stream_1 = require_stream();
@@ -46374,7 +45793,6 @@ var require_cache = __commonJS({
 var require_single_entry_cache = __commonJS({
   "node_modules/@redis/client/dist/lib/single-entry-cache.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var SingleEntryCache = class {
       static {
@@ -46422,7 +45840,6 @@ var require_single_entry_cache = __commonJS({
 var require_pool = __commonJS({
   "node_modules/@redis/client/dist/lib/client/pool.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -46797,7 +46214,6 @@ var require_package2 = __commonJS({
 var require_client = __commonJS({
   "node_modules/@redis/client/dist/lib/client/index.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -47763,7 +47179,6 @@ var require_client = __commonJS({
 var require_cluster_slots = __commonJS({
   "node_modules/@redis/client/dist/lib/cluster/cluster-slots.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -48358,7 +47773,6 @@ var require_cluster_slots = __commonJS({
 var require_multi_command3 = __commonJS({
   "node_modules/@redis/client/dist/lib/cluster/multi-command.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -48479,7 +47893,6 @@ var require_multi_command3 = __commonJS({
 var require_cluster = __commonJS({
   "node_modules/@redis/client/dist/lib/cluster/index.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -48872,7 +48285,6 @@ var require_cluster = __commonJS({
 var require_utils5 = __commonJS({
   "node_modules/@redis/client/dist/lib/sentinel/utils.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getMappedNode = exports.createScriptCommand = exports.createModuleCommand = exports.createFunctionCommand = exports.createCommand = exports.clientSocketToNode = exports.createNodeList = exports.parseNode = void 0;
     var parser_1 = require_parser();
@@ -48972,7 +48384,6 @@ var require_utils5 = __commonJS({
 var require_multi_commands = __commonJS({
   "node_modules/@redis/client/dist/lib/sentinel/multi-commands.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -49084,7 +48495,6 @@ var require_multi_commands = __commonJS({
 var require_pub_sub_proxy = __commonJS({
   "node_modules/@redis/client/dist/lib/sentinel/pub-sub-proxy.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -49224,7 +48634,6 @@ var require_pub_sub_proxy = __commonJS({
 var require_SENTINEL_MASTER = __commonJS({
   "node_modules/@redis/client/dist/lib/sentinel/commands/SENTINEL_MASTER.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -49248,7 +48657,6 @@ var require_SENTINEL_MASTER = __commonJS({
 var require_SENTINEL_MONITOR = __commonJS({
   "node_modules/@redis/client/dist/lib/sentinel/commands/SENTINEL_MONITOR.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -49271,7 +48679,6 @@ var require_SENTINEL_MONITOR = __commonJS({
 var require_SENTINEL_REPLICAS = __commonJS({
   "node_modules/@redis/client/dist/lib/sentinel/commands/SENTINEL_REPLICAS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -49302,7 +48709,6 @@ var require_SENTINEL_REPLICAS = __commonJS({
 var require_SENTINEL_SENTINELS = __commonJS({
   "node_modules/@redis/client/dist/lib/sentinel/commands/SENTINEL_SENTINELS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -49333,7 +48739,6 @@ var require_SENTINEL_SENTINELS = __commonJS({
 var require_SENTINEL_SET = __commonJS({
   "node_modules/@redis/client/dist/lib/sentinel/commands/SENTINEL_SET.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       /**
@@ -49357,7 +48762,6 @@ var require_SENTINEL_SET = __commonJS({
 var require_commands2 = __commonJS({
   "node_modules/@redis/client/dist/lib/sentinel/commands/index.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -49386,7 +48790,6 @@ var require_commands2 = __commonJS({
 var require_module = __commonJS({
   "node_modules/@redis/client/dist/lib/sentinel/module.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -49402,7 +48805,6 @@ var require_module = __commonJS({
 var require_wait_queue = __commonJS({
   "node_modules/@redis/client/dist/lib/sentinel/wait-queue.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.WaitQueue = void 0;
     var linked_list_1 = require_linked_list();
@@ -49435,7 +48837,6 @@ var require_wait_queue = __commonJS({
 var require_sentinel = __commonJS({
   "node_modules/@redis/client/dist/lib/sentinel/index.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -50592,7 +49993,6 @@ var require_sentinel = __commonJS({
 var require_dist4 = __commonJS({
   "node_modules/@redis/client/dist/index.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -50673,7 +50073,6 @@ var require_dist4 = __commonJS({
 var require_ADD = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/bloom/ADD.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -50698,7 +50097,6 @@ var require_ADD = __commonJS({
 var require_CARD = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/bloom/CARD.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -50720,7 +50118,6 @@ var require_CARD = __commonJS({
 var require_EXISTS2 = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/bloom/EXISTS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -50745,7 +50142,6 @@ var require_EXISTS2 = __commonJS({
 var require_helpers2 = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/bloom/helpers.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.transformInfoV2Reply = void 0;
     var client_1 = require_dist4();
@@ -50780,7 +50176,6 @@ var require_helpers2 = __commonJS({
 var require_INFO2 = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/bloom/INFO.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var helpers_1 = require_helpers2();
     exports.default = {
@@ -50808,7 +50203,6 @@ var require_INFO2 = __commonJS({
 var require_INSERT = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/bloom/INSERT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -50855,7 +50249,6 @@ var require_INSERT = __commonJS({
 var require_LOADCHUNK = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/bloom/LOADCHUNK.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -50880,7 +50273,6 @@ var require_LOADCHUNK = __commonJS({
 var require_MADD = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/bloom/MADD.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -50905,7 +50297,6 @@ var require_MADD = __commonJS({
 var require_MEXISTS = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/bloom/MEXISTS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -50930,7 +50321,6 @@ var require_MEXISTS = __commonJS({
 var require_RESERVE = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/bloom/RESERVE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -50964,7 +50354,6 @@ var require_RESERVE = __commonJS({
 var require_SCANDUMP = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/bloom/SCANDUMP.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -50993,7 +50382,6 @@ var require_SCANDUMP = __commonJS({
 var require_bloom = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/bloom/index.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -51054,7 +50442,6 @@ var require_bloom = __commonJS({
 var require_INCRBY2 = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/count-min-sketch/INCRBY.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -51088,7 +50475,6 @@ var require_INCRBY2 = __commonJS({
 var require_INFO3 = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/count-min-sketch/INFO.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var bloom_1 = require_bloom();
     exports.default = {
@@ -51116,7 +50502,6 @@ var require_INFO3 = __commonJS({
 var require_INITBYDIM = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/count-min-sketch/INITBYDIM.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -51141,7 +50526,6 @@ var require_INITBYDIM = __commonJS({
 var require_INITBYPROB = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/count-min-sketch/INITBYPROB.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -51166,7 +50550,6 @@ var require_INITBYPROB = __commonJS({
 var require_MERGE = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/count-min-sketch/MERGE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -51205,7 +50588,6 @@ var require_MERGE = __commonJS({
 var require_QUERY = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/count-min-sketch/QUERY.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -51229,7 +50611,6 @@ var require_QUERY = __commonJS({
 var require_count_min_sketch = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/count-min-sketch/index.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -51261,7 +50642,6 @@ var require_count_min_sketch = __commonJS({
 var require_ADD2 = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/cuckoo/ADD.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -51286,7 +50666,6 @@ var require_ADD2 = __commonJS({
 var require_ADDNX = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/cuckoo/ADDNX.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -51311,7 +50690,6 @@ var require_ADDNX = __commonJS({
 var require_COUNT = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/cuckoo/COUNT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -51335,7 +50713,6 @@ var require_COUNT = __commonJS({
 var require_DEL2 = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/cuckoo/DEL.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -51360,7 +50737,6 @@ var require_DEL2 = __commonJS({
 var require_EXISTS3 = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/cuckoo/EXISTS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -51385,7 +50761,6 @@ var require_EXISTS3 = __commonJS({
 var require_INFO4 = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/cuckoo/INFO.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var bloom_1 = require_bloom();
     exports.default = {
@@ -51413,7 +50788,6 @@ var require_INFO4 = __commonJS({
 var require_INSERT2 = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/cuckoo/INSERT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.parseCfInsertArguments = void 0;
     var generic_transformers_1 = require_generic_transformers();
@@ -51454,7 +50828,6 @@ var require_INSERT2 = __commonJS({
 var require_INSERTNX = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/cuckoo/INSERTNX.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -51499,7 +50872,6 @@ var require_INSERTNX = __commonJS({
 var require_LOADCHUNK2 = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/cuckoo/LOADCHUNK.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -51524,7 +50896,6 @@ var require_LOADCHUNK2 = __commonJS({
 var require_RESERVE2 = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/cuckoo/RESERVE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -51561,7 +50932,6 @@ var require_RESERVE2 = __commonJS({
 var require_SCANDUMP2 = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/cuckoo/SCANDUMP.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -51590,7 +50960,6 @@ var require_SCANDUMP2 = __commonJS({
 var require_cuckoo = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/cuckoo/index.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -51637,7 +51006,6 @@ var require_cuckoo = __commonJS({
 var require_ADD3 = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/t-digest/ADD.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -51663,7 +51031,6 @@ var require_ADD3 = __commonJS({
 var require_BYRANK = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/t-digest/BYRANK.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.transformByRankArguments = void 0;
     var generic_transformers_1 = require_generic_transformers();
@@ -51696,7 +51063,6 @@ var require_BYRANK = __commonJS({
 var require_BYREVRANK = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/t-digest/BYREVRANK.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -51741,7 +51107,6 @@ var require_BYREVRANK = __commonJS({
 var require_CDF = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/t-digest/CDF.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -51768,7 +51133,6 @@ var require_CDF = __commonJS({
 var require_CREATE = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/t-digest/CREATE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -51795,7 +51159,6 @@ var require_CREATE = __commonJS({
 var require_INFO5 = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/t-digest/INFO.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var bloom_1 = require_bloom();
     exports.default = {
@@ -51823,7 +51186,6 @@ var require_INFO5 = __commonJS({
 var require_MAX = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/t-digest/MAX.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -51846,7 +51208,6 @@ var require_MAX = __commonJS({
 var require_MERGE2 = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/t-digest/MERGE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -51879,7 +51240,6 @@ var require_MERGE2 = __commonJS({
 var require_MIN = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/t-digest/MIN.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -51902,7 +51262,6 @@ var require_MIN = __commonJS({
 var require_QUANTILE = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/t-digest/QUANTILE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -51929,7 +51288,6 @@ var require_QUANTILE = __commonJS({
 var require_RANK = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/t-digest/RANK.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.transformRankArguments = void 0;
     function transformRankArguments(parser, key, values) {
@@ -51961,7 +51319,6 @@ var require_RANK = __commonJS({
 var require_RESET = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/t-digest/RESET.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -51983,7 +51340,6 @@ var require_RESET = __commonJS({
 var require_REVRANK = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/t-digest/REVRANK.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -52028,7 +51384,6 @@ var require_REVRANK = __commonJS({
 var require_TRIMMED_MEAN = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/t-digest/TRIMMED_MEAN.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -52054,7 +51409,6 @@ var require_TRIMMED_MEAN = __commonJS({
 var require_t_digest = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/t-digest/index.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -52110,7 +51464,6 @@ var require_t_digest = __commonJS({
 var require_ADD4 = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/top-k/ADD.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -52134,7 +51487,6 @@ var require_ADD4 = __commonJS({
 var require_COUNT2 = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/top-k/COUNT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -52158,7 +51510,6 @@ var require_COUNT2 = __commonJS({
 var require_INCRBY3 = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/top-k/INCRBY.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     function pushIncrByItem(parser, { item, incrementBy }) {
       parser.push(item, incrementBy.toString());
@@ -52192,7 +51543,6 @@ var require_INCRBY3 = __commonJS({
 var require_INFO6 = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/top-k/INFO.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     var bloom_1 = require_bloom();
@@ -52222,7 +51572,6 @@ var require_INFO6 = __commonJS({
 var require_LIST_WITHCOUNT = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/top-k/LIST_WITHCOUNT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -52254,7 +51603,6 @@ var require_LIST_WITHCOUNT = __commonJS({
 var require_LIST = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/top-k/LIST.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -52276,7 +51624,6 @@ var require_LIST = __commonJS({
 var require_QUERY2 = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/top-k/QUERY.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -52301,7 +51648,6 @@ var require_QUERY2 = __commonJS({
 var require_RESERVE3 = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/top-k/RESERVE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -52332,7 +51678,6 @@ var require_RESERVE3 = __commonJS({
 var require_top_k = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/top-k/index.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -52370,7 +51715,6 @@ var require_top_k = __commonJS({
 var require_commands3 = __commonJS({
   "node_modules/@redis/bloom/dist/lib/commands/index.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -52394,7 +51738,6 @@ var require_commands3 = __commonJS({
 var require_lib4 = __commonJS({
   "node_modules/@redis/bloom/dist/lib/index.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -52411,7 +51754,6 @@ var require_lib4 = __commonJS({
 var require_ARRAPPEND = __commonJS({
   "node_modules/@redis/json/dist/lib/commands/ARRAPPEND.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -52443,7 +51785,6 @@ var require_ARRAPPEND = __commonJS({
 var require_ARRINDEX = __commonJS({
   "node_modules/@redis/json/dist/lib/commands/ARRINDEX.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -52480,7 +51821,6 @@ var require_ARRINDEX = __commonJS({
 var require_ARRINSERT = __commonJS({
   "node_modules/@redis/json/dist/lib/commands/ARRINSERT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -52513,7 +51853,6 @@ var require_ARRINSERT = __commonJS({
 var require_ARRLEN = __commonJS({
   "node_modules/@redis/json/dist/lib/commands/ARRLEN.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -52542,7 +51881,6 @@ var require_ARRLEN = __commonJS({
 var require_ARRPOP = __commonJS({
   "node_modules/@redis/json/dist/lib/commands/ARRPOP.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -52578,7 +51916,6 @@ var require_ARRPOP = __commonJS({
 var require_ARRTRIM = __commonJS({
   "node_modules/@redis/json/dist/lib/commands/ARRTRIM.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -52606,7 +51943,6 @@ var require_ARRTRIM = __commonJS({
 var require_CLEAR = __commonJS({
   "node_modules/@redis/json/dist/lib/commands/CLEAR.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -52635,7 +51971,6 @@ var require_CLEAR = __commonJS({
 var require_DEBUG_MEMORY = __commonJS({
   "node_modules/@redis/json/dist/lib/commands/DEBUG_MEMORY.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -52664,7 +51999,6 @@ var require_DEBUG_MEMORY = __commonJS({
 var require_DEL3 = __commonJS({
   "node_modules/@redis/json/dist/lib/commands/DEL.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -52693,7 +52027,6 @@ var require_DEL3 = __commonJS({
 var require_FORGET = __commonJS({
   "node_modules/@redis/json/dist/lib/commands/FORGET.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -52722,7 +52055,6 @@ var require_FORGET = __commonJS({
 var require_GET2 = __commonJS({
   "node_modules/@redis/json/dist/lib/commands/GET.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -52752,7 +52084,6 @@ var require_GET2 = __commonJS({
 var require_MERGE3 = __commonJS({
   "node_modules/@redis/json/dist/lib/commands/MERGE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -52780,7 +52111,6 @@ var require_MERGE3 = __commonJS({
 var require_MGET2 = __commonJS({
   "node_modules/@redis/json/dist/lib/commands/MGET.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -52809,7 +52139,6 @@ var require_MGET2 = __commonJS({
 var require_MSET2 = __commonJS({
   "node_modules/@redis/json/dist/lib/commands/MSET.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -52840,7 +52169,6 @@ var require_MSET2 = __commonJS({
 var require_NUMINCRBY = __commonJS({
   "node_modules/@redis/json/dist/lib/commands/NUMINCRBY.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -52872,7 +52200,6 @@ var require_NUMINCRBY = __commonJS({
 var require_NUMMULTBY = __commonJS({
   "node_modules/@redis/json/dist/lib/commands/NUMMULTBY.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -52903,7 +52230,6 @@ var require_NUMMULTBY = __commonJS({
 var require_OBJKEYS = __commonJS({
   "node_modules/@redis/json/dist/lib/commands/OBJKEYS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -52932,7 +52258,6 @@ var require_OBJKEYS = __commonJS({
 var require_OBJLEN = __commonJS({
   "node_modules/@redis/json/dist/lib/commands/OBJLEN.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -52961,7 +52286,6 @@ var require_OBJLEN = __commonJS({
 var require_SET2 = __commonJS({
   "node_modules/@redis/json/dist/lib/commands/SET.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -53000,7 +52324,6 @@ var require_SET2 = __commonJS({
 var require_STRAPPEND = __commonJS({
   "node_modules/@redis/json/dist/lib/commands/STRAPPEND.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -53032,7 +52355,6 @@ var require_STRAPPEND = __commonJS({
 var require_STRLEN2 = __commonJS({
   "node_modules/@redis/json/dist/lib/commands/STRLEN.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -53061,7 +52383,6 @@ var require_STRLEN2 = __commonJS({
 var require_TOGGLE = __commonJS({
   "node_modules/@redis/json/dist/lib/commands/TOGGLE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -53087,7 +52408,6 @@ var require_TOGGLE = __commonJS({
 var require_TYPE2 = __commonJS({
   "node_modules/@redis/json/dist/lib/commands/TYPE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -53122,7 +52442,6 @@ var require_TYPE2 = __commonJS({
 var require_commands4 = __commonJS({
   "node_modules/@redis/json/dist/lib/commands/index.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -53224,7 +52543,6 @@ var require_commands4 = __commonJS({
 var require_lib5 = __commonJS({
   "node_modules/@redis/json/dist/lib/index.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -53241,7 +52559,6 @@ var require_lib5 = __commonJS({
 var require_LIST2 = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/_LIST.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -53265,7 +52582,6 @@ var require_LIST2 = __commonJS({
 var require_CREATE2 = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/CREATE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.REDISEARCH_LANGUAGE = exports.parseSchema = exports.SCHEMA_GEO_SHAPE_COORD_SYSTEM = exports.VAMANA_COMPRESSION_ALGORITHM = exports.SCHEMA_VECTOR_FIELD_ALGORITHM = exports.SCHEMA_TEXT_FIELD_PHONETIC = exports.SCHEMA_FIELD_TYPE = void 0;
     var generic_transformers_1 = require_generic_transformers();
@@ -53532,7 +52848,6 @@ var require_CREATE2 = __commonJS({
 var require_ALTER = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/ALTER.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var CREATE_1 = require_CREATE2();
     exports.default = {
@@ -53557,7 +52872,6 @@ var require_ALTER = __commonJS({
 var require_default = __commonJS({
   "node_modules/@redis/search/dist/lib/dialect/default.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.DEFAULT_DIALECT = void 0;
     exports.DEFAULT_DIALECT = "2";
@@ -53568,7 +52882,6 @@ var require_default = __commonJS({
 var require_SEARCH = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/SEARCH.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.parseSearchOptions = exports.parseParamsArgument = void 0;
     var generic_transformers_1 = require_generic_transformers();
@@ -53732,7 +53045,6 @@ var require_SEARCH = __commonJS({
 var require_AGGREGATE = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/AGGREGATE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.parseGroupByReducer = exports.parseAggregateOptions = exports.FT_AGGREGATE_GROUP_BY_REDUCERS = exports.FT_AGGREGATE_STEPS = void 0;
     var SEARCH_1 = require_SEARCH();
@@ -53945,7 +53257,6 @@ var require_AGGREGATE = __commonJS({
 var require_AGGREGATE_WITHCURSOR = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/AGGREGATE_WITHCURSOR.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -53991,7 +53302,6 @@ var require_AGGREGATE_WITHCURSOR = __commonJS({
 var require_ALIASADD = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/ALIASADD.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -54014,7 +53324,6 @@ var require_ALIASADD = __commonJS({
 var require_ALIASDEL = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/ALIASDEL.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -54036,7 +53345,6 @@ var require_ALIASDEL = __commonJS({
 var require_ALIASUPDATE = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/ALIASUPDATE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -54059,7 +53367,6 @@ var require_ALIASUPDATE = __commonJS({
 var require_CONFIG_GET2 = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/CONFIG_GET.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -54088,7 +53395,6 @@ var require_CONFIG_GET2 = __commonJS({
 var require_CONFIG_SET2 = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/CONFIG_SET.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -54111,7 +53417,6 @@ var require_CONFIG_SET2 = __commonJS({
 var require_CURSOR_DEL = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/CURSOR_DEL.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -54134,7 +53439,6 @@ var require_CURSOR_DEL = __commonJS({
 var require_CURSOR_READ = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/CURSOR_READ.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -54167,7 +53471,6 @@ var require_CURSOR_READ = __commonJS({
 var require_DICTADD = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/DICTADD.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -54191,7 +53494,6 @@ var require_DICTADD = __commonJS({
 var require_DICTDEL = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/DICTDEL.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -54215,7 +53517,6 @@ var require_DICTDEL = __commonJS({
 var require_DICTDUMP = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/DICTDUMP.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -54240,7 +53541,6 @@ var require_DICTDUMP = __commonJS({
 var require_DROPINDEX = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/DROPINDEX.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -54270,7 +53570,6 @@ var require_DROPINDEX = __commonJS({
 var require_EXPLAIN = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/EXPLAIN.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var SEARCH_1 = require_SEARCH();
     var default_1 = require_default();
@@ -54304,7 +53603,6 @@ var require_EXPLAIN = __commonJS({
 var require_EXPLAINCLI = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/EXPLAINCLI.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var default_1 = require_default();
     exports.default = {
@@ -54335,7 +53633,6 @@ var require_EXPLAINCLI = __commonJS({
 var require_HYBRID = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/HYBRID.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.FT_HYBRID_COMBINE_METHOD = exports.FT_HYBRID_VECTOR_METHOD = void 0;
     var generic_transformers_1 = require_generic_transformers();
@@ -54599,7 +53896,6 @@ var require_HYBRID = __commonJS({
 var require_INFO7 = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/INFO.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -54712,7 +54008,6 @@ var require_INFO7 = __commonJS({
 var require_PROFILE_SEARCH = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/PROFILE_SEARCH.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -54780,7 +54075,6 @@ var require_PROFILE_SEARCH = __commonJS({
 var require_PROFILE_AGGREGATE = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/PROFILE_AGGREGATE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -54848,7 +54142,6 @@ var require_PROFILE_AGGREGATE = __commonJS({
 var require_SEARCH_NOCONTENT = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/SEARCH_NOCONTENT.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -54887,7 +54180,6 @@ var require_SEARCH_NOCONTENT = __commonJS({
 var require_SPELLCHECK = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/SPELLCHECK.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var default_1 = require_default();
     exports.default = {
@@ -54948,7 +54240,6 @@ var require_SPELLCHECK = __commonJS({
 var require_SUGADD = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/SUGADD.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -54982,7 +54273,6 @@ var require_SUGADD = __commonJS({
 var require_SUGDEL = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/SUGDEL.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -55006,7 +54296,6 @@ var require_SUGDEL = __commonJS({
 var require_SUGGET = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/SUGGET.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -55039,7 +54328,6 @@ var require_SUGGET = __commonJS({
 var require_SUGGET_WITHPAYLOADS = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/SUGGET_WITHPAYLOADS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -55081,7 +54369,6 @@ var require_SUGGET_WITHPAYLOADS = __commonJS({
 var require_SUGGET_WITHSCORES_WITHPAYLOADS = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/SUGGET_WITHSCORES_WITHPAYLOADS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -55140,7 +54427,6 @@ var require_SUGGET_WITHSCORES_WITHPAYLOADS = __commonJS({
 var require_SUGGET_WITHSCORES = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/SUGGET_WITHSCORES.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -55197,7 +54483,6 @@ var require_SUGGET_WITHSCORES = __commonJS({
 var require_SUGLEN = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/SUGLEN.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -55218,7 +54503,6 @@ var require_SUGLEN = __commonJS({
 var require_SYNDUMP = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/SYNDUMP.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -55251,7 +54535,6 @@ var require_SYNDUMP = __commonJS({
 var require_SYNUPDATE = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/SYNUPDATE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -55281,7 +54564,6 @@ var require_SYNUPDATE = __commonJS({
 var require_TAGVALS = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/TAGVALS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -55307,7 +54589,6 @@ var require_TAGVALS = __commonJS({
 var require_commands5 = __commonJS({
   "node_modules/@redis/search/dist/lib/commands/index.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -55438,7 +54719,6 @@ var require_commands5 = __commonJS({
 var require_lib6 = __commonJS({
   "node_modules/@redis/search/dist/lib/index.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -55475,7 +54755,6 @@ var require_lib6 = __commonJS({
 var require_helpers3 = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/helpers.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.transformRESP2LabelsWithSources = exports.transformRESP2Labels = exports.parseSelectedLabelsArguments = exports.resp3MapToValue = exports.resp2MapToValue = exports.transformSamplesReply = exports.transformSampleReply = exports.parseLabelsArgument = exports.transformTimestampArgument = exports.parseDuplicatePolicy = exports.TIME_SERIES_DUPLICATE_POLICIES = exports.parseChunkSizeArgument = exports.parseEncodingArgument = exports.TIME_SERIES_ENCODING = exports.parseRetentionArgument = exports.parseIgnoreArgument = void 0;
     var client_1 = require_dist4();
@@ -55722,7 +55001,6 @@ var require_helpers3 = __commonJS({
 var require_ADD5 = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/ADD.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var helpers_1 = require_helpers3();
     exports.default = {
@@ -55757,7 +55035,6 @@ var require_ADD5 = __commonJS({
 var require_ALTER2 = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/ALTER.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var helpers_1 = require_helpers3();
     exports.default = {
@@ -55786,7 +55063,6 @@ var require_ALTER2 = __commonJS({
 var require_CREATE3 = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/CREATE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var helpers_1 = require_helpers3();
     exports.default = {
@@ -55816,7 +55092,6 @@ var require_CREATE3 = __commonJS({
 var require_CREATERULE = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/CREATERULE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TIME_SERIES_AGGREGATION_TYPE = void 0;
     exports.TIME_SERIES_AGGREGATION_TYPE = {
@@ -55870,7 +55145,6 @@ var require_CREATERULE = __commonJS({
 var require_INCRBY4 = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/INCRBY.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.parseIncrByArguments = void 0;
     var helpers_1 = require_helpers3();
@@ -55910,7 +55184,6 @@ var require_INCRBY4 = __commonJS({
 var require_DECRBY2 = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/DECRBY.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -55960,7 +55233,6 @@ var require_DECRBY2 = __commonJS({
 var require_DEL4 = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/DEL.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var helpers_1 = require_helpers3();
     exports.default = {
@@ -55986,7 +55258,6 @@ var require_DEL4 = __commonJS({
 var require_DELETERULE = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/DELETERULE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: false,
@@ -56009,7 +55280,6 @@ var require_DELETERULE = __commonJS({
 var require_GET3 = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/GET.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       IS_READ_ONLY: true,
@@ -56048,7 +55318,6 @@ var require_GET3 = __commonJS({
 var require_INFO8 = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/INFO.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var generic_transformers_1 = require_generic_transformers();
     exports.default = {
@@ -56112,7 +55381,6 @@ var require_INFO8 = __commonJS({
 var require_INFO_DEBUG = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/INFO_DEBUG.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -56164,7 +55432,6 @@ var require_INFO_DEBUG = __commonJS({
 var require_MADD2 = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/MADD.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var helpers_1 = require_helpers3();
     exports.default = {
@@ -56190,7 +55457,6 @@ var require_MADD2 = __commonJS({
 var require_MGET3 = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/MGET.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.parseFilterArgument = exports.parseLatestArgument = void 0;
     var helpers_1 = require_helpers3();
@@ -56245,7 +55511,6 @@ var require_MGET3 = __commonJS({
 var require_MGET_WITHLABELS = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/MGET_WITHLABELS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.createTransformMGetLabelsReply = void 0;
     var MGET_1 = require_MGET3();
@@ -56295,7 +55560,6 @@ var require_MGET_WITHLABELS = __commonJS({
 var require_MGET_SELECTED_LABELS = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/MGET_SELECTED_LABELS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     var MGET_1 = require_MGET3();
     var helpers_1 = require_helpers3();
@@ -56324,7 +55588,6 @@ var require_MGET_SELECTED_LABELS = __commonJS({
 var require_RANGE = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/RANGE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.transformRangeArguments = exports.parseRangeArguments = exports.TIME_SERIES_BUCKET_TIMESTAMP = void 0;
     var helpers_1 = require_helpers3();
@@ -56398,7 +55661,6 @@ var require_RANGE = __commonJS({
 var require_MRANGE_GROUPBY = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/MRANGE_GROUPBY.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.extractResp3MRangeSources = exports.createTransformMRangeGroupByArguments = exports.parseGroupByArguments = exports.TIME_SERIES_REDUCERS = void 0;
     var helpers_1 = require_helpers3();
@@ -56488,7 +55750,6 @@ var require_MRANGE_GROUPBY = __commonJS({
 var require_MRANGE_SELECTED_LABELS = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/MRANGE_SELECTED_LABELS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.createTransformMRangeSelectedLabelsArguments = void 0;
     var helpers_1 = require_helpers3();
@@ -56542,7 +55803,6 @@ var require_MRANGE_SELECTED_LABELS = __commonJS({
 var require_MRANGE_SELECTED_LABELS_GROUPBY = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/MRANGE_SELECTED_LABELS_GROUPBY.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -56597,7 +55857,6 @@ var require_MRANGE_SELECTED_LABELS_GROUPBY = __commonJS({
 var require_MRANGE_WITHLABELS_GROUPBY = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/MRANGE_WITHLABELS_GROUPBY.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.createMRangeWithLabelsGroupByTransformArguments = void 0;
     var helpers_1 = require_helpers3();
@@ -56656,7 +55915,6 @@ var require_MRANGE_WITHLABELS_GROUPBY = __commonJS({
 var require_MRANGE_WITHLABELS = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/MRANGE_WITHLABELS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.createTransformMRangeWithLabelsArguments = void 0;
     var helpers_1 = require_helpers3();
@@ -56717,7 +55975,6 @@ var require_MRANGE_WITHLABELS = __commonJS({
 var require_MRANGE = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/MRANGE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.createTransformMRangeArguments = void 0;
     var helpers_1 = require_helpers3();
@@ -56764,7 +56021,6 @@ var require_MRANGE = __commonJS({
 var require_MREVRANGE_GROUPBY = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/MREVRANGE_GROUPBY.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -56815,7 +56071,6 @@ var require_MREVRANGE_GROUPBY = __commonJS({
 var require_MREVRANGE_SELECTED_LABELS_GROUPBY = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/MREVRANGE_SELECTED_LABELS_GROUPBY.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -56867,7 +56122,6 @@ var require_MREVRANGE_SELECTED_LABELS_GROUPBY = __commonJS({
 var require_MREVRANGE_SELECTED_LABELS = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/MREVRANGE_SELECTED_LABELS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -56918,7 +56172,6 @@ var require_MREVRANGE_SELECTED_LABELS = __commonJS({
 var require_MREVRANGE_WITHLABELS_GROUPBY = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/MREVRANGE_WITHLABELS_GROUPBY.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -56969,7 +56222,6 @@ var require_MREVRANGE_WITHLABELS_GROUPBY = __commonJS({
 var require_MREVRANGE_WITHLABELS = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/MREVRANGE_WITHLABELS.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -57020,7 +56272,6 @@ var require_MREVRANGE_WITHLABELS = __commonJS({
 var require_MREVRANGE = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/MREVRANGE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -57071,7 +56322,6 @@ var require_MREVRANGE = __commonJS({
 var require_QUERYINDEX = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/QUERYINDEX.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {
       NOT_KEYED_COMMAND: true,
@@ -57097,7 +56347,6 @@ var require_QUERYINDEX = __commonJS({
 var require_REVRANGE = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/REVRANGE.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -57147,7 +56396,6 @@ var require_REVRANGE = __commonJS({
 var require_commands6 = __commonJS({
   "node_modules/@redis/time-series/dist/lib/commands/index.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -57268,7 +56516,6 @@ var require_commands6 = __commonJS({
 var require_lib7 = __commonJS({
   "node_modules/@redis/time-series/dist/lib/index.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __importDefault = exports && exports.__importDefault || function(mod) {
       return mod && mod.__esModule ? mod : { "default": mod };
     };
@@ -57303,7 +56550,6 @@ var require_lib7 = __commonJS({
 var require_dist5 = __commonJS({
   "node_modules/redis/dist/index.js"(exports) {
     "use strict";
-    init_modules_watch_stub();
     var __createBinding = exports && exports.__createBinding || (Object.create ? (function(o, m, k, k2) {
       if (k2 === void 0) k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -57391,7 +56637,6 @@ var require_dist5 = __commonJS({
 // config/security.js
 var require_security = __commonJS({
   "config/security.js"(exports, module) {
-    init_modules_watch_stub();
     var rateLimit = require_dist2();
     var { RedisStore } = require_dist3();
     var { createClient } = require_dist5();
@@ -57513,7 +56758,6 @@ var require_security = __commonJS({
 // config/i18n.js
 var require_i18n = __commonJS({
   "config/i18n.js"(exports, module) {
-    init_modules_watch_stub();
     var supportedLanguages = ["zh-CN", "zh-TW", "en"];
     var defaultLanguage = "zh-CN";
     var provinceCodeLabels = {
@@ -58784,7 +58028,6 @@ var require_i18n = __commonJS({
 // app/middleware/i18n.js
 var require_i18n2 = __commonJS({
   "app/middleware/i18n.js"(exports, module) {
-    init_modules_watch_stub();
     var {
       defaultLanguage,
       getLanguageOptions,
@@ -58823,7 +58066,6 @@ var require_i18n2 = __commonJS({
 var require_object_assign = __commonJS({
   "node_modules/object-assign/index.js"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     var getOwnPropertySymbols = Object.getOwnPropertySymbols;
     var hasOwnProperty = Object.prototype.hasOwnProperty;
     var propIsEnumerable = Object.prototype.propertyIsEnumerable;
@@ -58895,7 +58137,6 @@ var require_object_assign = __commonJS({
 // node_modules/cors/lib/index.js
 var require_lib8 = __commonJS({
   "node_modules/cors/lib/index.js"(exports, module) {
-    init_modules_watch_stub();
     (function() {
       "use strict";
       var assign = require_object_assign();
@@ -63697,7 +62938,6 @@ var require_data = __commonJS({
 // node_modules/china-area-data/data.js
 var require_data2 = __commonJS({
   "node_modules/china-area-data/data.js"(exports, module) {
-    init_modules_watch_stub();
     module.exports = require_data();
   }
 });
@@ -63705,7 +62945,6 @@ var require_data2 = __commonJS({
 // config/areaSelector.js
 var require_areaSelector = __commonJS({
   "config/areaSelector.js"(exports, module) {
-    init_modules_watch_stub();
     var chinaAreaData = require_data2();
     var { getProvinceCodeLabels } = require_i18n();
     var legacyProvinceNameByCode = {
@@ -63836,7 +63075,6 @@ var require_areaSelector = __commonJS({
 // app/services/translationProviderService.js
 var require_translationProviderService = __commonJS({
   "app/services/translationProviderService.js"(exports, module) {
-    init_modules_watch_stub();
     var {
       googleCloudTranslationApiKey,
       translationProviderConfigured,
@@ -63927,7 +63165,6 @@ var require_translationProviderService = __commonJS({
 // app/services/textTranslationService.js
 var require_textTranslationService = __commonJS({
   "app/services/textTranslationService.js"(exports, module) {
-    init_modules_watch_stub();
     var { translateTextsWithProvider } = require_translationProviderService();
     var translationCache = /* @__PURE__ */ new Map();
     var translationCacheMaxEntries = 250;
@@ -64132,7 +63369,6 @@ var require_textTranslationService = __commonJS({
 // app/services/areaOptionsService.js
 var require_areaOptionsService = __commonJS({
   "app/services/areaOptionsService.js"(exports, module) {
-    init_modules_watch_stub();
     var {
       cityOptionsByProvinceCode,
       countiesByCityCode
@@ -64209,7 +63445,6 @@ var require_areaOptionsService = __commonJS({
 // app/services/mapDataService.js
 var require_mapDataService = __commonJS({
   "app/services/mapDataService.js"(exports, module) {
-    init_modules_watch_stub();
     var { getProvinceCodeLabels } = require_i18n();
     var cachedData = null;
     var lastFetchTime = 0;
@@ -64395,7 +63630,6 @@ var require_mapDataService = __commonJS({
 // app/routes/apiRoutes.js
 var require_apiRoutes = __commonJS({
   "app/routes/apiRoutes.js"(exports, module) {
-    init_modules_watch_stub();
     var express = require_express2();
     var cors = require_lib8();
     var { createRateLimiter } = require_security();
@@ -64511,7 +63745,6 @@ var require_apiRoutes = __commonJS({
 var require_axios = __commonJS({
   "node_modules/axios/dist/browser/axios.cjs"(exports, module) {
     "use strict";
-    init_modules_watch_stub();
     function bind(fn, thisArg) {
       return /* @__PURE__ */ __name(function wrap() {
         return fn.apply(thisArg, arguments);
@@ -66392,9 +65625,9 @@ var require_axios = __commonJS({
     }, "trackStream");
     var DEFAULT_CHUNK_SIZE = 64 * 1024;
     var { isFunction } = utils$1;
-    var globalFetchAPI = (({ Request, Response: Response2 }) => ({
+    var globalFetchAPI = (({ Request, Response }) => ({
       Request,
-      Response: Response2
+      Response
     }))(utils$1.global);
     var { ReadableStream: ReadableStream$1, TextEncoder } = utils$1.global;
     var test = /* @__PURE__ */ __name((fn, ...args) => {
@@ -66412,10 +65645,10 @@ var require_axios = __commonJS({
         globalFetchAPI,
         env
       );
-      const { fetch: envFetch, Request, Response: Response2 } = env;
+      const { fetch: envFetch, Request, Response } = env;
       const isFetchSupported = envFetch ? isFunction(envFetch) : typeof fetch === "function";
       const isRequestSupported = isFunction(Request);
-      const isResponseSupported = isFunction(Response2);
+      const isResponseSupported = isFunction(Response);
       if (!isFetchSupported) {
         return false;
       }
@@ -66435,7 +65668,7 @@ var require_axios = __commonJS({
         body.cancel();
         return duplexAccessed && !hasContentType;
       });
-      const supportsResponseStream = isResponseSupported && isReadableStreamSupported && test(() => utils$1.isReadableStream(new Response2("").body));
+      const supportsResponseStream = isResponseSupported && isReadableStreamSupported && test(() => utils$1.isReadableStream(new Response("").body));
       const resolvers = {
         stream: supportsResponseStream && ((res) => res.body)
       };
@@ -66553,7 +65786,7 @@ var require_axios = __commonJS({
               responseContentLength,
               progressEventReducer(asyncDecorator(onDownloadProgress), true)
             ) || [];
-            response = new Response2(
+            response = new Response(
               trackStream(response.body, DEFAULT_CHUNK_SIZE, onProgress, () => {
                 flush && flush();
                 unsubscribe && unsubscribe();
@@ -66600,8 +65833,8 @@ var require_axios = __commonJS({
     var seedCache = /* @__PURE__ */ new Map();
     var getFetch = /* @__PURE__ */ __name((config) => {
       let env = config && config.env || {};
-      const { fetch: fetch2, Request, Response: Response2 } = env;
-      const seeds = [Request, Response2, fetch2];
+      const { fetch: fetch2, Request, Response } = env;
+      const seeds = [Request, Response, fetch2];
       let len = seeds.length, i = len, seed, target, map = seedCache;
       while (i--) {
         seed = seeds[i];
@@ -67195,7 +66428,6 @@ var require_axios = __commonJS({
 // config/formConfig.js
 var require_formConfig = __commonJS({
   "config/formConfig.js"(exports, module) {
-    init_modules_watch_stub();
     var allowedIdentities = /* @__PURE__ */ new Set(["\u53D7\u5BB3\u8005\u672C\u4EBA", "\u53D7\u5BB3\u8005\u7684\u4EE3\u7406\u4EBA"]);
     var allowedSexes = /* @__PURE__ */ new Set(["\u7537", "\u5973", "MtF", "FtM", "__other_option__"]);
     var identityOptions = [
@@ -67269,7 +66501,6 @@ var require_formConfig = __commonJS({
 // app/services/formService.js
 var require_formService = __commonJS({
   "app/services/formService.js"(exports, module) {
-    init_modules_watch_stub();
     var axios = require_axios();
     var { validateProvinceAndCity, validateCountyForCity } = require_areaSelector();
     var { allowedIdentities, allowedSexes, formRuleDefinitions } = require_formConfig();
@@ -67475,7 +66706,6 @@ var require_formService = __commonJS({
 // app/services/formProtectionService.js
 var require_formProtectionService = __commonJS({
   "app/services/formProtectionService.js"(exports, module) {
-    init_modules_watch_stub();
     var crypto = require_crypto();
     function normalizePositiveInteger(value, fallback) {
       const parsedValue = Number.parseInt(value, 10);
@@ -67581,7 +66811,6 @@ var require_formProtectionService = __commonJS({
 // app/services/auditLogService.js
 var require_auditLogService = __commonJS({
   "app/services/auditLogService.js"(exports, module) {
-    init_modules_watch_stub();
     function normalizeIp(value) {
       const normalizedValue = String(value || "").trim();
       if (!normalizedValue) {
@@ -67616,7 +66845,6 @@ var require_auditLogService = __commonJS({
 // app/routes/formRoutes.js
 var require_formRoutes = __commonJS({
   "app/routes/formRoutes.js"(exports, module) {
-    init_modules_watch_stub();
     var express = require_express2();
     var { createSubmitRateLimiter } = require_security();
     var {
@@ -67716,7 +66944,6 @@ var require_formRoutes = __commonJS({
 var require_marked = __commonJS({
   "node_modules/marked/lib/marked.cjs"(exports) {
     "use strict";
-    init_modules_watch_stub();
     function _defineProperties(target, props) {
       for (var i = 0; i < props.length; i++) {
         var descriptor = props[i];
@@ -70009,7 +69236,6 @@ var require_marked = __commonJS({
 // app/services/markedService.js
 var require_markedService = __commonJS({
   "app/services/markedService.js"(exports, module) {
-    init_modules_watch_stub();
     var { marked } = require_marked();
     var blockedProtocols = ["javascript:", "vbscript:", "data:"];
     function escapeHtml(value) {
@@ -70099,7 +69325,6 @@ var require_markedService = __commonJS({
 // app/services/blogTranslationService.js
 var require_blogTranslationService = __commonJS({
   "app/services/blogTranslationService.js"(exports, module) {
-    init_modules_watch_stub();
     var { escapeHtml, lexMarkdown, renderMarkdownTokens } = require_markedService();
     var { translateDetailItems } = require_textTranslationService();
     async function defaultTranslateBatch(texts, targetLanguage) {
@@ -70309,7 +69534,6 @@ var require_blogTranslationService = __commonJS({
 // app/services/friendsService.js
 var require_friendsService = __commonJS({
   "app/services/friendsService.js"(exports, module) {
-    init_modules_watch_stub();
     var fs = require_fs();
     var { paths } = require_fileConfig();
     function getFriendDescriptionKey(name) {
@@ -70382,7 +69606,6 @@ var require_friendsService = __commonJS({
 // app/services/sitemapService.js
 var require_sitemapService = __commonJS({
   "app/services/sitemapService.js"(exports, module) {
-    init_modules_watch_stub();
     var fs = require_fs();
     var { isWorkersRuntime } = require_runtimeConfig();
     function createUrlEntry({ changefreq, lastmod, loc, priority }) {
@@ -70547,7 +69770,6 @@ var require_sitemapService = __commonJS({
 // app/services/robotsService.js
 var require_robotsService = __commonJS({
   "app/services/robotsService.js"(exports, module) {
-    init_modules_watch_stub();
     var { createAbsoluteUrl } = require_sitemapService();
     function generateRobotsTxt(siteUrl) {
       const lines = [
@@ -70571,7 +69793,6 @@ var require_robotsService = __commonJS({
 // app/routes/pageRoutes.js
 var require_pageRoutes = __commonJS({
   "app/routes/pageRoutes.js"(exports, module) {
-    init_modules_watch_stub();
     var express = require_express2();
     var fs = require_fs();
     var path = require_path();
@@ -70779,7 +70000,6 @@ var require_pageRoutes = __commonJS({
 // app/app.js
 var require_app = __commonJS({
   "app/app.js"(exports, module) {
-    init_modules_watch_stub();
     var express = require_express2();
     var ejs = require_ejs();
     var fs = require_fs();
@@ -70875,7 +70095,6 @@ var require_app = __commonJS({
 // app/server.js
 var require_server = __commonJS({
   "app/server.js"(exports, module) {
-    init_modules_watch_stub();
     var app2 = require_app();
     var {
       appPort,
@@ -70912,194 +70131,13 @@ var require_server = __commonJS({
   }
 });
 
-// .wrangler/tmp/bundle-94T3ws/middleware-loader.entry.ts
-init_modules_watch_stub();
-
-// .wrangler/tmp/bundle-94T3ws/middleware-insertion-facade.js
-init_modules_watch_stub();
-
 // worker.mjs
-init_modules_watch_stub();
 var import_server = __toESM(require_server(), 1);
 import { httpServerHandler } from "cloudflare:node";
 import_server.default.listen(3e3);
 var worker_default = httpServerHandler({ port: 3e3 });
-
-// ../../.npm/_npx/32026684e21afda6/node_modules/wrangler/templates/middleware/middleware-ensure-req-body-drained.ts
-init_modules_watch_stub();
-var drainBody = /* @__PURE__ */ __name(async (request, env, _ctx, middlewareCtx) => {
-  try {
-    return await middlewareCtx.next(request, env);
-  } finally {
-    try {
-      if (request.body !== null && !request.bodyUsed) {
-        const reader = request.body.getReader();
-        while (!(await reader.read()).done) {
-        }
-      }
-    } catch (e) {
-      console.error("Failed to drain the unused request body.", e);
-    }
-  }
-}, "drainBody");
-var middleware_ensure_req_body_drained_default = drainBody;
-
-// ../../.npm/_npx/32026684e21afda6/node_modules/wrangler/templates/middleware/middleware-miniflare3-json-error.ts
-init_modules_watch_stub();
-function reduceError(e) {
-  return {
-    name: e?.name,
-    message: e?.message ?? String(e),
-    stack: e?.stack,
-    cause: e?.cause === void 0 ? void 0 : reduceError(e.cause)
-  };
-}
-__name(reduceError, "reduceError");
-var jsonError = /* @__PURE__ */ __name(async (request, env, _ctx, middlewareCtx) => {
-  try {
-    return await middlewareCtx.next(request, env);
-  } catch (e) {
-    const error = reduceError(e);
-    return Response.json(error, {
-      status: 500,
-      headers: { "MF-Experimental-Error-Stack": "true" }
-    });
-  }
-}, "jsonError");
-var middleware_miniflare3_json_error_default = jsonError;
-
-// .wrangler/tmp/bundle-94T3ws/middleware-insertion-facade.js
-var __INTERNAL_WRANGLER_MIDDLEWARE__ = [
-  middleware_ensure_req_body_drained_default,
-  middleware_miniflare3_json_error_default
-];
-var middleware_insertion_facade_default = worker_default;
-
-// ../../.npm/_npx/32026684e21afda6/node_modules/wrangler/templates/middleware/common.ts
-init_modules_watch_stub();
-var __facade_middleware__ = [];
-function __facade_register__(...args) {
-  __facade_middleware__.push(...args.flat());
-}
-__name(__facade_register__, "__facade_register__");
-function __facade_invokeChain__(request, env, ctx, dispatch, middlewareChain) {
-  const [head, ...tail] = middlewareChain;
-  const middlewareCtx = {
-    dispatch,
-    next(newRequest, newEnv) {
-      return __facade_invokeChain__(newRequest, newEnv, ctx, dispatch, tail);
-    }
-  };
-  return head(request, env, ctx, middlewareCtx);
-}
-__name(__facade_invokeChain__, "__facade_invokeChain__");
-function __facade_invoke__(request, env, ctx, dispatch, finalMiddleware) {
-  return __facade_invokeChain__(request, env, ctx, dispatch, [
-    ...__facade_middleware__,
-    finalMiddleware
-  ]);
-}
-__name(__facade_invoke__, "__facade_invoke__");
-
-// .wrangler/tmp/bundle-94T3ws/middleware-loader.entry.ts
-var __Facade_ScheduledController__ = class ___Facade_ScheduledController__ {
-  constructor(scheduledTime, cron, noRetry) {
-    this.scheduledTime = scheduledTime;
-    this.cron = cron;
-    this.#noRetry = noRetry;
-  }
-  static {
-    __name(this, "__Facade_ScheduledController__");
-  }
-  #noRetry;
-  noRetry() {
-    if (!(this instanceof ___Facade_ScheduledController__)) {
-      throw new TypeError("Illegal invocation");
-    }
-    this.#noRetry();
-  }
-};
-function wrapExportedHandler(worker) {
-  if (__INTERNAL_WRANGLER_MIDDLEWARE__ === void 0 || __INTERNAL_WRANGLER_MIDDLEWARE__.length === 0) {
-    return worker;
-  }
-  for (const middleware of __INTERNAL_WRANGLER_MIDDLEWARE__) {
-    __facade_register__(middleware);
-  }
-  const fetchDispatcher = /* @__PURE__ */ __name(function(request, env, ctx) {
-    if (worker.fetch === void 0) {
-      throw new Error("Handler does not export a fetch() function.");
-    }
-    return worker.fetch(request, env, ctx);
-  }, "fetchDispatcher");
-  return {
-    ...worker,
-    fetch(request, env, ctx) {
-      const dispatcher = /* @__PURE__ */ __name(function(type, init) {
-        if (type === "scheduled" && worker.scheduled !== void 0) {
-          const controller = new __Facade_ScheduledController__(
-            Date.now(),
-            init.cron ?? "",
-            () => {
-            }
-          );
-          return worker.scheduled(controller, env, ctx);
-        }
-      }, "dispatcher");
-      return __facade_invoke__(request, env, ctx, dispatcher, fetchDispatcher);
-    }
-  };
-}
-__name(wrapExportedHandler, "wrapExportedHandler");
-function wrapWorkerEntrypoint(klass) {
-  if (__INTERNAL_WRANGLER_MIDDLEWARE__ === void 0 || __INTERNAL_WRANGLER_MIDDLEWARE__.length === 0) {
-    return klass;
-  }
-  for (const middleware of __INTERNAL_WRANGLER_MIDDLEWARE__) {
-    __facade_register__(middleware);
-  }
-  return class extends klass {
-    #fetchDispatcher = /* @__PURE__ */ __name((request, env, ctx) => {
-      this.env = env;
-      this.ctx = ctx;
-      if (super.fetch === void 0) {
-        throw new Error("Entrypoint class does not define a fetch() function.");
-      }
-      return super.fetch(request);
-    }, "#fetchDispatcher");
-    #dispatcher = /* @__PURE__ */ __name((type, init) => {
-      if (type === "scheduled" && super.scheduled !== void 0) {
-        const controller = new __Facade_ScheduledController__(
-          Date.now(),
-          init.cron ?? "",
-          () => {
-          }
-        );
-        return super.scheduled(controller);
-      }
-    }, "#dispatcher");
-    fetch(request) {
-      return __facade_invoke__(
-        request,
-        this.env,
-        this.ctx,
-        this.#dispatcher,
-        this.#fetchDispatcher
-      );
-    }
-  };
-}
-__name(wrapWorkerEntrypoint, "wrapWorkerEntrypoint");
-var WRAPPED_ENTRY;
-if (typeof middleware_insertion_facade_default === "object") {
-  WRAPPED_ENTRY = wrapExportedHandler(middleware_insertion_facade_default);
-} else if (typeof middleware_insertion_facade_default === "function") {
-  WRAPPED_ENTRY = wrapWorkerEntrypoint(middleware_insertion_facade_default);
-}
-var middleware_loader_entry_default = WRAPPED_ENTRY;
 export {
-  __INTERNAL_WRANGLER_MIDDLEWARE__,
-  middleware_loader_entry_default as default
+  worker_default as default
 };
 /*! Bundled license information:
 
