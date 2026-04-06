@@ -10,6 +10,67 @@ const { generateRobotsTxt } = require('../services/robotsService');
 const { generateSitemapXml } = require('../services/sitemapService');
 const { paths } = require('../../config/fileConfig');
 
+function translateWithFallback(t, key, fallbackValue = '') {
+  if (typeof t !== 'function') {
+    return fallbackValue;
+  }
+
+  const translatedValue = t(key);
+  return translatedValue && translatedValue !== key ? translatedValue : fallbackValue;
+}
+
+function localizeBlogLanguageLabel(value, t) {
+  const normalizedValue = String(value || '').trim();
+  const languageKeyByLabel = {
+    English: 'blog.articleLanguages.en',
+    'zh-CN': 'blog.articleLanguages.zhCN',
+    'zh-TW': 'blog.articleLanguages.zhTW',
+    '简体中文': 'blog.articleLanguages.zhCN',
+    '簡體中文': 'blog.articleLanguages.zhCN',
+    '正體中文': 'blog.articleLanguages.zhTW',
+    '繁體中文': 'blog.articleLanguages.zhTW',
+    '英文': 'blog.articleLanguages.en'
+  };
+  const languageKey = languageKeyByLabel[normalizedValue];
+
+  if (!languageKey) {
+    return normalizedValue;
+  }
+
+  return translateWithFallback(t, languageKey, normalizedValue);
+}
+
+function localizeBlogCreationDate(value, language) {
+  const rawValue = String(value || '').trim();
+  if (language !== 'en') {
+    return rawValue;
+  }
+
+  const dateMatch = rawValue.match(/^(\d{4})年(\d{1,2})月(\d{1,2})日$/);
+  if (!dateMatch) {
+    return rawValue;
+  }
+
+  const [, year, month, day] = dateMatch;
+  const date = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
+
+  return new Intl.DateTimeFormat('en', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'UTC'
+  }).format(date);
+}
+
+function localizeBlogTagMap(tagMap, t) {
+  return Object.fromEntries(
+    Object.entries(tagMap || {}).map(([id, label]) => [
+      id,
+      translateWithFallback(t, `blog.tags.${id}`, label)
+    ])
+  );
+}
+
 function resolveMarkdownPath(blogDirectory, articleId) {
   if (
     typeof articleId !== 'string'
@@ -65,10 +126,11 @@ function createPageRoutes({ apiUrl, debugMod, formProtectionSecret, siteUrl, tit
   // 表單頁：把地区联动数据和前端校验规则一并下发到模板。
   router.get('/form', (req, res) => {
     const t = req.t;
+    const { provinces } = getAreaOptions(req.lang);
     res.render('form', {
       title: t('pageTitles.form', { title }),
       apiUrl,
-      areaOptions: getAreaOptions(req.lang),
+      areaOptions: { provinces },
       formProtectionToken: issueFormProtectionToken({ secret: formProtectionSecret }),
       formRules: getLocalizedFormRules(t),
       identityOptions: getLocalizedIdentityOptions(t),
@@ -89,6 +151,7 @@ function createPageRoutes({ apiUrl, debugMod, formProtectionSecret, siteUrl, tit
   router.get('/aboutus', async (req, res) => {
     const friendsData = await loadFriends({
       language: req.lang,
+      t: req.t
     });
     res.render('about', {
       title: req.t('pageTitles.about', { title }),
@@ -107,13 +170,13 @@ function createPageRoutes({ apiUrl, debugMod, formProtectionSecret, siteUrl, tit
   // 預留的調試頁面入口。
   router.get('/debug', (req, res) => {
     if (debugMod !== 'true') {
-      return res.status(404).send('Not Found');
+      return res.status(404).send(req.t('common.notFound'));
     }
 
     res.render('debug', {
       apiUrl,
       debugMode: debugMod,
-      title: `Debug|${title || req.t('common.siteName')}`
+      title: req.t('pageTitles.debug', { title })
     });
   });
 
@@ -130,11 +193,17 @@ function createPageRoutes({ apiUrl, debugMod, formProtectionSecret, siteUrl, tit
     const localizedEntries = await translateBlogListEntries(filteredPort, {
       targetLanguage: req.lang
     });
+    const localizedTags = localizeBlogTagMap(AllTags, req.t);
+    const localizedEntriesWithMeta = localizedEntries.map((entry) => ({
+      ...entry,
+      localizedCreationDate: localizeBlogCreationDate(entry.CreationDate, req.lang),
+      localizedLanguage: localizeBlogLanguageLabel(entry.Language, req.t)
+    }));
 
     res.render('blog', {
-      SavedTags:localizedEntries,//數據（已篩選）
+      SavedTags: localizedEntriesWithMeta,//數據（已篩選）
       QTag,//現在的query
-      AllTags,//所有tag的數據
+      AllTags: localizedTags,//所有tag的數據
       apiUrl,
       title: req.t('pageTitles.blog', { title })
     })

@@ -1,6 +1,9 @@
 const crypto = require('crypto');
+const { isWorkersRuntime } = require('./runtimeConfig');
 
-require('dotenv').config();
+if (!isWorkersRuntime()) {
+  require('dotenv').config();
+}
 
 function resolveTrustProxy(value) {
   if (typeof value !== 'string') {
@@ -29,6 +32,38 @@ function parsePositiveInteger(value, fallback) {
   return Number.isInteger(parsedValue) && parsedValue > 0 ? parsedValue : fallback;
 }
 
+function readTrimmedEnvValue(...values) {
+  for (const value of values) {
+    if (typeof value === 'string' && value.trim()) {
+      return value.trim();
+    }
+  }
+
+  return '';
+}
+
+function parseBooleanEnv(value, fallback) {
+  if (typeof value !== 'string') {
+    return fallback;
+  }
+
+  const normalizedValue = value.trim().toLowerCase();
+
+  if (!normalizedValue) {
+    return fallback;
+  }
+
+  if (normalizedValue === 'true' || normalizedValue === '1' || normalizedValue === 'yes' || normalizedValue === 'on') {
+    return true;
+  }
+
+  if (normalizedValue === 'false' || normalizedValue === '0' || normalizedValue === 'no' || normalizedValue === 'off') {
+    return false;
+  }
+
+  return fallback;
+}
+
 function resolveFormProtectionSecret({ explicitSecret, formId, siteUrl, title }) {
   if (typeof explicitSecret === 'string' && explicitSecret.trim()) {
     return explicitSecret.trim();
@@ -36,23 +71,23 @@ function resolveFormProtectionSecret({ explicitSecret, formId, siteUrl, title })
 
   return crypto
     .createHash('sha256')
-    .update([formId, siteUrl, title || 'NO-TORSION'].join(':'))
+    .update([formId, siteUrl, title || 'N·C·T'].join(':'))
     .digest('hex');
 }
 
 // 所有运行时环境变量统一从这里读，避免业务代码四处直接碰 process.env。
-const debugMod = process.env.DEBUG_MOD || 'false';
-const title = process.env.TITLE;
-const formDryRun = process.env.FORM_DRY_RUN === 'true';
+const debugMod = process.env.DEBUG_MOD || 'true';
+const title = process.env.TITLE || 'N·C·T';
+const formDryRun = parseBooleanEnv(process.env.FORM_DRY_RUN, true);
 const submitRateLimitMax = parsePositiveInteger(process.env.SUBMIT_RATE_LIMIT_MAX, 5);
 const formId = process.env.FORM_ID || '1FAIpQLScggjQgYutXQrjQDrutyxL0eLaFMktTMRKsFWPffQGavUFspA';
 const googleFormUrl = `https://docs.google.com/forms/d/e/${formId}/formResponse`;
 const googleScriptUrl = process.env.GOOGLE_SCRIPT_URL;
 const appPort = parsePositiveInteger(process.env.PORT, 3000);
 const publicMapDataUrl = process.env.PUBLIC_MAP_DATA_URL || 'https://nct.hosinoneko.me/api/map-data';
-const siteUrl = String(process.env.SITE_URL || 'https://nct.hosinoneko.me').replace(/\/+$/, '');
-const apiUrl = debugMod === 'true' || !googleScriptUrl ? publicMapDataUrl : '/api/map-data';
-const trustProxy = resolveTrustProxy(process.env.TRUST_PROXY || (process.env.VERCEL ? '1' : 'false'));
+const siteUrl = String(process.env.SITE_URL || 'https://www.victimsunion.org/').replace(/\/+$/, '');
+const apiUrl = '/api/map-data';
+const trustProxy = resolveTrustProxy(process.env.TRUST_PROXY || (process.env.VERCEL ? '1' : 'true'));
 const formProtectionMinFillMs = parsePositiveInteger(process.env.FORM_PROTECTION_MIN_FILL_MS, 3000);
 const formProtectionMaxAgeMs = parsePositiveInteger(process.env.FORM_PROTECTION_MAX_AGE_MS, 24 * 60 * 60 * 1000);
 const formProtectionSecretConfigured = Boolean(process.env.FORM_PROTECTION_SECRET && process.env.FORM_PROTECTION_SECRET.trim());
@@ -63,6 +98,12 @@ const formProtectionSecret = resolveFormProtectionSecret({
   title
 });
 const rateLimitRedisUrl = String(process.env.RATE_LIMIT_REDIS_URL || process.env.REDIS_URL || '').trim();
+const googleCloudTranslationApiKey = readTrimmedEnvValue(
+  process.env.GOOGLE_CLOUD_TRANSLATION_API_KEY,
+  process.env.GOOGLE_TRANSLATE_API_KEY
+);
+const translationProviderTimeoutMs = parsePositiveInteger(process.env.TRANSLATION_PROVIDER_TIMEOUT_MS, 10000);
+const translationProviderConfigured = Boolean(googleCloudTranslationApiKey);
 
 module.exports = {
   appPort,
@@ -74,12 +115,16 @@ module.exports = {
   formProtectionMinFillMs,
   formProtectionSecret,
   formProtectionSecretConfigured,
+  googleCloudTranslationApiKey,
   googleFormUrl,
   googleScriptUrl,
   publicMapDataUrl,
   rateLimitRedisUrl,
+  isWorkersRuntime: isWorkersRuntime(),
   siteUrl,
   submitRateLimitMax,
+  translationProviderConfigured,
+  translationProviderTimeoutMs,
   trustProxy,
   title
 };

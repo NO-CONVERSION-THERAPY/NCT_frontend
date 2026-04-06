@@ -160,13 +160,15 @@ const messages = {
     common: {
       siteName: 'NO CONVERSION THERAPY',
       language: '语言',
+      footerNavLabel: '页脚导航',
       languages: {
         'zh-CN': '简中',
         'zh-TW': '繁中',
         en: 'English'
       },
-      footerBy: '© 2026 NO CONVERSION THERAPY Project. By:',
-      loading: '加载中...'
+      footerBy: '© 2026 N·C·T Project. By: ',
+      loading: '加载中...',
+      notFound: '未找到'
     },
     pageTitles: {
       home: '首页|{title}',
@@ -176,7 +178,8 @@ const messages = {
       privacy: '隐私政策与 Cookie 说明|{title}',
       submitPreview: '提交预览|{title}',
       blog: '文库|{title}',
-      article: '{articleTitle}|{title}'
+      article: '{articleTitle}|{title}',
+      debug: '调试|{title}'
     },
     navigation: {
       home: '返回首页',
@@ -199,7 +202,21 @@ const messages = {
       language: '语言：',
       noTag: '#无标签',
       empty: '暂时还没有文章喵~',
-      articleNotFound: '文章不存在'
+      articleNotFound: '文章不存在',
+      articleLanguages: {
+        zhCN: '简体中文',
+        zhTW: '繁体中文',
+        en: '英文'
+      },
+      tags: {
+        '1': '更新',
+        '2': '公告',
+        '3': '回忆录',
+        '4': '杂谈',
+        '5': '法律',
+        '6': '精选',
+        '7': '讣告'
+      }
     },
     form: {
       title: 'NO CONVERSION THERAPY FORM',
@@ -256,7 +273,8 @@ const messages = {
       },
       buttons: {
         openMap: '点击可直接在地图上选点',
-        submit: '确认并提交信息'
+        submit: '确认并提交信息',
+        submitting: '提交中...'
       },
       hints: {
         dateEnd: '若目前仍在校，可不填',
@@ -290,6 +308,7 @@ const messages = {
         updateNotice: '数据每 {seconds} 秒（{minutes} 分钟）更新一次，如未看到您的提交，请耐心等待',
         submittedForms: '已提交表单：',
         provinceStats: '各省已知机构数量：',
+        provinceSubmissions: '各省投稿量',
         averageAge: '受害者平均年龄：',
         secondsAgo: '{seconds} 秒前',
         refresh: '刷新',
@@ -348,7 +367,14 @@ const messages = {
       friendLinks: '致谢',
       ownership: '本项目由 TRANS UNION 维护、开发，透过Apachi-2.0 License开源。',
       origin: '本网站建站于 2026 年 2 月 21 日，由 HosinoNeko 站长在逃到上海后建立。',
-      thanks: '在这里衷心感谢以下项目、企业和个人为本项目提供了免费的援助，没有他们就没有这个网站的诞生：'
+      thanks: '在这里衷心感谢以下项目、企业和个人为本项目提供了免费的援助，没有他们就没有这个网站的诞生：',
+      friendDescriptions: {
+        hosinoneko: '站长、策划执行与社群建立',
+        nanmuxue: '代码重构',
+        hermaphroditus: '域名贡献者',
+        muyuan: '社群传播、资料提供',
+        amber: '社群建立'
+      }
     },
     privacy: {
       title: '隐私政策与 Cookie 说明',
@@ -449,7 +475,17 @@ const messages = {
       submitFailed: '提交失败',
       invalidFormSubmission: '提交已失效或异常，请刷新页面后重试。',
       tooManyRequests: '提交过于频繁，请稍后再试。',
-      mapDataUnavailable: '无法取得地图数据'
+      mapDataUnavailable: '无法取得地图数据',
+      areaOptionsUnavailable: '无法取得地区选项'
+    },
+    debug: {
+      title: '调试',
+      intro: '此页面仅在 DEBUG_MOD=true 时可用。',
+      labels: {
+        language: '语言',
+        apiUrl: 'API 地址',
+        debugMode: '调试模式'
+      }
     },
     data: {
       inputTypes: {
@@ -464,13 +500,15 @@ const messages = {
     common: {
       siteName: 'NO CONVERSION THERAPY',
       language: '語言',
+      footerNavLabel: '頁腳導航',
       languages: {
         'zh-CN': '簡中',
         'zh-TW': '繁中',
         en: 'English'
       },
-      footerBy: '© 2026 NO CONVERSION THERAPY Project. By:',
-      loading: '載入中...'
+      footerBy: '© 2026 N·C·T Project. By: ',
+      loading: '載入中...',
+      notFound: '未找到'
     },
     pageTitles: {
       home: '主頁|{title}',
@@ -480,7 +518,8 @@ const messages = {
       privacy: '隱私政策與 Cookie 說明|{title}',
       submitPreview: '提交預覽|{title}',
       blog: '文庫|{title}',
-      article: '{articleTitle}|{title}'
+      article: '{articleTitle}|{title}',
+      debug: '調試|{title}'
     },
     navigation: {
       home: '返回首頁',
@@ -503,7 +542,21 @@ const messages = {
       language: '語言：',
       noTag: '#無標籤',
       empty: '暫時還沒有文章喵~',
-      articleNotFound: '文章不存在'
+      articleNotFound: '文章不存在',
+      articleLanguages: {
+        zhCN: '簡體中文',
+        zhTW: '繁體中文',
+        en: '英文'
+      },
+      tags: {
+        '1': '更新',
+        '2': '公告',
+        '3': '回憶錄',
+        '4': '雜談',
+        '5': '法律',
+        '6': '精選',
+        '7': '訃告'
+      }
     },
     form: {
       title: 'NO CONVERSION THERAPY FORM',
@@ -560,7 +613,8 @@ const messages = {
       },
       buttons: {
         openMap: '點擊可直接在地圖上選點',
-        submit: '確認並提交信息'
+        submit: '確認並提交信息',
+        submitting: '提交中...'
       },
       hints: {
         dateEnd: '若目前仍在校，可不填',
@@ -594,6 +648,7 @@ const messages = {
         updateNotice: '數據每 {seconds} 秒（{minutes} 分鐘）更新一次，如未看到您的提交，請耐心等待',
         submittedForms: '已提交表單：',
         provinceStats: '各省已知機構數量：',
+        provinceSubmissions: '各省投稿量',
         averageAge: '受害者平均年齡：',
         secondsAgo: '{seconds} 秒前',
         refresh: '刷新',
@@ -652,7 +707,14 @@ const messages = {
       friendLinks: '致謝',
       ownership: '本項目由 TRANS UNION 維護與開發 ，透過Apachi-2.0 License開源',
       origin: '本網站建站於 2026 年 2 月 21 日，由 HosinoNeko 站長在逃到上海後建立。',
-      thanks: '在這裡衷心感謝以下項目、企業和個人為本項目提供了免費的援助，沒有他們就沒有這個網站的誕生：'
+      thanks: '在這裡衷心感謝以下項目、企業和個人為本項目提供了免費的援助，沒有他們就沒有這個網站的誕生：',
+      friendDescriptions: {
+        hosinoneko: '站長、策劃執行與社群建立',
+        nanmuxue: '程式碼重構',
+        hermaphroditus: '域名貢獻者',
+        muyuan: '社群傳播、資料提供',
+        amber: '社群建立'
+      }
     },
     privacy: {
       title: '隱私政策與 Cookie 說明',
@@ -753,7 +815,17 @@ const messages = {
       submitFailed: '提交失敗',
       invalidFormSubmission: '提交已失效或異常，請重新整理頁面後再試。',
       tooManyRequests: '提交過於頻繁，請稍後再試。',
-      mapDataUnavailable: '無法取得地圖數據'
+      mapDataUnavailable: '無法取得地圖數據',
+      areaOptionsUnavailable: '無法取得地區選項'
+    },
+    debug: {
+      title: '調試',
+      intro: '此頁面僅在 DEBUG_MOD=true 時可用。',
+      labels: {
+        language: '語言',
+        apiUrl: 'API 位址',
+        debugMode: '調試模式'
+      }
     },
     data: {
       inputTypes: {
@@ -768,13 +840,15 @@ const messages = {
     common: {
       siteName: 'NO CONVERSION THERAPY',
       language: 'Language',
+      footerNavLabel: 'Footer',
       languages: {
         'zh-CN': '简中',
         'zh-TW': '繁中',
         en: 'English'
       },
-      footerBy: '© 2026 NO CONVERSION THERAPY Project. By:',
-      loading: 'Loading...'
+      footerBy: '© 2026 N·C·T Project. By: ',
+      loading: 'Loading...',
+      notFound: 'Not Found'
     },
     pageTitles: {
       home: 'Home | {title}',
@@ -784,7 +858,8 @@ const messages = {
       privacy: 'Privacy & Cookie Notice | {title}',
       submitPreview: 'Submission Preview | {title}',
       blog: 'Library | {title}',
-      article: '{articleTitle} | {title}'
+      article: '{articleTitle} | {title}',
+      debug: 'Debug | {title}'
     },
     navigation: {
       home: 'Back to Home',
@@ -807,7 +882,21 @@ const messages = {
       language: 'Language: ',
       noTag: '#No Tag',
       empty: 'No articles yet.',
-      articleNotFound: 'Article not found'
+      articleNotFound: 'Article not found',
+      articleLanguages: {
+        zhCN: 'Simplified Chinese',
+        zhTW: 'Traditional Chinese',
+        en: 'English'
+      },
+      tags: {
+        '1': 'Updates',
+        '2': 'Announcements',
+        '3': 'Memoir',
+        '4': 'Essays',
+        '5': 'Law',
+        '6': 'Featured',
+        '7': 'Obituary'
+      }
     },
     form: {
       title: 'NO CONVERSION THERAPY FORM',
@@ -864,7 +953,8 @@ const messages = {
       },
       buttons: {
         openMap: 'Pick a point directly on the map',
-        submit: 'Confirm and Submit'
+        submit: 'Confirm and Submit',
+        submitting: 'Submitting...'
       },
       hints: {
         dateEnd: 'Leave blank if you are still enrolled',
@@ -898,6 +988,7 @@ const messages = {
         updateNotice: 'Data refreshes every {seconds} seconds ({minutes} minutes). If your submission is not visible yet, please wait a little longer.',
         submittedForms: 'Submitted forms:',
         provinceStats: 'Known institutions by province:',
+        provinceSubmissions: 'Submission counts by province',
         averageAge: 'Average age of survivors:',
         secondsAgo: '{seconds} seconds ago',
         refresh: 'Refresh',
@@ -956,7 +1047,14 @@ const messages = {
       friendLinks: 'THANKS',
       ownership: 'This project belongs to the TRANS UNION team, which holds all related intellectual property rights.',
       origin: 'This website went online on February 21, 2026. HosinoNeko created it shortly after reaching Shanghai.',
-      thanks: 'We sincerely thank the following projects, organizations, and individuals for helping make this website possible:'
+      thanks: 'We sincerely thank the following projects, organizations, and individuals for helping make this website possible:',
+      friendDescriptions: {
+        hosinoneko: 'Founder, planning/execution, and community building',
+        nanmuxue: 'Code refactoring',
+        hermaphroditus: 'Domain contributor',
+        muyuan: 'Community outreach and source material support',
+        amber: 'Community building'
+      }
     },
     privacy: {
       title: 'Privacy & Cookie Notice',
@@ -1057,7 +1155,17 @@ const messages = {
       submitFailed: 'Submission failed',
       invalidFormSubmission: 'This submission has expired or looks invalid. Please refresh the form and try again.',
       tooManyRequests: 'Too many submissions. Please try again later.',
-      mapDataUnavailable: 'Unable to fetch map data'
+      mapDataUnavailable: 'Unable to fetch map data',
+      areaOptionsUnavailable: 'Unable to load area options'
+    },
+    debug: {
+      title: 'Debug',
+      intro: 'This page is only available when DEBUG_MOD=true.',
+      labels: {
+        language: 'Language',
+        apiUrl: 'API URL',
+        debugMode: 'Debug Mode'
+      }
     },
     data: {
       inputTypes: {

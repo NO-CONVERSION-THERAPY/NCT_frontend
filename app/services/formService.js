@@ -215,7 +215,11 @@ function encodeGoogleFormFields(fields) {
 async function submitToGoogleForm(googleFormUrl, encodedPayload) {
   await axios.post(googleFormUrl, encodedPayload, {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    timeout: 10000
+    timeout: 10000,
+    maxRedirects: 0,
+    validateStatus(status) {
+      return status >= 200 && status < 400;
+    }
   });
 }
 

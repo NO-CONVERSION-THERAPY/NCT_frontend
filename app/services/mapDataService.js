@@ -1,3 +1,5 @@
+const { getProvinceCodeLabels } = require('../../config/i18n');
+
 // 地图数据缓存放在 service 层，避免每次请求都直打 Apps Script。
 let cachedData = null;
 let lastFetchTime = 0;
@@ -6,6 +8,72 @@ let lastForceRefreshTime = 0;
 const cacheDurationMs = 300000;
 // 即使用户手动点刷新，也给上游 Apps Script 一个冷却时间，避免被连续击穿。
 const forceRefreshCooldownMs = 30000;
+const simplifiedProvinceLabels = getProvinceCodeLabels('zh-CN');
+const legacyProvinceLabels = getProvinceCodeLabels('zh-TW');
+const provinceAliasToLegacyName = buildProvinceAliasToLegacyNameMap();
+
+function buildProvinceAliasToLegacyNameMap() {
+  const aliasMap = new Map();
+
+  Object.keys(legacyProvinceLabels).forEach((code) => {
+    const legacyName = legacyProvinceLabels[code];
+    const simplifiedName = simplifiedProvinceLabels[code];
+
+    [legacyName, simplifiedName].filter(Boolean).forEach((alias) => {
+      aliasMap.set(alias, legacyName);
+    });
+  });
+
+  return aliasMap;
+}
+
+function normalizeProvinceNameToLegacy(provinceName) {
+  const normalizedProvinceName = String(provinceName || '').trim();
+
+  if (!normalizedProvinceName) {
+    return '';
+  }
+
+  return provinceAliasToLegacyName.get(normalizedProvinceName) || normalizedProvinceName;
+}
+
+function normalizeProvinceStatistics(items) {
+  const mergedStatistics = new Map();
+
+  (Array.isArray(items) ? items : []).forEach((item) => {
+    const province = normalizeProvinceNameToLegacy(item && item.province);
+    const count = Number(item && item.count);
+
+    if (!province) {
+      return;
+    }
+
+    if (!mergedStatistics.has(province)) {
+      mergedStatistics.set(province, {
+        ...item,
+        province,
+        count: Number.isFinite(count) ? count : 0
+      });
+      return;
+    }
+
+    const existingItem = mergedStatistics.get(province);
+    existingItem.count += Number.isFinite(count) ? count : 0;
+  });
+
+  return [...mergedStatistics.values()];
+}
+
+function resolveNumericValue(...candidates) {
+  for (const value of candidates) {
+    const numericValue = Number(value);
+    if (Number.isFinite(numericValue)) {
+      return numericValue;
+    }
+  }
+
+  return null;
+}
 
 // 远端没有提供 last_synced 时，用当前抓取时间兜底，保证前端总能显示相对时间。
 function resolveLastSyncedTimestamp(lastSynced, fallbackTimestamp) {
@@ -45,7 +113,7 @@ function cleanMapData(rawData) {
     .map((item) => ({
       name: item.name || item['學校名稱'] || '未填寫名稱',
       addr: item.addr || item['學校地址'] || '無地址',
-      province: item.province || item['省份'] || '',
+      province: normalizeProvinceNameToLegacy(item.province || item['省份'] || ''),
       prov: item.prov || item['區、縣'] || '',
       else: item.else || item['其他'] || '',
       lat: parseFloat(item.lat || item['緯度']),
@@ -94,14 +162,16 @@ async function getMapData({ forceRefresh = false, googleScriptUrl, publicMapData
 
       const responseBody = await response.json();
       const rawData = normalizeRawData(responseBody.data);
-      const avgAge = Number(responseBody.avg_age);
+      const avgAge = resolveNumericValue(responseBody.avg_age);
+      const schoolNum = resolveNumericValue(responseBody.schoolNum, responseBody.SchoolNum);
+      const formNum = resolveNumericValue(responseBody.formNum, responseBody.FormNum);
       const finalResponse = {
         avg_age: Number.isFinite(avgAge) ? avgAge : 0,//受害者平均年齡
-        schoolNum: Number.isFinite(responseBody.SchoolNum) ? Number(responseBody.SchoolNum) : 0,//學校數量
-        formNum: Number.isFinite(responseBody.formNum) ? Number(responseBody.formNum) : 0,//表單數量
+        schoolNum: Number.isFinite(schoolNum) ? schoolNum : 0,//學校數量
+        formNum: Number.isFinite(formNum) ? formNum : 0,//表單數量
         last_synced: resolveLastSyncedTimestamp(responseBody.last_synced, now),//上一次更新時間
-        statistics: Array.isArray(responseBody.statistics) ? responseBody.statistics : [],//各省扭轉幾個數量
-        statisticsForm: Array.isArray(responseBody.statisticsForm) ? responseBody.statisticsForm : [],//各省收到的表單數量
+        statistics: normalizeProvinceStatistics(responseBody.statistics),//各省扭轉幾個數量
+        statisticsForm: normalizeProvinceStatistics(responseBody.statisticsForm),//各省收到的表單數量
         data: cleanMapData(rawData)
       };
 
@@ -136,6 +206,7 @@ async function getMapData({ forceRefresh = false, googleScriptUrl, publicMapData
 
 module.exports = {
   getMapData,
+  normalizeProvinceNameToLegacy,
   resolveLastSyncedTimestamp,
   resetMapDataCache() {
     cachedData = null;

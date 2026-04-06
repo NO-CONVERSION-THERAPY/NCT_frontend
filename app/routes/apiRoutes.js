@@ -1,6 +1,10 @@
 const express = require('express');
 const cors = require('cors');
 const { createRateLimiter } = require('../../config/security');
+const {
+  getLocalizedCityOptionsForProvince,
+  getLocalizedCountyOptionsForCity
+} = require('../services/areaOptionsService');
 const { getMapData } = require('../services/mapDataService');
 const { translateDetailItems } = require('../services/textTranslationService');
 
@@ -48,6 +52,30 @@ function createApiRoutes({ googleScriptUrl, publicMapDataUrl, rateLimitRedisUrl 
 
   // 对外公开的地图数据接口。
   router.options('/api/map-data', publicMapDataCors);
+
+  router.get('/api/area-options', async (req, res) => {
+    try {
+      const provinceCode = typeof req.query.provinceCode === 'string' ? req.query.provinceCode.trim() : '';
+      const cityCode = typeof req.query.cityCode === 'string' ? req.query.cityCode.trim() : '';
+
+      if (cityCode) {
+        return res.json({
+          options: await getLocalizedCountyOptionsForCity(cityCode, req.lang)
+        });
+      }
+
+      if (provinceCode) {
+        return res.json({
+          options: await getLocalizedCityOptionsForProvince(provinceCode, req.lang)
+        });
+      }
+
+      return res.json({ options: [] });
+    } catch (error) {
+      console.error('Area options API Error:', error.message);
+      return res.status(500).json({ error: req.t('server.areaOptionsUnavailable') });
+    }
+  });
 
   router.get('/api/map-data', publicMapDataCors, refreshRateLimiter, async (req, res) => {
     try {

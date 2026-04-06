@@ -77,29 +77,46 @@ function createRateLimiter({
   store,
   storePrefix
 }) {
-  return rateLimit({
-    windowMs,
-    max: Number.isFinite(max) && max > 0 ? max : 5,
-    skip,
-    store: store || getRedisRateLimitStore({ redisUrl, prefix: storePrefix }),
-    standardHeaders: true,
-    legacyHeaders: false,
-    handler(req, res, _next, options) {
-      const message = typeof getMessage === 'function'
-        ? getMessage(req)
-        : '請求過於頻繁，請稍後再試。';
+  let middleware;
 
-      if (typeof onLimit === 'function') {
-        onLimit(req, options.statusCode, message);
+  return function lazyRateLimiter(req, res, next) {
+    try {
+      // Workers 不允許在 global scope 裡啟動 express-rate-limit 的內部 timer，
+      // 因此把真正的 middleware 初始化延後到首次請求時再完成。
+      if (!middleware) {
+        middleware = rateLimit({
+          windowMs,
+          max: Number.isFinite(max) && max > 0 ? max : 5,
+          skip,
+          store: store || getRedisRateLimitStore({ redisUrl, prefix: storePrefix }),
+          validate: {
+            creationStack: false
+          },
+          standardHeaders: true,
+          legacyHeaders: false,
+          handler(limitedReq, limitedRes, _next, options) {
+            const message = typeof getMessage === 'function'
+              ? getMessage(limitedReq)
+              : '請求過於頻繁，請稍後再試。';
+
+            if (typeof onLimit === 'function') {
+              onLimit(limitedReq, options.statusCode, message);
+            }
+
+            if (typeof sendLimitResponse === 'function') {
+              return sendLimitResponse(limitedReq, limitedRes, options.statusCode, message);
+            }
+
+            return limitedRes.status(options.statusCode).send(message);
+          }
+        });
       }
 
-      if (typeof sendLimitResponse === 'function') {
-        return sendLimitResponse(req, res, options.statusCode, message);
-      }
-
-      return res.status(options.statusCode).send(message);
+      return middleware(req, res, next);
+    } catch (error) {
+      return next(error);
     }
-  });
+  };
 }
 
 // 表单提交限流单独封装，方便在 route 层直接创建并接审计回调。

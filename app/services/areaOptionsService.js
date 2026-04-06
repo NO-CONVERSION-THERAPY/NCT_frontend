@@ -1,0 +1,86 @@
+const {
+  cityOptionsByProvinceCode,
+  countiesByCityCode
+} = require('../../config/areaSelector');
+const { translateDetailItems } = require('./textTranslationService');
+
+const localizedAreaNameCache = new Map();
+
+function getCacheKey(language, text) {
+  return `${language}::${text}`;
+}
+
+function shouldTranslateAreaNames(language) {
+  return language === 'en' || language === 'zh-TW';
+}
+
+function normalizeOptions(options) {
+  return Array.isArray(options)
+    ? options.map((option) => ({
+      code: option.code,
+      name: String(option.name || '')
+    }))
+    : [];
+}
+
+async function localizeOptions(options, language) {
+  const normalizedOptions = normalizeOptions(options);
+
+  if (!shouldTranslateAreaNames(language) || normalizedOptions.length === 0) {
+    return normalizedOptions;
+  }
+
+  const pendingTexts = [...new Set(
+    normalizedOptions
+      .map((option) => option.name.trim())
+      .filter(Boolean)
+      .filter((text) => !localizedAreaNameCache.has(getCacheKey(language, text)))
+  )];
+
+  if (pendingTexts.length > 0) {
+    const translations = await translateDetailItems({
+      items: pendingTexts.map((text, index) => ({
+        fieldKey: String(index),
+        text
+      })),
+      targetLanguage: language
+    });
+
+    translations.forEach((entry) => {
+      localizedAreaNameCache.set(
+        getCacheKey(language, entry.text),
+        entry.translatedText || entry.text
+      );
+    });
+  }
+
+  return normalizedOptions.map((option) => ({
+    ...option,
+    name: localizedAreaNameCache.get(getCacheKey(language, option.name.trim())) || option.name
+  }));
+}
+
+async function getLocalizedCityOptionsForProvince(provinceCode, language) {
+  const cityOptions = cityOptionsByProvinceCode[provinceCode] || [];
+
+  if (language === 'zh-CN') {
+    return normalizeOptions(cityOptions);
+  }
+
+  return localizeOptions(cityOptions, language);
+}
+
+async function getLocalizedCountyOptionsForCity(cityCode, language) {
+  const countyOptions = countiesByCityCode[cityCode] || [];
+
+  if (language === 'zh-CN') {
+    return normalizeOptions(countyOptions);
+  }
+
+  return localizeOptions(countyOptions, language);
+}
+
+module.exports = {
+  getLocalizedCityOptionsForProvince,
+  getLocalizedCountyOptionsForCity
+};
