@@ -231,22 +231,22 @@ async function fetchJsonDirectIpv4(dataSourceUrl, upstreamTimeoutMs = defaultUps
 }
 
 async function fetchMapPayloadFromSource(dataSourceUrl, {
-  mapDataForceIpv4 = false,
+  mapDataNodeTransportOverrides = false,
   upstreamTimeoutMs = defaultUpstreamRequestTimeoutMs
 } = {}) {
   const strategies = [];
   let lastError = null;
   const workersRuntime = isWorkersRuntime();
-  const shouldUseDirectIpv4 = !workersRuntime && mapDataForceIpv4;
+  const shouldUseNodeTransportOverrides = !workersRuntime && mapDataNodeTransportOverrides;
 
-  if (!workersRuntime && hasProxyConfiguration()) {
+  if (shouldUseNodeTransportOverrides && hasProxyConfiguration()) {
     strategies.push({
       name: 'proxy-agent',
       request: () => fetchJsonThroughProxy(dataSourceUrl, upstreamTimeoutMs)
     });
   }
 
-  if (shouldUseDirectIpv4) {
+  if (shouldUseNodeTransportOverrides) {
     strategies.push({
       name: 'direct-ipv4',
       request: () => fetchJsonDirectIpv4(dataSourceUrl, upstreamTimeoutMs)
@@ -324,7 +324,7 @@ function cleanMapData(rawData) {
 async function getMapData({
   forceRefresh = false,
   googleScriptUrl,
-  mapDataForceIpv4 = false,
+  mapDataNodeTransportOverrides = false,
   publicMapDataUrl,
   upstreamTimeoutMs = defaultUpstreamRequestTimeoutMs
 }) {
@@ -353,7 +353,7 @@ async function getMapData({
     try {
       const dataSourceUrl = resolveMapDataSource({ googleScriptUrl, publicMapDataUrl });
       const responseBody = await fetchMapPayloadFromSource(dataSourceUrl, {
-        mapDataForceIpv4,
+        mapDataNodeTransportOverrides,
         upstreamTimeoutMs
       });
       const rawData = normalizeRawData(responseBody.data);

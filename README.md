@@ -134,7 +134,7 @@ npm test
 | `FORM_ID` | 非必要 | `1FAIpQLScggjQgYutXQrjQDrutyxL0eLaFMktTMRKsFWPffQGavUFspA` | Google Form ID |
 | `GOOGLE_SCRIPT_URL` | 非必要 | 空 | 私有 Google Apps Script 資料源；留空時回退公開資料源 |
 | `PUBLIC_MAP_DATA_URL` | 非必要 | `https://nct.hosinoeiji.workers.dev/api/map-data` | 公開地圖 API 地址 |
-| `MAP_DATA_FORCE_IPV4` | 非必要 | `false` | 是否在 Node 運行時改用 IPv4 直連地圖上游；Workers 運行時會忽略 |
+| `MAP_DATA_NODE_TRANSPORT_OVERRIDES` | 非必要 | `false` | Node 運行時的地圖上游網路策略總開關；`true` 時才會啓用代理 agent 與 IPv4 直連，預設兩者都關閉；Workers 運行時會忽略 |
 | `MAP_DATA_UPSTREAM_TIMEOUT_MS` | 非必要 | `25000` | 地圖上游請求超時，單位毫秒 |
 | `GOOGLE_CLOUD_TRANSLATION_API_KEY` | 按需 | 空 | Google Cloud Translation API Key；啓用翻譯功能時必填 |
 | `TRANSLATION_PROVIDER_TIMEOUT_MS` | 非必要 | `10000` | 翻譯請求超時，單位毫秒 |
@@ -308,7 +308,7 @@ GOOGLE_CLOUD_TRANSLATION_API_KEY="換成你自己的正式 API Key"
 | `FORM_PROTECTION_MAX_AGE_MS` | Text | 預設 `86400000` |
 | `GOOGLE_SCRIPT_URL` | Text 或 Secret | 有私有資料源時填 |
 | `PUBLIC_MAP_DATA_URL` | Text | 沒有私有資料源時配置成你的公開地圖 API |
-| `MAP_DATA_FORCE_IPV4` | Text | 可選；`true` 時在 Node 運行時改用 IPv4 直連地圖上游 |
+| `MAP_DATA_NODE_TRANSPORT_OVERRIDES` | Text | 可選；Node 運行時的地圖上游網路策略總開關，`true` 時才啓用代理 agent 與 IPv4 直連 |
 | `MAP_DATA_UPSTREAM_TIMEOUT_MS` | Text | 預設 `25000` |
 | `GOOGLE_CLOUD_TRANSLATION_API_KEY` | Secret | 啓用翻譯功能時必填 |
 | `TRANSLATION_PROVIDER_TIMEOUT_MS` | Text | 預設 `10000` |

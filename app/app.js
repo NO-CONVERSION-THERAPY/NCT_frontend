@@ -15,7 +15,7 @@ const {
   maintenanceMode,
   maintenanceNotice,
   maintenanceRetryAfterSeconds,
-  mapDataForceIpv4,
+  mapDataNodeTransportOverrides,
   mapDataUpstreamTimeoutMs,
   mapReadRateLimitMax,
   pageReadRateLimitMax,
@@ -126,7 +126,7 @@ app.use(createFormRoutes({
 }));
 app.use(createApiRoutes({
   googleScriptUrl,
-  mapDataForceIpv4,
+  mapDataNodeTransportOverrides,
   mapDataUpstreamTimeoutMs,
   mapReadRateLimitMax,
   publicMapDataUrl,

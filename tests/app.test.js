@@ -18,7 +18,7 @@ function loadApp(envOverrides = {}) {
   const effectiveEnvOverrides = {
     MAINTENANCE_MODE: 'false',
     MAINTENANCE_NOTICE: '',
-    MAP_DATA_FORCE_IPV4: 'false',
+    MAP_DATA_NODE_TRANSPORT_OVERRIDES: 'false',
     ...envOverrides
   };
 
@@ -1542,7 +1542,7 @@ test('map data service accepts lowercase schoolNum from upstream payloads', asyn
   });
 });
 
-test('map data service uses proxy agent when proxy env is configured', async () => {
+test('map data service uses proxy agent when MAP_DATA_NODE_TRANSPORT_OVERRIDES is enabled and proxy env is configured', async () => {
   await withEnvOverrides({
     ...getNoProxyEnv(),
     HTTPS_PROXY: 'http://proxy.example:1080'
@@ -1589,6 +1589,7 @@ test('map data service uses proxy agent when proxy env is configured', async () 
     try {
       const result = await mapDataService.getMapData({
         publicMapDataUrl: 'https://example.com/api/map-data',
+        mapDataNodeTransportOverrides: true,
         upstreamTimeoutMs: 23456
       });
 
@@ -1612,7 +1613,61 @@ test('map data service uses proxy agent when proxy env is configured', async () 
   });
 });
 
-test('map data service uses direct IPv4 requests when MAP_DATA_FORCE_IPV4 is enabled', async () => {
+test('map data service ignores proxy env when MAP_DATA_NODE_TRANSPORT_OVERRIDES is disabled', async () => {
+  await withEnvOverrides({
+    ...getNoProxyEnv(),
+    HTTPS_PROXY: 'http://proxy.example:1080'
+  }, async () => {
+    clearProjectModules();
+    const axios = require('axios');
+    const mapDataService = require(path.join(projectRoot, 'app/services/mapDataService'));
+    const originalGet = axios.get;
+    const originalFetch = global.fetch;
+    let fetchCount = 0;
+    let axiosCount = 0;
+
+    mapDataService.resetMapDataCache();
+    global.fetch = async () => {
+      fetchCount += 1;
+
+      return {
+        ok: true,
+        async json() {
+          return {
+            avg_age: 18,
+            last_synced: 1000,
+            schoolNum: 2,
+            formNum: 1,
+            statistics: [],
+            statisticsForm: [],
+            data: []
+          };
+        }
+      };
+    };
+    axios.get = async () => {
+      axiosCount += 1;
+      throw new Error('axios should not be called when MAP_DATA_NODE_TRANSPORT_OVERRIDES is disabled');
+    };
+
+    try {
+      const result = await mapDataService.getMapData({
+        publicMapDataUrl: 'https://example.com/api/map-data',
+        upstreamTimeoutMs: 23456
+      });
+
+      assert.equal(result.schoolNum, 2);
+      assert.equal(fetchCount, 1);
+      assert.equal(axiosCount, 0);
+    } finally {
+      axios.get = originalGet;
+      global.fetch = originalFetch;
+      mapDataService.resetMapDataCache();
+    }
+  });
+});
+
+test('map data service uses direct IPv4 requests when MAP_DATA_NODE_TRANSPORT_OVERRIDES is enabled', async () => {
   await withEnvOverrides(getNoProxyEnv(), async () => {
     clearProjectModules();
     const axios = require('axios');
@@ -1623,7 +1678,7 @@ test('map data service uses direct IPv4 requests when MAP_DATA_FORCE_IPV4 is ena
 
     mapDataService.resetMapDataCache();
     global.fetch = async () => {
-      throw new Error('fetch should not be called when MAP_DATA_FORCE_IPV4 is enabled');
+      throw new Error('fetch should not be called when MAP_DATA_NODE_TRANSPORT_OVERRIDES is enabled');
     };
     axios.get = async (_url, config = {}) => {
       axiosCalls.push(config);
@@ -1645,7 +1700,7 @@ test('map data service uses direct IPv4 requests when MAP_DATA_FORCE_IPV4 is ena
     try {
       const result = await mapDataService.getMapData({
         publicMapDataUrl: 'https://example.com/api/map-data',
-        mapDataForceIpv4: true,
+        mapDataNodeTransportOverrides: true,
         upstreamTimeoutMs: 23456
       });
 
