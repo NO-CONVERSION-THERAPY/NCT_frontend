@@ -1,4 +1,12 @@
 (() => {
+const SCHOOL_MARKER_SCALE = 0.75;
+const SCHOOL_MARKER_DEFAULT_OPACITY = 0.75;
+const SCHOOL_MARKER_MAX_OPACITY = 1;
+const SCHOOL_MARKER_SHADOW_URL = 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png';
+const SCHOOL_MARKER_DEFAULT_COLOR = '#36a2eb';
+const SCHOOL_MARKER_REPORT_MIN_COLOR = '#fca5a5';
+const SCHOOL_MARKER_REPORT_MAX_COLOR = '#7f1d1d';
+
 function toHexChannel(value) {
     return Math.round(value).toString(16).padStart(2, '0');
 }
@@ -33,7 +41,12 @@ function getProvinceDensityColor(density, maxDensity) {
 const i18n = window.I18N;
 const MAP_DATA_REFRESH_INTERVAL_SECONDS = 300;
 const { getElapsedSeconds, renderLastSyncedValue } = window.MapTimeUtils;
-const { getSchoolStatsKey, groupSchoolRecords } = window.MapRecordStats;
+const {
+    buildSchoolReportStats,
+    getSchoolReportStats,
+    getSchoolStatsKey,
+    groupSchoolRecords
+} = window.MapRecordStats;
 const {
     buildProvinceDensityMap,
     getProvinceCodeFromFeature
@@ -48,6 +61,7 @@ let provinceFillLayer = null;
 let provinceFillRenderer = null;
 let provinceBorderRenderer = null;
 const chartInstances = [];
+const schoolMarkerIconCache = new Map();
 const TILE_ERROR_THRESHOLD = 6;
 const BASE_TILE_PROVIDERS = {
     dark: [
@@ -94,6 +108,80 @@ const BASE_TILE_PROVIDERS = {
     ]
 };
 let mapTileProviderIndex = 0;
+
+function scaleMarkerDimension(value) {
+    return Math.round(value * SCHOOL_MARKER_SCALE);
+}
+
+function createSchoolMarkerSvgDataUrl(fillColor) {
+    const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="41" viewBox="0 0 25 41">
+            <path
+                d="M12.5 0C5.596 0 0 5.596 0 12.5C0 20.774 12.5 41 12.5 41C12.5 41 25 20.774 25 12.5C25 5.596 19.404 0 12.5 0Z"
+                fill="${fillColor}"
+                stroke="rgba(255,255,255,0.95)"
+                stroke-width="1.5"
+            />
+            <circle cx="12.5" cy="12.5" r="4.5" fill="rgba(255,255,255,0.92)" />
+        </svg>
+    `;
+
+    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
+function createSchoolMarkerIcon(fillColor) {
+    return L.icon({
+        iconUrl: createSchoolMarkerSvgDataUrl(fillColor),
+        shadowUrl: SCHOOL_MARKER_SHADOW_URL,
+        iconSize: [scaleMarkerDimension(25), scaleMarkerDimension(41)],
+        iconAnchor: [scaleMarkerDimension(12), scaleMarkerDimension(41)],
+        popupAnchor: [scaleMarkerDimension(1), scaleMarkerDimension(-34)],
+        tooltipAnchor: [scaleMarkerDimension(16), scaleMarkerDimension(-28)],
+        shadowSize: [scaleMarkerDimension(41), scaleMarkerDimension(41)],
+        shadowAnchor: [scaleMarkerDimension(13), scaleMarkerDimension(41)],
+        className: 'school-marker-icon'
+    });
+}
+
+function getSchoolMarkerReportCount(schoolReportStats) {
+    return Number(schoolReportStats && schoolReportStats.selfCount || 0)
+        + Number(schoolReportStats && schoolReportStats.agentCount || 0);
+}
+
+function getSchoolMarkerReportRatio(schoolReportStats, maxReportedMarkerCount) {
+    const reportedMarkerCount = getSchoolMarkerReportCount(schoolReportStats);
+    return reportedMarkerCount > 0 && maxReportedMarkerCount > 0
+        ? Math.min(1, reportedMarkerCount / maxReportedMarkerCount)
+        : 0;
+}
+
+function getSchoolMarkerColor(schoolReportStats, maxReportedMarkerCount) {
+    const reportRatio = getSchoolMarkerReportRatio(schoolReportStats, maxReportedMarkerCount);
+
+    if (!(reportRatio > 0)) {
+        return SCHOOL_MARKER_DEFAULT_COLOR;
+    }
+
+    return interpolateHexColor(
+        SCHOOL_MARKER_REPORT_MIN_COLOR,
+        SCHOOL_MARKER_REPORT_MAX_COLOR,
+        reportRatio
+    );
+}
+
+function getSchoolMarkerOpacity(schoolReportStats, maxReportedMarkerCount) {
+    const reportRatio = getSchoolMarkerReportRatio(schoolReportStats, maxReportedMarkerCount);
+    return SCHOOL_MARKER_DEFAULT_OPACITY
+        + ((SCHOOL_MARKER_MAX_OPACITY - SCHOOL_MARKER_DEFAULT_OPACITY) * reportRatio);
+}
+
+function getSchoolMarkerIcon(fillColor) {
+    if (!schoolMarkerIconCache.has(fillColor)) {
+        schoolMarkerIconCache.set(fillColor, createSchoolMarkerIcon(fillColor));
+    }
+
+    return schoolMarkerIconCache.get(fillColor);
+}
 
 // 底图、边框和图表主题都跟随系统深色模式一起切换。
 function isDarkMode() {
@@ -816,13 +904,25 @@ window.getSharedMapData()
         const inputSearch = (urlParams.get('search') || '').trim();
         // 地图 marker 和列表详情共用同一份筛选结果，保证锚点能一一对应。
         const filteredData = data.filter((item) => matchesInputType(item, inputType) && matchesSearch(item, inputSearch));
+        const schoolReportStatsBySchool = typeof buildSchoolReportStats === 'function'
+            ? buildSchoolReportStats(data)
+            : new Map();
+        const maxReportedMarkerCount = Math.max(0, ...Array.from(schoolReportStatsBySchool.values()).map((schoolReportStats) => {
+            return getSchoolMarkerReportCount(schoolReportStats);
+        }));
         const groupedFilteredData = groupSchoolRecords(filteredData);
         const groupIndexBySchoolKey = new Map(
             groupedFilteredData.map((group, index) => [group.schoolKey, index])
         );
 
         filteredData.forEach((item, index) => {
+            const schoolReportStats = typeof getSchoolReportStats === 'function'
+                ? getSchoolReportStats(schoolReportStatsBySchool, item)
+                : { selfCount: 0, agentCount: 0 };
+            const schoolMarkerColor = getSchoolMarkerColor(schoolReportStats, maxReportedMarkerCount);
             const marker = L.marker([item.lat, item.lng], {
+                icon: getSchoolMarkerIcon(schoolMarkerColor),
+                opacity: getSchoolMarkerOpacity(schoolReportStats, maxReportedMarkerCount),
                 pane: 'schoolMarkerPane',
                 shadowPane: 'schoolShadowPane'
             }).addTo(map);

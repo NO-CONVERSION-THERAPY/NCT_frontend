@@ -484,6 +484,16 @@ test('map frontend keeps a renderer and layout fallback for province overlays', 
   assert.match(mapScript, /schoolTooltipPane/);
   assert.match(mapScript, /shadowPane:\s*'schoolShadowPane'/);
   assert.match(mapScript, /pane:\s*'schoolTooltipPane'/);
+  assert.match(mapScript, /const SCHOOL_MARKER_SCALE = 0\.75/);
+  assert.match(mapScript, /const SCHOOL_MARKER_DEFAULT_OPACITY = 0\.75/);
+  assert.match(mapScript, /const SCHOOL_MARKER_MAX_OPACITY = 1/);
+  assert.match(mapScript, /buildSchoolReportStats/);
+  assert.match(mapScript, /function getSchoolMarkerReportCount/);
+  assert.match(mapScript, /function getSchoolMarkerReportRatio/);
+  assert.match(mapScript, /SCHOOL_MARKER_DEFAULT_COLOR = '#36a2eb'/);
+  assert.match(mapScript, /interpolateHexColor\(\s*SCHOOL_MARKER_REPORT_MIN_COLOR,\s*SCHOOL_MARKER_REPORT_MAX_COLOR,\s*reportRatio\s*\)/);
+  assert.match(mapScript, /icon:\s*getSchoolMarkerIcon\(schoolMarkerColor\)/);
+  assert.match(mapScript, /opacity:\s*getSchoolMarkerOpacity\(schoolReportStats, maxReportedMarkerCount\)/);
   assert.match(mapScript, /const densityRatio = density \/ maxDensity/);
   assert.match(mapScript, /interpolateHexColor\('#FED976', '#800026', densityRatio\)/);
   assert.match(mapScript, /getProvinceFillOpacity/);
