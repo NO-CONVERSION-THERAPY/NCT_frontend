@@ -270,8 +270,6 @@ function buildValidSubmissionBody(overrides = {}) {
   const basePayload = {
     identity: '受害者本人',
     birth_year: '2008',
-    birth_month: '5',
-    birth_day: '20',
     sex: '男',
     sex_other: '',
     provinceCode: '110000',
@@ -355,10 +353,10 @@ test('form page includes school name and address autocomplete hooks', async () =
   const response = await requestPath(app, '/form');
 
   assert.equal(response.statusCode, 200);
-  assert.match(response.body, /出生年月日/);
+  assert.match(response.body, /出生年份/);
   assert.match(response.body, /name="birth_year"/);
-  assert.match(response.body, /name="birth_month"/);
-  assert.match(response.body, /name="birth_day"/);
+  assert.doesNotMatch(response.body, /name="birth_month"/);
+  assert.doesNotMatch(response.body, /name="birth_day"/);
   assert.match(response.body, /机构所在省份/);
   assert.match(response.body, /机构所在城市 \/ 区县/);
   assert.match(response.body, /机构所在县区（可选）/);
@@ -1182,13 +1180,13 @@ test('submit route still accepts a valid protected form in dry run mode', async 
   assert.match(response.body, /entry\.842223433_month/);
   assert.match(response.body, /entry\.842223433_day/);
   assert.match(response.body, />2008</);
-  assert.match(response.body, />5</);
-  assert.match(response.body, />20</);
+  assert.match(response.body, /entry\.842223433_month<\/code><\/td>\s*<td>出生月份<\/td>\s*<td>1<\/td>/);
+  assert.match(response.body, /entry\.842223433_day<\/code><\/td>\s*<td>出生日期<\/td>\s*<td>1<\/td>/);
   assert.doesNotMatch(response.body, /entry\.842223433<\/code>/);
   clearProjectModules();
 });
 
-test('submit route rejects invalid birth date combinations', async () => {
+test('submit route rejects invalid birth year values', async () => {
   clearProjectModules();
   const { issueFormProtectionToken } = require(path.join(projectRoot, 'app/services/formProtectionService'));
   const app = loadApp({
@@ -1204,9 +1202,7 @@ test('submit route rejects invalid birth date combinations', async () => {
       'Content-Type': 'application/x-www-form-urlencoded'
     },
     body: buildValidSubmissionBody({
-      birth_year: '2024',
-      birth_month: '2',
-      birth_day: '31',
+      birth_year: '1899',
       form_token: issueFormProtectionToken({
         secret: 'test-form-protection-secret',
         issuedAt: Date.now() - 5000
@@ -1215,7 +1211,7 @@ test('submit route rejects invalid birth date combinations', async () => {
   });
 
   assert.equal(response.statusCode, 400);
-  assert.match(response.body, /有效的出生年月日/);
+  assert.match(response.body, /有效的出生年份/);
   clearProjectModules();
 });
 

@@ -289,8 +289,8 @@ const messages = {
       },
       validation: {
         selectIdentity: '请选择填写身份',
-        fillBirthDate: '请选择出生年月日',
-        invalidBirthDate: '请选择有效的出生年月日',
+        fillBirthDate: '请选择出生年份',
+        invalidBirthDate: '请选择有效的出生年份',
         fillAge: '请填写年龄',
         ageRange: '年龄必须是 {min} 到 {max} 的整数',
         selectSex: '请选择性别',
@@ -474,7 +474,7 @@ const messages = {
     formErrors: {
       required: '{label}为必填',
       maxLength: '{label}不能超过 {maxLength} 字',
-      invalidBirthDate: '请选择有效的出生年月日',
+      invalidBirthDate: '请选择有效的出生年份',
       ageRange: '{label}必须是 {min} 到 {max} 的整数',
       invalidIdentity: '请选择有效的填写身份',
       invalidSex: '性别不合法，请修改',
@@ -643,8 +643,8 @@ const messages = {
       },
       validation: {
         selectIdentity: '請選擇填寫身份',
-        fillBirthDate: '請選擇出生年月日',
-        invalidBirthDate: '請選擇有效的出生年月日',
+        fillBirthDate: '請選擇出生年份',
+        invalidBirthDate: '請選擇有效的出生年份',
         fillAge: '請填寫年齡',
         ageRange: '年齡必須是 {min} 到 {max} 的整數',
         selectSex: '請選擇性別',
@@ -828,7 +828,7 @@ const messages = {
     formErrors: {
       required: '{label}為必填',
       maxLength: '{label}不能超過 {maxLength} 字',
-      invalidBirthDate: '請選擇有效的出生年月日',
+      invalidBirthDate: '請選擇有效的出生年份',
       ageRange: '{label}必須是 {min} 到 {max} 的整數',
       invalidIdentity: '請選擇有效的填寫身份',
       invalidSex: '性別不合法，請修改',
@@ -997,8 +997,8 @@ const messages = {
       },
       validation: {
         selectIdentity: 'Please choose your submission role',
-        fillBirthDate: 'Please select date of birth',
-        invalidBirthDate: 'Please select a valid date of birth',
+        fillBirthDate: 'Please select a birth year',
+        invalidBirthDate: 'Please select a valid birth year',
         fillAge: 'Please enter age',
         ageRange: 'Age must be an integer between {min} and {max}',
         selectSex: 'Please choose gender',
@@ -1182,7 +1182,7 @@ const messages = {
     formErrors: {
       required: '{label} is required',
       maxLength: '{label} cannot exceed {maxLength} characters',
-      invalidBirthDate: 'Please select a valid date of birth',
+      invalidBirthDate: 'Please select a valid birth year',
       ageRange: '{label} must be an integer between {min} and {max}',
       invalidIdentity: 'Please choose a valid submission role',
       invalidSex: 'The selected gender value is invalid',
