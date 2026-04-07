@@ -1,7 +1,6 @@
 import { httpServerHandler } from 'cloudflare:node'
 import { readFileSync } from 'node:fs'
 import app from './app/server.js'
-import { rebuildResponseWithHeaders } from './app/services/workerResponse.mjs'
 
 const REFERRER_POLICY = 'strict-origin-when-cross-origin'
 const CHINA_GEOJSON_PATH = '/bundle/public/cn.json'
@@ -47,10 +46,6 @@ export default {
       })
     }
 
-    const response = await nodeHandler.fetch(request, env, ctx)
-    return rebuildResponseWithHeaders(response, {
-      // Workers 侧再兜一层，避免部署环境把 Referrer-Policy 覆盖回 no-referrer。
-      'Referrer-Policy': REFERRER_POLICY
-    })
+    return nodeHandler.fetch(request, env, ctx)
   }
 }
