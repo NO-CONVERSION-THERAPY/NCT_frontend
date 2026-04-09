@@ -22,6 +22,7 @@
                         <div class="blog-list-card__main">
                             <h2 class="blog-list-card__title">
                                 <span class="blog-list-card__title-original"><%= Prot.title %></span>
+                                <% // 英文列表页会额外展示 translatedTitle，方便保留原题同时给出可读翻译。 %>
                                 <% if (Prot.translatedTitle) { %>
                                     <span class="blog-list-card__title-translation"><%= Prot.translatedTitle %></span>
                                 <% } %>

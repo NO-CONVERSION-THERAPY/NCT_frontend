@@ -2,6 +2,7 @@ const chinaAreaData = require('china-area-data');
 const { getProvinceCodeLabels } = require('./i18n');
 const { getLegacyProvinceNamesByCode } = require('./provinceMetadata');
 
+// 行政区联动数据在这里一次性构建，避免每次请求再遍历整份 china-area-data。
 // china-area-data 提供的是标准行政区名称，这里维护旧表单沿用的省份展示名映射。
 const legacyProvinceNameByCode = getLegacyProvinceNamesByCode();
 

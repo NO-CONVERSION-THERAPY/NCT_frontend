@@ -6,6 +6,8 @@ function doGet(e) {
   try {
     const ss = SpreadsheetApp.openById(SHEET_FILE);
     
+    // 这个 doGet 是站点私有地图数据源的上游契约：
+    // Express 侧会直接消费这里输出的 data / statistics / avg_age 等字段。
     // --- 1. 處理 MAIN 分頁 ---
     const mainSheet = ss.getSheetByName(SHEET_NAME);
     const mainData = mainSheet.getDataRange().getValues();
@@ -77,6 +79,7 @@ function mainUpdateGeocodes() {
   const ss = SpreadsheetApp.openById(SHEET_FILE);
   const startTime = new Date().getTime();
 
+  // Apps Script 单次执行时长有限，所以按工作表逐个处理，并在接近 5 分钟时主动停止。
   for (const sheetName of TARGET_SHEETS) {
     const sheet = ss.getSheetByName(sheetName);
     if (!sheet) {
@@ -119,6 +122,7 @@ function processSingleSheet(sheet, startTime) {
       if (!address) continue; // 如果連地址都沒有，那就快滾一邊去吧
 
       const addressStr = address.toString();
+      // 表单页手动选点时会把经纬度写成 latlng<lat>,<lng>，这里直接识别而不再调用地理编码。
       const latlngCheck = addressStr.startsWith("latlng");
 
       try {

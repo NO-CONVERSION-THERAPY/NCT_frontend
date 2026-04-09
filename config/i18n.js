@@ -11,6 +11,8 @@ const provinceCodeLabels = Object.fromEntries(
 
 const legacyProvinceNamesByCode = getLegacyProvinceNamesByCode();
 
+// 站内文案与省份元数据分开维护：
+// 纯界面文本在 messages，行政区显示名仍复用 provinceMetadata 里的权威定义。
 function buildLocalizedLegacyProvinceNames(language) {
   return Object.fromEntries(
     Object.entries(legacyProvinceNamesByCode).map(([code, legacyName]) => [legacyName, provinceCodeLabels[language][code]])
@@ -1384,6 +1386,7 @@ function interpolateString(value, variables = {}) {
 }
 
 function cloneAndInterpolate(value, variables = {}) {
+  // 翻译节点有时是对象或数组，递归插值后可直接下发给模板和前端脚本复用。
   if (typeof value === 'string') {
     return interpolateString(value, variables);
   }
@@ -1437,6 +1440,7 @@ function parseCookieHeader(cookieHeader = '') {
 
       const key = chunk.slice(0, index).trim();
       const value = chunk.slice(index + 1).trim();
+      // 这里只解析最基础的 key=value cookie，足够支撑语言切换场景。
       result[key] = decodeURIComponent(value);
       return result;
     }, {});

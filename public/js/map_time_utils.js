@@ -7,6 +7,7 @@
 
     globalObject.MapTimeUtils = exports;
 })(typeof globalThis !== 'undefined' ? globalThis : this, () => {
+    // 地图页多个位置都要用到“最后同步多久前”，单独抽成纯函数方便测试和复用。
     function formatMessage(template, values) {
         return Object.entries(values).reduce((result, [key, value]) => {
             return result.replaceAll(`{${key}}`, value);
@@ -49,6 +50,7 @@
             return;
         }
 
+        // 超过正常刷新周期后再展示按钮，避免用户一看到页面就误以为必须手动刷新。
         lastSyncedElement.appendChild(documentRef.createTextNode(', '));
 
         const refreshButton = documentRef.createElement('button');

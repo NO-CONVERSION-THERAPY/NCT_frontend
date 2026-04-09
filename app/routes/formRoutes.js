@@ -20,6 +20,7 @@ const { validateFormProtection } = require('../services/formProtectionService');
 const { logAuditEvent } = require('../services/auditLogService');
 
 function encodeConfirmationPayload(encodedPayload) {
+  // 确认页用 base64url 包一层，避免 form-urlencoded 里再次出现特殊字符歧义。
   return Buffer.from(String(encodedPayload || ''), 'utf8').toString('base64url');
 }
 
@@ -129,6 +130,7 @@ function createFormRoutes({
       }
 
       const confirmationPayload = encodeConfirmationPayload(encodedPayload);
+      // 生产模式下强制多一步确认，给用户最后一次核对机会，也阻止客户端改包直接提交。
       const confirmationToken = issueFormConfirmationToken({
         payload: confirmationPayload,
         secret: formProtectionSecret

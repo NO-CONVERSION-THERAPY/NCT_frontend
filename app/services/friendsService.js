@@ -4,6 +4,7 @@ const { paths } = require('../../config/fileConfig');
 function getFriendDescriptionKey(name) {
   const normalizedName = String(name || '').trim().toLowerCase();
 
+  // 友链描述目前仍按少量固定成员映射翻译 key，避免要求 friends.json 同步维护多语言结构。
   if (normalizedName === 'hosinoneko') {
     return 'hosinoneko';
   }

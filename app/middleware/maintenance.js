@@ -23,6 +23,7 @@ function createMaintenanceMiddleware({
     res.set('Retry-After', String(retryAfterSeconds));
 
     const acceptedType = req.accepts(['html', 'json', 'text']);
+    // 浏览器访问优先返回维护页，程序化调用则保留 json / text 响应，便于监控与调试。
     const wantsHtml = (req.method === 'GET' || req.method === 'HEAD')
       && (acceptedType === 'html' || acceptedType === false);
 

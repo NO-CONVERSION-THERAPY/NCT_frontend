@@ -43,6 +43,7 @@ const rateLimitStoreCache = new Map();
 
 function getRedisRateLimitStore({ redisUrl, prefix = 'rate-limit:' } = {}) {
   if (!redisUrl) {
+    // 未配置 Redis 时自动退回到进程内限流，单实例可用，但多实例之间不会共享计数。
     return undefined;
   }
 
@@ -60,6 +61,8 @@ function getRedisRateLimitStore({ redisUrl, prefix = 'rate-limit:' } = {}) {
     });
 
     const connection = client.connect().catch((error) => {
+      // 如果这里报错，首个命中该 limiter 的请求通常也会失败；
+      // 排障时优先检查 RATE_LIMIT_REDIS_URL、网络连通性和 Redis ACL。
       console.error('Redis rate limit connect failed:', error.message);
       throw error;
     });
@@ -69,6 +72,7 @@ function getRedisRateLimitStore({ redisUrl, prefix = 'rate-limit:' } = {}) {
   }
 
   const store = new RedisStore({
+    // express-rate-limit 只关心 sendCommand 接口，这里把连接初始化细节封装掉。
     prefix,
     sendCommand: (...args) => redisClientEntry.connection.then(() => redisClientEntry.client.sendCommand(args))
   });
@@ -96,6 +100,8 @@ function createRateLimiter({
       // Workers 不允許在 global scope 裡啟動 express-rate-limit 的內部 timer，
       // 因此把真正的 middleware 初始化延後到首次請求時再完成。
       if (!middleware) {
+        // 真正创建 limiter 的时机被推迟到首个请求，
+        // 因此“配置错误只在流量进入后暴露”是预期行为，不是随机故障。
         middleware = rateLimit({
           windowMs,
           max: Number.isFinite(max) && max > 0 ? max : 5,
@@ -143,6 +149,7 @@ function createSubmitRateLimiter({ max, onLimit, getMessage, redisUrl }) {
 }
 
 function applySensitivePageHeaders(res) {
+  // 预览页、确认页、维护页都不应被缓存或被搜索引擎索引。
   res.set(sensitiveResponseHeaders);
   return res;
 }

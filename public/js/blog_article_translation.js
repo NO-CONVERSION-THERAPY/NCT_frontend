@@ -1,4 +1,5 @@
 (function progressivelyTranslateBlogArticle() {
+    // 博客文章页只在英文界面按段落渐进翻译，避免首屏就为整篇文章阻塞渲染。
     if (window.APP_LANG !== 'en') {
         return;
     }
@@ -53,6 +54,8 @@
     }
 
     async function requestTranslations(items) {
+        // 博客前端不直接碰第三方翻译服务，统一回到站内 API，
+        // 这样可以复用服务端限流、缓存和错误处理策略。
         const response = await window.fetch('/api/translate-text', {
             method: 'POST',
             headers: {
@@ -86,6 +89,7 @@
             const cachedTranslation = readTranslationCache(window.APP_LANG, sourceText);
 
             if (cachedTranslation) {
+                // 同一个标签页里再次打开文章时优先复用 sessionStorage，减少重复翻译请求。
                 revealTranslation(node, cachedTranslation);
                 return;
             }
@@ -100,6 +104,7 @@
 
         for (const entryChunk of chunkEntries(pendingEntries, REQUEST_BATCH_SIZE)) {
             try {
+                // 分块请求能把失败范围控制在当前批次，也避免单次请求正文过长。
                 const translations = await requestTranslations(entryChunk.map((entry) => ({
                     fieldKey: entry.fieldKey,
                     text: entry.sourceText
@@ -120,6 +125,7 @@
                     const translatedText = translatedTextByFieldKey[fieldKey] || '';
 
                     if (!translatedText) {
+                        // 空结果不抛错，只标记状态，让页面继续展示原文。
                         node.dataset.translationState = 'empty';
                         return;
                     }

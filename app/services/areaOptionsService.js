@@ -4,6 +4,7 @@ const {
 } = require('../../config/areaSelector');
 const { translateDetailItems } = require('./textTranslationService');
 
+// 行政区名称翻译频率高、变化极少，适合直接做进程内缓存。
 const localizedAreaNameCache = new Map();
 
 function getCacheKey(language, text) {
@@ -30,6 +31,7 @@ async function localizeOptions(options, language) {
     return normalizedOptions;
   }
 
+  // 先去重再批量翻译，避免同一城市/区县名称重复调用上游翻译服务。
   const pendingTexts = [...new Set(
     normalizedOptions
       .map((option) => option.name.trim())

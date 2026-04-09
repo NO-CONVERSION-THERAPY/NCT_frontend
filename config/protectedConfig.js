@@ -1,5 +1,7 @@
 const crypto = require('crypto');
 
+// 受保护配置使用“前缀版本号 + HKDF 派生 + AES-GCM”这一套格式，
+// 便于后续在不破坏旧密文的前提下演进实现。
 const PROTECTED_VALUE_PREFIX = 'enc:v1';
 const KEY_LENGTH_BYTES = 32;
 const AES_GCM_ALGORITHM = 'aes-256-gcm';
@@ -22,6 +24,7 @@ function ensureBaseSecret(baseSecret) {
 }
 
 function deriveKey(baseSecret, purpose) {
+  // 同一个基础 secret 会按 purpose 派生不同密钥，避免不同配置项之间互相混用。
   return crypto.hkdfSync(
     'sha256',
     Buffer.from(ensureBaseSecret(baseSecret), 'utf8'),
@@ -74,6 +77,7 @@ function decryptProtectedValue(value, baseSecret, purpose) {
   const normalizedValue = normalizeText(value);
   const parts = normalizedValue.split(':');
 
+  // 这里故意严格校验版本前缀，避免把任意字符串误当作密文继续解密。
   if (parts.length !== 5 || parts[0] !== 'enc' || parts[1] !== 'v1') {
     throw new Error('受保護配置格式無效');
   }

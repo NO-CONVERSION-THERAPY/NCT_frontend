@@ -1856,6 +1856,86 @@ test('map data service can bypass in-memory cache on force refresh', async () =>
   });
 });
 
+test('map data service temporarily serves public fallback data and upgrades to GOOGLE_SCRIPT_URL when it succeeds later', async () => {
+  await withEnvOverrides(getNoProxyEnv(), async () => {
+    clearProjectModules();
+    const mapDataService = require(path.join(projectRoot, 'app/services/mapDataService'));
+    const originalFetch = global.fetch;
+
+    mapDataService.resetMapDataCache();
+    global.fetch = async (url) => {
+      if (url === 'https://private.example/map-data') {
+        await new Promise((resolve) => setTimeout(resolve, 40));
+
+        return {
+          ok: true,
+          async json() {
+            return {
+              avg_age: 21,
+              last_synced: 2000,
+              schoolNum: 9,
+              formNum: 5,
+              statistics: [],
+              statisticsForm: [],
+              data: [
+                { province: '北京', lat: 39.9, lng: 116.4 }
+              ]
+            };
+          }
+        };
+      }
+
+      if (url === 'https://public.example/map-data') {
+        await new Promise((resolve) => setTimeout(resolve, 5));
+
+        return {
+          ok: true,
+          async json() {
+            return {
+              avg_age: 18,
+              last_synced: 1000,
+              schoolNum: 3,
+              formNum: 2,
+              statistics: [],
+              statisticsForm: [],
+              data: [
+                { province: '上海', lat: 31.2, lng: 121.5 }
+              ]
+            };
+          }
+        };
+      }
+
+      throw new Error(`unexpected url: ${url}`);
+    };
+
+    try {
+      const initialResult = await mapDataService.getMapData({
+        googleScriptUrl: 'https://private.example/map-data',
+        publicMapDataUrl: 'https://public.example/map-data'
+      });
+
+      assert.equal(initialResult.source, 'public-map-data');
+      assert.equal(initialResult.isSourceFallback, true);
+      assert.equal(initialResult.schoolNum, 3);
+
+      await new Promise((resolve) => setTimeout(resolve, 80));
+
+      const upgradedResult = await mapDataService.getMapData({
+        googleScriptUrl: 'https://private.example/map-data',
+        publicMapDataUrl: 'https://public.example/map-data'
+      });
+
+      assert.equal(upgradedResult.source, 'google-script');
+      assert.equal(upgradedResult.isSourceFallback, false);
+      assert.equal(upgradedResult.schoolNum, 9);
+    } finally {
+      global.fetch = originalFetch;
+      mapDataService.resetMapDataCache();
+    }
+  });
+});
+
 test('map data service merges province statistics that differ only by script', async () => {
   await withEnvOverrides(getNoProxyEnv(), async () => {
     clearProjectModules();

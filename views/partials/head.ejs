@@ -21,6 +21,8 @@
     <link rel="stylesheet" href="/css/backTopBtn.css"/>
     <link rel="icon" href="/favicon.svg"/>
     <script>
+        // 服务端按当前请求语言把接口地址、语言代码和整份前端文案字典注入到页面，
+        // 各个前端脚本只读这些全局值，不再各自维护语言状态。
         window.API_URL = "<%= apiUrl %>";
         window.APP_LANG = "<%= lang %>";
         window.ASSET_VERSION = "<%= assetVersion || '' %>";

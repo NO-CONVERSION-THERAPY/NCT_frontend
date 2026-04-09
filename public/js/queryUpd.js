@@ -10,6 +10,7 @@ function queryUpd(addQname,addQvalue) {
     }
 
     //把新参数同步到 URL
+    // 这里用 replaceState 而不是 pushState，避免每次筛选都在浏览器历史里堆一条记录。
     window.history.replaceState({}, '', 
         window.location.pathname + '?' + urlParams.toString()
     );

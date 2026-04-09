@@ -1,5 +1,7 @@
 const { translateTextsWithProvider } = require('./translationProviderService');
 
+// 详情翻译是“尽力而为”的增强能力：
+// 站点主体功能不应因为翻译服务波动而整体不可用。
 // 轻量级进程内缓存：避免同一批详情文案反复请求翻译接口。
 const translationCache = new Map();
 const translationCacheMaxEntries = 250;
@@ -117,6 +119,8 @@ function isTranslationServiceCoolingDown(now = Date.now()) {
 }
 
 function openTranslationFailureCooldown(now = Date.now()) {
+  // 冷却窗口开启后，短时间内会快速失败而不再继续请求上游；
+  // 支持排障时看到连续失败并不一定代表上游被高频调用。
   translationServiceUnavailableUntil = now + translationFailureCooldownMs;
 }
 
@@ -129,6 +133,7 @@ async function requestTranslationBatch(texts, targetLanguage) {
     throw new Error('翻譯服務連線冷卻中');
   }
 
+  // 给上游一次额外重试机会，但仍保持调用方的响应时间可控。
   let lastError = null;
 
   for (let attempt = 0; attempt < 2; attempt += 1) {
@@ -151,6 +156,7 @@ async function requestTranslationBatch(texts, targetLanguage) {
 }
 
 function logTranslationFailure(error, texts, targetLanguage) {
+  // 这里的 sample 只截取少量公开文本片段，既方便排障，也尽量避免日志里堆太多正文内容。
   console.warn(
     '翻譯服務暫時不可用，未返回翻譯結果：',
     getErrorDiagnostics(error) || (error && error.message ? error.message : error),
@@ -236,6 +242,7 @@ async function translateInterfaceText({ text, targetLanguage }) {
     targetLanguage
   });
 
+  // 界面级翻译失败时直接回退原文，维护者不需要为此额外补一层 try/catch。
   return translatedItem && translatedItem.translatedText
     ? translatedItem.translatedText
     : normalizedText;

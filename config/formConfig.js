@@ -67,6 +67,7 @@ function getFormRuleDefinitions(now = new Date()) {
 function getLocalizedFormRules(t, now = new Date()) {
   const formRuleDefinitions = getFormRuleDefinitions(now);
 
+  // 后端校验和前端提示共用同一份 rule 定义，只在这里注入本地化 label。
   return Object.fromEntries(
     Object.entries(formRuleDefinitions).map(([field, definition]) => [
       field,

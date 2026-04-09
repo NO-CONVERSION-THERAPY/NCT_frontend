@@ -79,6 +79,7 @@ function buildNormalizedSexValue(sex, sexOtherType, sexOther) {
     return sex;
   }
 
+  // “其他性别认同”最终会折叠成一个字符串，便于继续映射到单个 Google Form 字段。
   if (sexOtherType === CUSTOM_OTHER_SEX_OPTION) {
     return sexOther;
   }
@@ -149,6 +150,7 @@ function validateSubmission(body, t) {
   let validatedLocation = null;
   let validatedCounty = null;
 
+  // 当前表单只采集出生年份，所以月/日会用规则定义里的最小值补齐成合法日期。
   if (!birthYearValue) {
     errors.push(t('formErrors.required', { label: formRules.birthYear.label }));
   } else {
@@ -198,6 +200,7 @@ function validateSubmission(body, t) {
   }
 
   if (provinceCode && cityCode) {
+    // 省市联动数据来自统一配置，后端再次校验可以防止用户手工篡改 option value。
     validatedLocation = validateProvinceAndCity(provinceCode, cityCode);
     if (!validatedLocation) {
       errors.push(t('formErrors.provinceCityMismatch'));
@@ -289,6 +292,7 @@ function buildGoogleFormFields(values, t) {
 }
 
 function buildConfirmationFields(values, t) {
+  // 确认页展示使用“用户可读标签”，不暴露 Google Form 的 entry id。
   return [
     { label: t('form.fields.identity'), value: values.identity },
     { label: t(getBirthYearLabelKey(values.identity)), value: values.birthYear },

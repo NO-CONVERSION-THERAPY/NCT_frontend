@@ -47,7 +47,8 @@ FORM_PROTECTION_MIN_FILL_MS="3000"
 FORM_PROTECTION_MAX_AGE_MS="86400000"
 
 # Public map API fallback
-PUBLIC_MAP_DATA_URL="https://your-domain.example/api/map-data"
+# Used as the public fallback source when GOOGLE_SCRIPT_URL is slow or temporarily unavailable.
+PUBLIC_MAP_DATA_URL="https://nct.hosinoeiji.workers.dev/api/map-data"
 MAP_DATA_UPSTREAM_TIMEOUT_MS="25000"
 
 # Optional translation support

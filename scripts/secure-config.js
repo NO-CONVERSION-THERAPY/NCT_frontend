@@ -10,6 +10,8 @@ const {
   encryptProtectedValue
 } = require('../config/protectedConfig');
 
+// 这个脚本是“配置搬运工具”：
+// 把明文 FORM_ID / GOOGLE_SCRIPT_URL 转成可放进普通变量栏位的密文值。
 const PURPOSES = new Map([
   ['form-id', 'FORM_ID_ENCRYPTED'],
   ['google-script-url', 'GOOGLE_SCRIPT_URL_ENCRYPTED']
@@ -125,6 +127,7 @@ function buildBootstrapConfig({ formId, googleScriptUrl, secret }) {
 function buildBootstrapConfigFromEnvSource({ envSource, secret }) {
   const values = envSource && envSource.values ? envSource.values : process.env;
 
+  // bootstrap-env 适合给已经存在的 .env / .dev.vars 做“一键迁移”。
   return buildBootstrapConfig({
     formId: readTrimmedText(values.FORM_ID),
     googleScriptUrl: readTrimmedText(values.GOOGLE_SCRIPT_URL),
@@ -139,6 +142,8 @@ function printBootstrapConfig(config, options = {}) {
     console.log(`# Generated from ${sourceLabel}`);
   }
 
+  // 输出格式刻意做成“可直接复制回 env / Secret 面板”的样子，
+  // 但维护时仍要注意：这些值本身属于敏感信息，不应直接提交进仓库。
   console.log('# Copy the following values into your Secrets or env file');
   console.log(`FORM_PROTECTION_SECRET="${config.formProtectionSecret}"`);
 
@@ -170,6 +175,7 @@ function main() {
   }
 
   if (command === 'generate-secret') {
+    // generate-secret 适合先单独生成 secret，再交给密码管理器或云平台 Secret 面板保存。
     console.log(createRandomSecret());
     return;
   }

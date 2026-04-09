@@ -247,6 +247,7 @@ function createPageRoutes({
 
   router.get('/port/:id', pageReadLimiter, async (req, res) => {
     const mdName = req.params.id;
+    // 文章详情必须限制在 blog 目录内读取，避免利用 id 做路径穿越。
     const mdPath = resolveMarkdownPath(paths.blog, mdName);
     
     if (!mdPath || !fs.existsSync(mdPath)) {

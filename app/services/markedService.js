@@ -1,5 +1,6 @@
 const { marked } = require('marked');
 
+// 博客 Markdown 允许常见排版，但仍要把 HTML / URL 做最小化净化，避免直接透传危险内容。
 const blockedProtocols = ['javascript:', 'vbscript:', 'data:'];
 
 function escapeHtml(value) {
@@ -19,6 +20,7 @@ function sanitizeUrl(url) {
   }
 
   try {
+    // 先看协议是否危险，再做 encodeURI；两步分开能兼顾可读性和安全性。
     const normalizedProtocol = decodeURIComponent(rawValue)
       .replace(/[^\w:]/g, '')
       .toLowerCase();

@@ -1,36 +1,146 @@
 # N·C·T
 
-N·C·T 是一個用來記錄、整理、公開展示「扭轉治療」相關機構與經歷資訊的站點。它提供匿名表單、公開地圖、文章頁面與多語言界面，也保留了自部署能力，方便在不同環境持續運行。
+<div align="center">
+  <p><strong>NO CONVERSION THERAPY</strong></p>
+  <p>用于记录、整理与公开展示“扭转治疗”相关机构与经历信息的多语言站点。</p>
+  <p>
+    <a href="./README.md"><strong>简体中文</strong></a> ·
+    <a href="./README.zh-TW.md">繁體中文</a> ·
+    <a href="./README.en.md">English</a>
+  </p>
+  <p>
+    <img alt="Node.js 20+" src="https://img.shields.io/badge/Node.js-20+-339933?logo=node.js&logoColor=white">
+    <img alt="Express 5" src="https://img.shields.io/badge/Express-5-000000?logo=express&logoColor=white">
+    <img alt="EJS" src="https://img.shields.io/badge/EJS-Templates-B4CA65">
+    <img alt="Cloudflare Workers" src="https://img.shields.io/badge/Cloudflare-Workers-F38020?logo=cloudflare&logoColor=white">
+    <img alt="License" src="https://img.shields.io/badge/License-Apache%202.0-blue">
+  </p>
+</div>
 
-## 線上入口
+## 目录
 
-- 站點首頁：https://nct.hosinoneko.me
-- 匿名表單：https://nct.hosinoneko.me/form
-- 公開地圖：https://nct.hosinoneko.me/map
-- 隱私說明：https://nct.hosinoneko.me/privacy
+- [项目简介](#项目简介)
+- [线上入口](#线上入口)
+- [核心能力](#核心能力)
+- [技术栈](#技术栈)
+- [技术架构图](#技术架构图)
+- [仓库结构](#仓库结构)
+- [快速开始](#快速开始)
+- [常用命令](#常用命令)
+- [关键配置](#关键配置)
+- [保护敏感配置](#保护敏感配置)
+- [表单隐私说明](#表单隐私说明)
+- [部署到 Cloudflare Workers](#部署到-cloudflare-workers)
+- [相关文件](#相关文件)
+
+## 项目简介
+
+N·C·T 是一个用来记录、整理、公开展示“扭转治疗”相关机构与经历信息的站点。它提供匿名表单、公开地图、博客文章、多语言界面，以及 Node.js 与 Cloudflare Workers 双运行时部署能力，方便在不同环境下持续运行。
+
+## 线上入口
+
+| 页面 | 链接 |
+| --- | --- |
+| 站点首页 | https://www.victimsunion.org |
+| 匿名表单 | https://www.victimsunion.org/form |
+| 公开地图 | https://www.victimsunion.org/map |
+| 隐私说明 | https://www.victimsunion.org/privacy |
 
 ## 核心能力
 
-- 匿名表單提交，包含基礎防刷、限流與審計日志。
-- 公開機構地圖與 `GET /api/map-data` 資料接口。
-- 博客、通知與一般內容頁面。
-- 多語言界面與部分內容翻譯。
-- `sitemap.xml`、`robots.txt` 自動輸出。
-- 支援 Node.js 本地運行與 Cloudflare Workers 部署。
+| 模块 | 说明 |
+| --- | --- |
+| 匿名表单 | 支持匿名提交，带基础防刷、限流与审计日志 |
+| 公开地图 | 对外展示机构数据，并提供 `GET /api/map-data` 接口 |
+| 博客内容 | 支持博客列表、文章详情与 Markdown 渲染 |
+| 多语言界面 | 支持简体中文、繁体中文、英文，以及部分动态翻译 |
+| 站点基础设施 | 自动输出 `robots.txt`、`sitemap.xml`、静态资源版本号 |
+| 双运行时部署 | 支持本地 Node.js 运行，也支持 Cloudflare Workers 部署 |
 
-## 技術棧
+## 技术栈
 
-- Node.js 20+
-- Express 5
-- EJS
-- Cloudflare Workers
-- Google Form
-- 可選 Google Apps Script 資料源
-- 可選 Google Cloud Translation API
+| 类别 | 选型 |
+| --- | --- |
+| 服务端 | Node.js 20+, Express 5 |
+| 模板引擎 | EJS |
+| 前端 | 原生 JavaScript + Leaflet + Chart.js |
+| 部署运行时 | Node.js / Cloudflare Workers |
+| 数据写入 | Google Form |
+| 地图数据源 | Google Apps Script 私有源，可回退到公开 API |
+| 翻译能力 | Google Cloud Translation API，可选启用 |
+| 配置安全 | 自带 `secure-config` 密文生成工具 |
 
-## 快速開始
+## 技术架构图
 
-### 1. 安裝
+```mermaid
+flowchart TD
+  U[用户 / 浏览器]
+
+  U --> R{部署入口}
+  R -->|Node.js| N[app/server.js]
+  R -->|Cloudflare Workers| W[worker.mjs]
+  W -->|转发 Node 兼容处理| N
+
+  N --> A[app/app.js<br/>Express 应用装配]
+
+  A --> M[中间件层<br/>Helmet / i18n / Maintenance / Body Parser]
+  A --> P[页面路由<br/>app/routes/pageRoutes.js]
+  A --> F[表单路由<br/>app/routes/formRoutes.js]
+  A --> I[API 路由<br/>app/routes/apiRoutes.js]
+
+  P --> V[视图模板<br/>views/*.ejs]
+  P --> C1[内容与站点数据<br/>blog/*.md / data.json / friends.json]
+  P --> S1[站点输出<br/>robots.txt / sitemap.xml]
+
+  F --> FS[formService<br/>表单校验 + Google Form 字段映射]
+  F --> FP[formProtectionService<br/>honeypot + 填写耗时 token]
+  F --> FC[formConfirmationService<br/>确认签名]
+  F --> GF[(Google Form)]
+
+  I --> MD[mapDataService<br/>地图缓存 + 私有源优先 + 公开源回退]
+  I --> TS[textTranslationService<br/>翻译缓存 + 冷却机制]
+  I --> AO[areaOptionsService<br/>省市区选项本地化]
+
+  MD --> GAS[(Google Apps Script 私有数据源)]
+  MD --> PM[(Public Map Data API 回退源)]
+  TS --> GCT[(Google Cloud Translation API)]
+
+  V --> J[前端脚本<br/>public/js/*.js]
+  J --> I
+  J --> CN[/cn.json GeoJSON/]
+
+  W --> W1[Workers 额外处理<br/>/cn.json 与 /api/map-data 响应完整性保护]
+```
+
+补充说明：
+
+- Node.js 与 Workers 共用同一套 Express 业务逻辑，Workers 只在入口层额外保护大 JSON 响应。
+- 页面、表单、API 三类路由分开管理，主要业务逻辑沉到 `service` 层。
+- 地图页、表单联动和自动补全共用 `/api/*` 能力，避免维护多套数据入口。
+
+## 仓库结构
+
+```text
+.
+├── app/
+│   ├── middleware/        # i18n、维护模式等中间件
+│   ├── routes/            # 页面、表单、API 路由
+│   ├── services/          # 表单、地图、翻译、博客等核心服务
+│   ├── app.js             # Express 应用装配
+│   └── server.js          # Node.js 启动入口
+├── config/                # 运行时配置、i18n、表单规则、安全配置
+├── public/                # 静态资源、GeoJSON、前端脚本与样式
+├── views/                 # EJS 模板
+├── blog/                  # Markdown 博客文章
+├── scripts/               # 运维脚本，例如 secure-config
+├── tests/                 # 自动化测试
+├── worker.mjs             # Cloudflare Workers 入口
+└── AppScript.js           # Google Apps Script 上游脚本示例
+```
+
+## 快速开始
+
+### 1. 安装依赖
 
 ```bash
 git clone https://github.com/HosinoEJ/No-Torsion.git
@@ -38,7 +148,7 @@ cd No-Torsion
 npm install
 ```
 
-### 2. 選擇本地運行方式
+### 2. 选择本地运行方式
 
 Node 模式：
 
@@ -54,71 +164,73 @@ cp .dev.vars.example .dev.vars
 npm run dev:workers
 ```
 
-建議：
+建议：
 
-- 本地開發先保持 `FORM_DRY_RUN="true"`，避免誤提交到正式 Google Form。
-- Node 模式用 `.env`，Workers 模式用 `.dev.vars`，不要混用。
-- 完整配置註釋請直接看 [`.env.example`](./.env.example) 和 [`.dev.vars.example`](./.dev.vars.example)。
+- 本地开发先保持 `FORM_DRY_RUN="true"`，避免误提交到正式 Google Form。
+- Node 模式使用 `.env`，Workers 模式使用 `.dev.vars`，不要混用。
+- 完整配置注释请直接查看 [`.env.example`](./.env.example) 与 [`.dev.vars.example`](./.dev.vars.example)。
 
-### 3. 常用命令
+## 常用命令
 
-- `npm start`：以 Node.js 啓動應用。
-- `npm run dev:workers`：用 Wrangler 本地調試 Workers 版本。
-- `npm test`：跑測試。
-- `npm run build`：做一次啓動級別的構建檢查。
-- `npm run secure-config -- bootstrap-env --env-file ".env"`：從現有 env 檔讀取 `FORM_ID` / `GOOGLE_SCRIPT_URL`，自動生成密文。
-- `npm run secure-config -- bootstrap --form-id "..." --google-script-url "..."`：一次性生成 `FORM_PROTECTION_SECRET` 和對應密文。
-- `npm run secure-config -- generate-secret`：生成高強度 `FORM_PROTECTION_SECRET`。
-
-## 重要配置
-
-README 只保留最常用項；完整配置請看 [`.env.example`](./.env.example)。
-
-| 變數 | 用途 |
+| 命令 | 说明 |
 | --- | --- |
-| `SITE_URL` | 站點正式網址，用於 sitemap、robots 與 canonical 等輸出 |
-| `FORM_DRY_RUN` | `true` 時只預覽提交，不真正送出 |
-| `FORM_PROTECTION_SECRET` | 表單保護與密文解密的核心 secret，正式環境務必顯式配置 |
-| `FORM_ID` / `FORM_ID_ENCRYPTED` | Google Form ID，二選一 |
-| `GOOGLE_SCRIPT_URL` / `GOOGLE_SCRIPT_URL_ENCRYPTED` | 私有 Apps Script 資料源，二選一 |
-| `PUBLIC_MAP_DATA_URL` | 沒有私有資料源時使用的公開地圖 API |
-| `GOOGLE_CLOUD_TRANSLATION_API_KEY` | 啓用翻譯功能時必填 |
-| `MAINTENANCE_MODE` | 全站維護開關 |
-| `MAINTENANCE_NOTICE` | 維護頁公告文字 |
-| `RATE_LIMIT_REDIS_URL` | 多實例部署時建議配置的共享限流存儲 |
+| `npm start` | 以 Node.js 启动应用 |
+| `npm run dev:workers` | 使用 Wrangler 本地调试 Workers 版本 |
+| `npm test` | 运行测试 |
+| `npm run build` | 做一次启动级别的构建检查 |
+| `npm run secure-config -- bootstrap-env --env-file ".env"` | 从现有环境文件读取 `FORM_ID` / `GOOGLE_SCRIPT_URL` 并生成密文 |
+| `npm run secure-config -- bootstrap --form-id "..." --google-script-url "..."` | 一次性生成 `FORM_PROTECTION_SECRET` 与对应密文 |
+| `npm run secure-config -- generate-secret` | 生成高强度 `FORM_PROTECTION_SECRET` |
 
-配置原則：
+## 关键配置
 
-- `FORM_ID` 和 `FORM_ID_ENCRYPTED` 只選一個。
-- `GOOGLE_SCRIPT_URL` 和 `GOOGLE_SCRIPT_URL_ENCRYPTED` 只選一個。
-- 使用密文配置時，必須顯式配置 `FORM_PROTECTION_SECRET`。
-- Workers 正式部署時，敏感值請放到 Cloudflare `Variables and Secrets`，不要寫進倉庫或 `wrangler.jsonc`。
-- 如果你暫時不使用密文配置，至少請把 `FORM_ID`、`GOOGLE_SCRIPT_URL` 和 `FORM_PROTECTION_SECRET` 都設成 `Secret`。
-- 如果你使用密文配置，推薦把 `FORM_PROTECTION_SECRET` 設成 `Secret`，`FORM_ID_ENCRYPTED` 和 `GOOGLE_SCRIPT_URL_ENCRYPTED` 可用 `Text` 或 `Secret`。
+README 只保留最常用配置；完整变量说明请查看 [`.env.example`](./.env.example)。
 
-## 保護敏感配置
+| 变量 | 用途 |
+| --- | --- |
+| `SITE_URL` | 站点正式网址，用于 sitemap、robots 与 canonical 输出 |
+| `FORM_DRY_RUN` | `true` 时只预览提交，不真正发往 Google Form |
+| `FORM_PROTECTION_SECRET` | 表单保护与密文解密的核心 secret，正式环境务必显式配置 |
+| `FORM_ID` / `FORM_ID_ENCRYPTED` | Google Form ID，二选一 |
+| `GOOGLE_SCRIPT_URL` / `GOOGLE_SCRIPT_URL_ENCRYPTED` | 私有 Apps Script 数据源，二选一 |
+| `PUBLIC_MAP_DATA_URL` | 公开地图回退源，私有源慢或暂时不可用时会先顶上 |
+| `GOOGLE_CLOUD_TRANSLATION_API_KEY` | 启用翻译能力时必填 |
+| `MAINTENANCE_MODE` | 全站维护开关 |
+| `MAINTENANCE_NOTICE` | 维护页公告文字 |
+| `RATE_LIMIT_REDIS_URL` | 多实例部署时建议配置的共享限流存储 |
 
-如果你不想把 `FORM_ID` 或 `GOOGLE_SCRIPT_URL` 以明文方式放在普通環境變數中，可以改用密文配置。
+配置原则：
 
-如果你已經把 `FORM_ID` 和 `GOOGLE_SCRIPT_URL` 寫進 `.env` 或 `.dev.vars`，最省事的方式是直接從檔案讀取並生成：
+- `FORM_ID` 与 `FORM_ID_ENCRYPTED` 只选一个。
+- `GOOGLE_SCRIPT_URL` 与 `GOOGLE_SCRIPT_URL_ENCRYPTED` 只选一个。
+- 使用密文配置时，必须显式配置 `FORM_PROTECTION_SECRET`。
+- Workers 正式部署时，敏感值请放到 Cloudflare `Variables and Secrets`，不要写进仓库或 `wrangler.jsonc`。
+- 如果暂时不使用密文配置，至少请把 `FORM_ID`、`GOOGLE_SCRIPT_URL` 与 `FORM_PROTECTION_SECRET` 都设为 Secret。
+- 如果使用密文配置，推荐把 `FORM_PROTECTION_SECRET` 设为 Secret，而 `FORM_ID_ENCRYPTED` 与 `GOOGLE_SCRIPT_URL_ENCRYPTED` 可用 Text 或 Secret。
+
+## 保护敏感配置
+
+如果你不想把 `FORM_ID` 或 `GOOGLE_SCRIPT_URL` 以明文形式放在普通环境变量里，可以改用密文配置。
+
+如果你已经把 `FORM_ID` 与 `GOOGLE_SCRIPT_URL` 写进 `.env` 或 `.dev.vars`，最省事的方式是直接从文件读取并生成：
 
 ```bash
 npm run secure-config -- bootstrap-env --env-file ".env"
 ```
 
-它會直接輸出：
+它会直接输出：
 
 - `FORM_PROTECTION_SECRET`
 - `FORM_ID_ENCRYPTED`
 - `GOOGLE_SCRIPT_URL_ENCRYPTED`
 
-Workers 本地調試時，也可以改讀 `.dev.vars`：
+Workers 本地调试时，也可以改读 `.dev.vars`：
 
 ```bash
 npm run secure-config -- bootstrap-env --env-file ".dev.vars"
 ```
 
-如果你只想分步操作，也可以手動先生成 secret，再分別加密：
+如果你只想分步操作，也可以先生成 secret，再分别加密：
 
 ```bash
 npm run secure-config -- generate-secret
@@ -129,29 +241,29 @@ npm run secure-config -- encrypt --purpose form-id --secret "你的_FORM_PROTECT
 npm run secure-config -- encrypt --purpose google-script-url --secret "你的_FORM_PROTECTION_SECRET" --value "你的_GOOGLE_SCRIPT_URL"
 ```
 
-需要明確的邊界：
+需要明确的边界：
 
-- 這能降低明文出現在倉庫、日誌、普通配置欄位或調試頁中的風險。
-- 這不是替代後端鑑權的方案；如果攻擊者能讀取服務端所有 secrets，密文與解密 secret 最終仍可能一起暴露。
-- 真正要防止繞過網站驗證，最可靠的方法仍然是不要把最終寫入入口設計成可匿名直打的公開 Google Form。
+- 这能降低明文出现在仓库、日志、普通配置栏位或调试页中的风险。
+- 这不是替代后端鉴权的方案。如果攻击者能读取服务端所有 secrets，密文与解密 secret 最终仍可能一起暴露。
+- 真正要防止绕过网站验证，最可靠的方法仍然是不要把最终写入入口设计成可匿名直打的公开 Google Form。
 
-## 表單隱私說明
+## 表单隐私说明
 
-目前表單頁與 `/privacy` 頁面對外使用的說明如下：
+当前表单页与 `/privacy` 页面对外使用的说明如下：
 
-> 隐私说明：本问卷中填写的出生年份、性别等个人基本信息将被严格保密，相关经历、机构曝光信息可能在本站公开页面展示。提交内容会通过 Google Form / Google 表格保存和整理；请勿在可能公开的字段中填写身份证号、私人电话、家庭住址等您的个人敏感信息。
+> 隐私说明：本问卷中填写的出生年份、性别等个人基本信息将被严格保密，相关经历、机构曝光信息可能在本站公开页面展示。提交内容会通过 Google Form / Google 表格保存和整理；请勿在可能公开的字段中填写身份证号、私人电话、家庭住址等个人敏感信息。
 
-如果你後續調整了公開字段範圍，記得同步更新：
+如果你后续调整了公开字段范围，记得同步更新：
 
-- 表單頁提示文案 `form.privacyNotice`
-- 隱私頁 `/privacy`
-- README 中這段說明
+- 表单页提示文案 `form.privacyNotice`
+- 隐私页 `/privacy`
+- README 中这段说明
 
 ## 部署到 Cloudflare Workers
 
-本專案正式部署以 GitHub + Workers Builds 為主。
+本项目正式部署以 GitHub + Workers Builds 为主。
 
-### 1. 本地先驗證
+### 1. 本地先验证
 
 ```bash
 npm install
@@ -160,64 +272,64 @@ npm run dev:workers
 npm test
 ```
 
-### 2. 連接 GitHub 倉庫
+### 2. 连接 GitHub 仓库
 
 在 Cloudflare Dashboard 中：
 
-1. 進入 `Workers & Pages`
-2. 點擊 `Create application`
-3. 選擇 `Import a repository`
-4. 授權 GitHub App 並選擇本專案倉庫
+1. 进入 `Workers & Pages`
+2. 点击 `Create application`
+3. 选择 `Import a repository`
+4. 授权 GitHub App 并选择本项目仓库
 
-### 3. 建議的構建設置
+### 3. 建议的构建设置
 
-| 項目 | 建議值 |
+| 项目 | 建议值 |
 | --- | --- |
 | `Root directory` | `.` |
 | `Build command` | 留空 |
 | `Deploy command` | `npm run deploy:workers` |
 
-補充：
+补充：
 
-- 正式部署分支可在 `Settings -> Build -> Branch control` 中調整。
-- 倉庫中的 [`wrangler.jsonc`](./wrangler.jsonc) 只保留必要的 `RUNTIME_TARGET="workers"`，其他變數請放到 Dashboard 或本地 `.dev.vars`。
+- 正式部署分支可在 `Settings -> Build -> Branch control` 中调整。
+- 仓库中的 [`wrangler.jsonc`](./wrangler.jsonc) 只保留必要的 `RUNTIME_TARGET="workers"`，其余变量请放到 Dashboard 或本地 `.dev.vars`。
 
-### 4. 補齊 Variables 和 Secrets
+### 4. 补齐 Variables 和 Secrets
 
-至少建議配置以下項目：
+部署建议：
 
-部署建議：
+- 最简单且正确的做法，是把 `FORM_ID`、`GOOGLE_SCRIPT_URL`、`FORM_PROTECTION_SECRET` 都设成 Secret。
+- 如果你要进一步降低明文误暴露风险，再改用 `FORM_ID_ENCRYPTED`、`GOOGLE_SCRIPT_URL_ENCRYPTED`，并保留 `FORM_PROTECTION_SECRET` 为 Secret。
 
-- 最簡單且正確的做法，是把 `FORM_ID`、`GOOGLE_SCRIPT_URL`、`FORM_PROTECTION_SECRET` 都設成 `Secret`。
-- 如果你要進一步降低明文誤暴露風險，再改用 `FORM_ID_ENCRYPTED`、`GOOGLE_SCRIPT_URL_ENCRYPTED`，並保留 `FORM_PROTECTION_SECRET` 為 `Secret`。
-
-| 名稱 | 類型 | 說明 |
+| 名称 | 类型 | 说明 |
 | --- | --- | --- |
-| `SITE_URL` | Text | 正式站點網址 |
-| `FORM_DRY_RUN` | Text | 正式環境建議為 `false` |
-| `FORM_PROTECTION_SECRET` | Secret | 表單保護與密文解密所需 |
-| `FORM_ID` | Secret | 明文 Google Form ID；簡單方案推薦這樣配置 |
-| `FORM_ID_ENCRYPTED` | Text 或 Secret | 加密後的 Google Form ID；使用時留空 `FORM_ID` |
-| `GOOGLE_SCRIPT_URL` | Secret | 明文私有資料源 URL；簡單方案推薦這樣配置 |
-| `GOOGLE_SCRIPT_URL_ENCRYPTED` | Text 或 Secret | 加密後的私有資料源 URL；使用時留空 `GOOGLE_SCRIPT_URL` |
-| `PUBLIC_MAP_DATA_URL` | Text | 沒有私有資料源時的回退公開 API |
-| `GOOGLE_CLOUD_TRANSLATION_API_KEY` | Secret | 只有啓用翻譯時才需要 |
-| `MAINTENANCE_MODE` | Text | 需要全站維護時設為 `true` |
-| `MAINTENANCE_NOTICE` | Text | 維護公告文字 |
-| `RATE_LIMIT_REDIS_URL` | Secret | 多實例部署建議配置 |
+| `SITE_URL` | Text | 正式站点网址 |
+| `FORM_DRY_RUN` | Text | 正式环境建议为 `false` |
+| `FORM_PROTECTION_SECRET` | Secret | 表单保护与密文解密所需 |
+| `FORM_ID` | Secret | 明文 Google Form ID，简单方案推荐这样配置 |
+| `FORM_ID_ENCRYPTED` | Text 或 Secret | 加密后的 Google Form ID，使用时留空 `FORM_ID` |
+| `GOOGLE_SCRIPT_URL` | Secret | 明文私有数据源 URL，简单方案推荐这样配置 |
+| `GOOGLE_SCRIPT_URL_ENCRYPTED` | Text 或 Secret | 加密后的私有数据源 URL，使用时留空 `GOOGLE_SCRIPT_URL` |
+| `PUBLIC_MAP_DATA_URL` | Text | 没有私有数据源时的回退公开 API |
+| `GOOGLE_CLOUD_TRANSLATION_API_KEY` | Secret | 只有启用翻译时才需要 |
+| `MAINTENANCE_MODE` | Text | 需要全站维护时设为 `true` |
+| `MAINTENANCE_NOTICE` | Text | 维护公告文字 |
+| `RATE_LIMIT_REDIS_URL` | Secret | 多实例部署建议配置 |
 
-### 5. 綁定正式域名
+### 5. 绑定正式域名
 
-如果你不想使用 `*.workers.dev`，可以在 `Settings -> Domains & Routes` 裡新增自定義域名。綁定完成後，記得同步更新：
+如果你不想使用 `*.workers.dev`，可以在 `Settings -> Domains & Routes` 中新增自定义域名。绑定完成后，记得同步更新：
 
 - `SITE_URL`
 - `PUBLIC_MAP_DATA_URL`
 
-## 相關檔案
+## 相关文件
 
-- [`.env.example`](./.env.example)：Node 模式環境變數示例
-- [`.dev.vars.example`](./.dev.vars.example)：Workers 本地調試示例
+- [`.env.example`](./.env.example)：Node 模式环境变量示例
+- [`.dev.vars.example`](./.dev.vars.example)：Workers 本地调试示例
 - [`wrangler.jsonc`](./wrangler.jsonc)：Workers 配置
 - [`scripts/secure-config.js`](./scripts/secure-config.js)：敏感配置加密工具
+- [`worker.mjs`](./worker.mjs)：Cloudflare Workers 入口
+- [`AppScript.js`](./AppScript.js)：Google Apps Script 数据上游示例
 
-如果你要調整公開字段、提交流程或資料上游，建議連同 [`/privacy`](https://nct.hosinoneko.me/privacy) 與表單頁提示文案一起檢查，避免對外說明和實際行為脫節。
+如果你要调整公开字段、提交流程或数据上游，建议连同 [`/privacy`](https://www.victimsunion.org/privacy) 与表单页提示文案一起检查，避免对外说明和实际行为脱节。

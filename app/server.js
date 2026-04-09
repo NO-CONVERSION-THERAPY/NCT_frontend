@@ -17,6 +17,8 @@ module.exports = app;
 
 if (require.main === module) {
   app.listen(appPort, () => {
+    // 这些启动日志同时也是最小化部署自检清单：
+    // 线上一旦功能异常，先看这里通常就能快速定位是“配置缺失”还是“运行时行为异常”。
     if (debugMod === 'true') {
       console.warn('警告！你現在在調試模式', debugMod, 'api获取位置：', apiUrl);
     }

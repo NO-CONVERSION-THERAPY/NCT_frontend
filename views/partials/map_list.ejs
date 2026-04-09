@@ -17,6 +17,7 @@
     const mapSearchInput = document.getElementById('mapSearchInput');
     const dataContainer = document.getElementById('data-container');
     const loadSentinel = document.getElementById('data-container-sentinel');
+    // 简中界面直接显示原始中文字段，其他语言再按需补充翻译块。
     const shouldTranslateDetails = window.APP_LANG !== 'zh-CN';
     const RECORD_BATCH_SIZE = 24;
     const RECORD_LOAD_ROOT_MARGIN = '1200px 0px 1200px 0px';
@@ -30,6 +31,7 @@
         scandal: '学校丑闻：',
         other: '其他：'
     };
+    // 地图详情只翻译正文最重的三个字段，避免把联系人、省份等短字段重复翻译一遍。
     const translatableFieldConfigs = [
         {
             key: 'experience',
@@ -190,6 +192,7 @@
             </div>
         `;
 
+        // 非简中界面采用“原文 + 译文”并排补充，而不是直接把原文替换掉。
         if (!shouldTranslateDetails) {
             return originalHtml;
         }
@@ -204,6 +207,7 @@
     }
 
     async function requestTranslations(items) {
+        // 与博客段落翻译共用同一个后端接口，便于集中控制配额、缓存和限流。
         const response = await window.fetch('/api/translate-text', {
             method: 'POST',
             headers: {
@@ -228,6 +232,7 @@
             return;
         }
 
+        // 每张卡片第一次展开时才发起翻译请求，避免首屏一次性翻译整页详情。
         const itemsToTranslate = translatableFieldConfigs
             .map((config) => ({
                 fieldKey: config.key,
@@ -271,6 +276,7 @@
                 const targetNode = container.querySelector(`[data-translate-field="${entry.fieldKey}"] .map-detail-translation__text`);
 
                 if (targetNode) {
+                    // 某个字段翻译失败时只回退当前字段，不影响卡片里其它已成功的译文。
                     targetNode.textContent = translatedTextByField[entry.fieldKey] || i18n.map.list.translationUnavailable;
                 }
             });

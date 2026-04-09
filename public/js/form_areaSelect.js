@@ -1,4 +1,5 @@
 (() => {
+  // 省市县选项不直接整包内联到页面，而是按需请求，减轻首屏 HTML 体积。
   const areaSelectorData = window.AREA_SELECTOR_DATA || { provinces: [] };
   const i18n = window.I18N;
   const provinceSelect = document.getElementById('provinceSelect');
@@ -27,6 +28,7 @@
   async function requestAreaOptions(queryKey, queryValue) {
     const requestUrl = new URL('/api/area-options', window.location.origin);
     requestUrl.searchParams.set(queryKey, queryValue);
+    // 当前界面语言也一并传给后端，城市/县区名称可按访问语言即时本地化。
     requestUrl.searchParams.set('lang', window.APP_LANG || '');
 
     const response = await window.fetch(requestUrl.toString(), {
@@ -56,6 +58,7 @@
 
     try {
       const cityOptions = await requestAreaOptions('provinceCode', provinceCode);
+      // 用户快速切换省份时，只保留最后一次请求结果，避免旧响应覆盖新选择。
       if (currentRequestId !== cityRequestId) {
         return;
       }
@@ -94,6 +97,7 @@
 
     try {
       const countyOptions = await requestAreaOptions('cityCode', cityCode);
+      // 县区请求同样做“最后一次生效”，避免异步返回顺序打乱界面状态。
       if (currentRequestId !== countyRequestId) {
         return;
       }

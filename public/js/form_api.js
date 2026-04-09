@@ -7,6 +7,7 @@
 
     globalObject.FormAutocomplete = exports;
 })(typeof globalThis !== 'undefined' ? globalThis : this, (globalObject) => {
+    // 表单自动补全直接复用地图 API 数据，避免再维护一套独立的学校搜索索引。
     const MAX_AUTOCOMPLETE_RESULTS = 8;
     let recordsCache = null;
     let recordsRequest = null;
@@ -180,6 +181,7 @@
             }
 
             item.addEventListener('mousedown', (event) => {
+                // 用 mousedown 而不是 click，避免输入框失焦后候选列表先被隐藏。
                 event.preventDefault();
                 onSelect(record);
             });
@@ -277,6 +279,7 @@
         bindInputAutocomplete(addressInput, 'address');
 
         document.addEventListener('click', (event) => {
+            // 点击外部区域时收起面板，保持交互与常见搜索框一致。
             if (!schoolResultsList.parentElement.contains(event.target)) {
                 hideResults(schoolResultsList);
             }

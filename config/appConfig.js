@@ -7,6 +7,7 @@ if (!isWorkersRuntime()) {
 }
 
 function resolveTrustProxy(value) {
+  // Express 的 trust proxy 既支持布尔值，也支持 hop 数和自定义字符串。
   if (typeof value !== 'string') {
     return false;
   }
@@ -70,6 +71,8 @@ function resolveFormProtectionSecret({ explicitSecret, formId, siteUrl, title })
     return explicitSecret.trim();
   }
 
+  // 本地开发允许根据站点上下文派生一个稳定值，避免完全没法启动；
+  // 但只要涉及密文配置，正式环境仍要求显式配置高强度随机 secret。
   return crypto
     .createHash('sha256')
     .update([formId, siteUrl, title || 'N·C·T'].join(':'))
@@ -84,6 +87,7 @@ function resolveProtectedEnvValue({
 }) {
   const plainValue = readTrimmedEnvValue(process.env[envName]);
   if (plainValue) {
+    // 明文优先，便于应急排障时直接覆盖加密值。
     return plainValue;
   }
 
@@ -130,6 +134,7 @@ const googleScriptUrl = resolveProtectedEnvValue({
   purpose: 'google-script-url'
 });
 const appPort = parsePositiveInteger(process.env.PORT, 3000);
+// 公共地图回退源用于“私有 Apps Script 暂时不可达但页面仍需可用”的场景。
 const publicMapDataUrl = process.env.PUBLIC_MAP_DATA_URL || 'https://nct.hosinoeiji.workers.dev/api/map-data';
 const mapDataNodeTransportOverrides = parseBooleanEnv(process.env.MAP_DATA_NODE_TRANSPORT_OVERRIDES, false);
 const mapDataUpstreamTimeoutMs = parsePositiveInteger(process.env.MAP_DATA_UPSTREAM_TIMEOUT_MS, 25000);

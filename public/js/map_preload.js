@@ -1,4 +1,5 @@
 (() => {
+    // 首页静默预加载只做“加速下一跳”，不应抢占用户当前首屏的主线程与带宽。
     function schedulePreload(callback) {
         if (typeof window.requestIdleCallback === 'function') {
             window.requestIdleCallback(callback, { timeout: 2000 });

@@ -37,6 +37,7 @@ const configuredAssetVersion = String(process.env.ASSET_VERSION || '').trim();
 const assetVersion = configuredAssetVersion && configuredAssetVersion !== '0'
   ? configuredAssetVersion
   : String(Date.now());
+// GeoJSON 在 Node / Workers 两侧都会频繁读取，启动时预读可以避免每次请求重复走磁盘。
 const chinaGeoJsonPayload = fs.readFileSync(nodePath.join(paths.public, 'cn.json'), 'utf8');
 
 function collectEjsTemplatePaths(directory) {
@@ -54,6 +55,7 @@ function collectEjsTemplatePaths(directory) {
 function primeEjsTemplateCache(viewsDirectory) {
   const templatePaths = collectEjsTemplatePaths(viewsDirectory);
 
+  // EJS 模板在启动阶段预编译并写入缓存，减轻首个请求的模板解析开销。
   for (const templatePath of templatePaths) {
     const templateSource = fs.readFileSync(templatePath, 'utf8');
     const compiledTemplate = ejs.compile(templateSource, {

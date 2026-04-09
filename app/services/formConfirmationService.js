@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 
+// 确认页 token 的目标不是“识别用户身份”，而是防止预览后的 payload 被篡改再提交。
 function normalizePositiveInteger(value, fallback) {
   const parsedValue = Number.parseInt(value, 10);
   return Number.isInteger(parsedValue) && parsedValue > 0 ? parsedValue : fallback;
@@ -30,6 +31,7 @@ function secureEquals(left, right) {
 
 function issueFormConfirmationToken({ payload, secret, issuedAt = Date.now() } = {}) {
   const normalizedIssuedAt = normalizePositiveInteger(issuedAt, Date.now());
+  // token 只绑定 payload 的哈希，不把正文直接放进签名串里，避免体积继续膨胀。
   const payloadHash = hashPayload(payload);
   const tokenPayload = buildTokenPayload(normalizedIssuedAt, payloadHash);
   const signature = signTokenPayload(tokenPayload, secret);

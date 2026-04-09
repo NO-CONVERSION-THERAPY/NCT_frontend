@@ -20,6 +20,7 @@ function createI18nMiddleware() {
     const cookies = parseCookieHeader(req.headers.cookie);
     const queryLanguage = resolveLanguage(req.query.lang);
     const cookieLanguage = resolveLanguage(cookies.lang);
+    // 链接参数优先于 cookie，保证用户点进任意带 lang 的链接都能立即切换语言。
     const language = queryLanguage || cookieLanguage || defaultLanguage;
 
     if (queryLanguage && queryLanguage !== cookieLanguage) {
@@ -29,6 +30,7 @@ function createI18nMiddleware() {
     req.lang = language;
     req.t = (key, variables) => translate(language, key, variables);
 
+    // 模板和前端脚本共享同一份本地化上下文，减少每个页面单独拼装。
     res.locals.lang = language;
     res.locals.t = req.t;
     res.locals.assetVersion = resolveAssetVersion(

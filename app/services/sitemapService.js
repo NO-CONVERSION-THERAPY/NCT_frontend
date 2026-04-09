@@ -1,6 +1,7 @@
 const fs = require('fs');
 const { isWorkersRuntime } = require('../../config/runtimeConfig');
 
+// sitemap 由静态页面和博客文章两部分拼成，保证部署到不同运行时都能生成一致结果。
 function createUrlEntry({ changefreq, lastmod, loc, priority }) {
   return {
     changefreq,
@@ -59,6 +60,7 @@ function parseBlogCreationDate(value) {
 function resolveArticleLastModified(markdownPath, article) {
   if (!isWorkersRuntime()) {
     try {
+      // Node 环境优先读取真实文件 mtime，Workers 再退回到文章元数据时间。
       const stat = fs.statSync(markdownPath);
       const lastModified = getIsoDate(stat.mtime);
 

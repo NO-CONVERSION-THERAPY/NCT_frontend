@@ -81,6 +81,7 @@ function createApiRoutes({
       const provinceCode = typeof req.query.provinceCode === 'string' ? req.query.provinceCode.trim() : '';
       const cityCode = typeof req.query.cityCode === 'string' ? req.query.cityCode.trim() : '';
 
+      // area-options 复用一个端点：传 provinceCode 取城市，传 cityCode 取县区。
       if (cityCode) {
         return res.json({
           options: await getLocalizedCountyOptionsForCity(cityCode, req.lang)
@@ -111,6 +112,8 @@ function createApiRoutes({
       });
       return res.json(mapData);
     } catch (error) {
+      // 这里的 500 往往不是“前端问题”，而是上游数据源、网络或运行时配置问题。
+      // 排障时优先结合 getMapData 内部日志与启动期警告一起看。
       console.error('API Error:', error.message);
       return res.status(500).json({ error: req.t('server.mapDataUnavailable') });
     }
@@ -121,6 +124,7 @@ function createApiRoutes({
       const items = Array.isArray(req.body.items) ? req.body.items : [];
       const targetLanguage = req.body.targetLanguage;
 
+      // 详情翻译只允许一小批文本，既限制成本，也避免被当成通用翻译接口滥用。
       const validItems = items
         .map((item) => ({
           fieldKey: typeof item.fieldKey === 'string' ? item.fieldKey : '',
@@ -140,6 +144,8 @@ function createApiRoutes({
 
       return res.json({ translations });
     } catch (error) {
+      // 翻译接口失败默认只影响增强体验，不应影响页面主功能；
+      // 支持排障时要区分“翻译不可用”和“页面本身不可用”这两类问题。
       console.error('Translation API Error:', error.message);
       return res.status(500).json({ error: req.t('map.list.translationUnavailable') });
     }

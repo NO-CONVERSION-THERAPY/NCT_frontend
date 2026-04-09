@@ -14,6 +14,7 @@
             </main>
         <% }) %>
     </div>
+    <% // 只有英文文章页会在前端按段落补充双语翻译，其它语言直接显示服务端渲染结果。 %>
     <% if (lang === 'en') { %>
         <script src="/js/blog_article_translation.js"></script>
     <% } %>

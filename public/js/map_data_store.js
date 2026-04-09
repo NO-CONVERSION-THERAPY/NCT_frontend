@@ -1,6 +1,7 @@
 (() => {
     const CACHE_TTL_MS = 300000;
     const CACHE_PREFIX = 'map-data-cache:';
+    // 地图页、首页预加载、表单自动补全都会读同一份地图数据，这里统一负责共享与缓存。
     // 记录同一时刻的共享请求，避免多个组件重复拉同一份地图数据。
     const inMemoryRequests = new Map();
 
@@ -38,6 +39,7 @@
 
             const parsedValue = JSON.parse(rawValue);
             if (!parsedValue || !isValidMapPayload(parsedValue.payload)) {
+                // 旧结构或被污染的缓存直接丢弃，避免把坏数据继续传播给所有页面。
                 return null;
             }
 
@@ -74,6 +76,13 @@
         writeCache(apiUrl, payload);
         return payload;
     }
+
+    window.fetchSharedMapDataFromNetwork = async function fetchSharedMapDataFromNetwork(options = {}) {
+        const apiUrl = window.API_URL;
+        return fetchMapPayload(apiUrl, {
+            forceRefresh: options.forceRefresh === true
+        });
+    };
 
     // 暴露给表单补全、地图页等多个入口复用的共享数据读取函数。
     window.getSharedMapData = async function getSharedMapData(options = {}) {

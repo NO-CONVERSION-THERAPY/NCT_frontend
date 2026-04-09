@@ -4,6 +4,10 @@ const https = require('https');
 const { provinceMetadataByCode } = require('../../config/provinceMetadata');
 const { isWorkersRuntime } = require('../../config/runtimeConfig');
 
+// 地图数据读取要同时兼顾三件事：
+// 1. 优先走私有 Apps Script 拿到最新数据；
+// 2. 私有源慢或失败时可回退到公开源；
+// 3. 不把上游接口因为前端并发访问而打爆。
 // 地图数据缓存放在 service 层，避免每次请求都直打 Apps Script。
 let cachedData = null;
 let lastFetchTime = 0;
@@ -49,6 +53,7 @@ function addProvinceAlias(aliasMap, alias, legacyName) {
 function buildProvinceAliasToLegacyNameMap() {
   const aliasMap = new Map();
 
+  // 历史数据、GeoJSON 和翻译文案里省份写法不完全一致，这里统一收口做兼容映射。
   Object.entries(provinceMetadataByCode).forEach(([code, metadata]) => {
     const aliases = new Set([
       code,
@@ -126,15 +131,23 @@ function resolveLastSyncedTimestamp(lastSynced, fallbackTimestamp) {
   return Number.isFinite(numericLastSynced) && numericLastSynced > 0 ? numericLastSynced : fallbackTimestamp;
 }
 
-// 优先使用服务端私有数据源；没有时再退回公开 map-data 接口。
-function resolveMapDataSource({ googleScriptUrl, publicMapDataUrl }) {
-  const dataSourceUrl = googleScriptUrl || publicMapDataUrl;
+function normalizeMapDataSourceUrl(dataSourceUrl) {
+  const normalizedUrl = String(dataSourceUrl || '').trim();
+  return normalizedUrl && normalizedUrl !== '/api/map-data' ? normalizedUrl : '';
+}
 
-  if (!dataSourceUrl || dataSourceUrl === '/api/map-data') {
+function resolveMapDataSources({ googleScriptUrl, publicMapDataUrl }) {
+  const preferredSourceUrl = normalizeMapDataSourceUrl(googleScriptUrl);
+  const fallbackSourceUrl = normalizeMapDataSourceUrl(publicMapDataUrl);
+
+  if (!preferredSourceUrl && !fallbackSourceUrl) {
     throw new Error('未配置有效的地圖數據源');
   }
 
-  return dataSourceUrl;
+  return {
+    preferredSourceUrl,
+    fallbackSourceUrl
+  };
 }
 
 function hasProxyConfiguration() {
@@ -276,6 +289,7 @@ async function fetchMapPayloadFromSource(dataSourceUrl, {
   const shouldUseNodeTransportOverrides = !workersRuntime && mapDataNodeTransportOverrides;
 
   if (shouldUseNodeTransportOverrides && hasProxyConfiguration()) {
+    // 某些自托管环境只能经由代理访问外部 Google 资源，优先尝试代理链路。
     strategies.push({
       name: 'proxy-agent',
       request: () => fetchJsonThroughProxy(dataSourceUrl, upstreamTimeoutMs)
@@ -283,6 +297,7 @@ async function fetchMapPayloadFromSource(dataSourceUrl, {
   }
 
   if (shouldUseNodeTransportOverrides) {
+    // 直连时优先固定 IPv4，可规避部分环境下 IPv6 出站不稳定的问题。
     strategies.push({
       name: 'direct-ipv4',
       request: () => fetchJsonDirectIpv4(dataSourceUrl, upstreamTimeoutMs)
@@ -317,6 +332,7 @@ async function fetchMapPayloadFromSource(dataSourceUrl, {
     }
   }
 
+  // 这里会把每种传输策略的失败摘要串起来，方便支持人员直接从一条日志里看到完整尝试链路。
   const finalError = new Error(`地圖數據源請求失敗：${attemptDiagnostics.join(' | ')}`);
   finalError.cause = lastError;
   throw finalError;
@@ -333,6 +349,86 @@ function normalizeRawData(rawData) {
   }
 
   throw new Error('預期收到陣列但得到其他類型');
+}
+
+function buildNormalizedMapResponse(responseBody, now, sourceName) {
+  const rawData = normalizeRawData(responseBody.data);
+  const avgAge = resolveNumericValue(responseBody.avg_age);
+  const schoolNum = resolveNumericValue(responseBody.schoolNum, responseBody.SchoolNum);
+  const formNum = resolveNumericValue(responseBody.formNum, responseBody.FormNum);
+
+  // 这里输出的是前端消费契约：
+  // 字段名、统计结构和 source/fallback 标记都在这里一次性标准化。
+  return {
+    avg_age: Number.isFinite(avgAge) ? avgAge : 0,
+    schoolNum: Number.isFinite(schoolNum) ? schoolNum : 0,
+    formNum: Number.isFinite(formNum) ? formNum : 0,
+    last_synced: resolveLastSyncedTimestamp(responseBody.last_synced, now),
+    statistics: normalizeProvinceStatistics(responseBody.statistics),
+    statisticsForm: normalizeProvinceStatistics(responseBody.statisticsForm),
+    data: cleanMapData(rawData),
+    source: sourceName,
+    preferredSource: 'google-script',
+    isSourceFallback: sourceName !== 'google-script'
+  };
+}
+
+function writeCache(payload, now) {
+  cachedData = payload;
+  lastFetchTime = now;
+}
+
+function getSourcePriority(sourceName) {
+  return sourceName === 'google-script' ? 2 : 1;
+}
+
+function shouldPromoteCachedPayload(candidatePayload) {
+  if (!cachedData) {
+    return true;
+  }
+
+  const candidatePriority = getSourcePriority(candidatePayload && candidatePayload.source);
+  const currentPriority = getSourcePriority(cachedData && cachedData.source);
+
+  if (candidatePriority !== currentPriority) {
+    return candidatePriority > currentPriority;
+  }
+
+  return Number(candidatePayload && candidatePayload.last_synced) >= Number(cachedData && cachedData.last_synced);
+}
+
+async function fetchMapPayloadFromNamedSource(sourceName, dataSourceUrl, options) {
+  const responseBody = await fetchMapPayloadFromSource(dataSourceUrl, options);
+  return buildNormalizedMapResponse(responseBody, Date.now(), sourceName);
+}
+
+function createCandidatePromise(sourceName, dataSourceUrl, options) {
+  // race 里不直接抛错，而是包装成 result 对象，便于区分“先失败”和“先成功”的分支。
+  return fetchMapPayloadFromNamedSource(sourceName, dataSourceUrl, options)
+    .then((payload) => ({
+      ok: true,
+      sourceName,
+      payload
+    }))
+    .catch((error) => ({
+      ok: false,
+      sourceName,
+      error
+    }));
+}
+
+function promotePreferredPayloadInBackground(candidatePromise) {
+  candidatePromise.then((result) => {
+    if (!result.ok || result.sourceName !== 'google-script') {
+      return;
+    }
+
+    if (shouldPromoteCachedPayload(result.payload)) {
+      writeCache(result.payload, Date.now());
+    }
+  }).catch(() => {
+    // 背景升级失败不应影响已返回给前端的临时数据。
+  });
 }
 
 // 对外 API 只暴露前端真正需要的字段，原始表格列不直接透出。
@@ -387,29 +483,63 @@ async function getMapData({
 
   const request = (async () => {
     try {
-      const dataSourceUrl = resolveMapDataSource({ googleScriptUrl, publicMapDataUrl });
-      const responseBody = await fetchMapPayloadFromSource(dataSourceUrl, {
+      const { preferredSourceUrl, fallbackSourceUrl } = resolveMapDataSources({
+        googleScriptUrl,
+        publicMapDataUrl
+      });
+      const requestOptions = {
         mapDataNodeTransportOverrides,
         upstreamTimeoutMs
-      });
-      const rawData = normalizeRawData(responseBody.data);
-      const avgAge = resolveNumericValue(responseBody.avg_age);
-      const schoolNum = resolveNumericValue(responseBody.schoolNum, responseBody.SchoolNum);
-      const formNum = resolveNumericValue(responseBody.formNum, responseBody.FormNum);
-      const finalResponse = {
-        avg_age: Number.isFinite(avgAge) ? avgAge : 0,//受害者平均年齡
-        schoolNum: Number.isFinite(schoolNum) ? schoolNum : 0,//學校數量
-        formNum: Number.isFinite(formNum) ? formNum : 0,//表單數量
-        last_synced: resolveLastSyncedTimestamp(responseBody.last_synced, now),//上一次更新時間
-        statistics: normalizeProvinceStatistics(responseBody.statistics),//各省扭轉幾個數量
-        statisticsForm: normalizeProvinceStatistics(responseBody.statisticsForm),//各省收到的表單數量
-        data: cleanMapData(rawData)
       };
 
-      cachedData = finalResponse;
-      lastFetchTime = now;
+      if (!preferredSourceUrl) {
+        // 只有公开源时，接口仍然可用，但前端会失去“后台升级到私有源”的机会。
+        const fallbackPayload = await fetchMapPayloadFromNamedSource('public-map-data', fallbackSourceUrl, requestOptions);
+        writeCache(fallbackPayload, now);
+        return fallbackPayload;
+      }
 
-      return finalResponse;
+      if (!fallbackSourceUrl) {
+        // 只有私有源时，任何上游抖动都会直接暴露给调用方，因此正式环境更推荐同时保留公开回退源。
+        const preferredPayload = await fetchMapPayloadFromNamedSource('google-script', preferredSourceUrl, requestOptions);
+        writeCache(preferredPayload, now);
+        return preferredPayload;
+      }
+
+      const preferredCandidatePromise = createCandidatePromise('google-script', preferredSourceUrl, requestOptions);
+      const fallbackCandidatePromise = createCandidatePromise('public-map-data', fallbackSourceUrl, requestOptions);
+      // 谁先完成先决定首屏响应，但更高优先级的数据仍可能在后台提升缓存。
+      const firstCompletedResult = await Promise.race([
+        preferredCandidatePromise,
+        fallbackCandidatePromise
+      ]);
+
+      if (firstCompletedResult.ok) {
+        if (firstCompletedResult.sourceName === 'google-script') {
+          writeCache(firstCompletedResult.payload, now);
+          return firstCompletedResult.payload;
+        }
+
+        // 公開數據先返回，私有源继续在后台完成后升级缓存。
+        writeCache(firstCompletedResult.payload, now);
+        promotePreferredPayloadInBackground(preferredCandidatePromise);
+        return firstCompletedResult.payload;
+      }
+
+      const secondaryResult = await (
+        firstCompletedResult.sourceName === 'google-script'
+          ? fallbackCandidatePromise
+          : preferredCandidatePromise
+      );
+
+      if (secondaryResult.ok) {
+        writeCache(secondaryResult.payload, now);
+        return secondaryResult.payload;
+      }
+
+      // 两个源都失败时保留 firstCompletedResult 的原始错误，
+      // 这样状态码或最早的网络异常不会被后续包装淹没。
+      throw firstCompletedResult.error;
     } catch (error) {
       // 抓取失败但本地仍有旧缓存时，优先保服务可用而不是直接报错。
       if (cachedData) {
@@ -450,5 +580,7 @@ module.exports = {
   },
   getRequestErrorDiagnostics,
   hasProxyConfiguration,
-  fetchMapPayloadFromSource
+  fetchMapPayloadFromSource,
+  resolveMapDataSources,
+  buildNormalizedMapResponse
 };

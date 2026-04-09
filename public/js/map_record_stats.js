@@ -7,6 +7,7 @@
 
     globalObject.MapRecordStats = exports;
 })(typeof globalThis !== 'undefined' ? globalThis : this, () => {
+    // 地图列表页会把同一学校的多条记录聚合显示，但 marker 颜色仍要参考原始举报总量。
     const SELF_REPORT_INPUT_TYPE = '受害者本人';
     const AGENT_REPORT_INPUT_TYPE = '受害者的代理人';
 
@@ -81,6 +82,7 @@
         const groupedRecords = [];
         const groupBySchoolKey = new Map();
 
+        // 同一学校下正文完全相同的页面只保留一次，避免列表里重复刷屏。
         (Array.isArray(records) ? records : []).forEach((record, index) => {
             const schoolKey = getSchoolStatsKey(record) || `__unknown__:${index}`;
             let group = groupBySchoolKey.get(schoolKey);

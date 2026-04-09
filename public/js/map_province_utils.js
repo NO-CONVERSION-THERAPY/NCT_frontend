@@ -7,6 +7,7 @@
 
     globalObject.MapProvinceUtils = exports;
 })(typeof globalThis !== 'undefined' ? globalThis : this, (globalObject) => {
+    // 省份工具既要在浏览器里给地图页用，也要在 Node 测试里直接 require，所以做成 UMD 风格。
     const provinceMetadataByCode = normalizeProvinceMetadata(getInitialProvinceMetadataSource(globalObject));
     const provinceCodes = new Set(Object.keys(provinceMetadataByCode));
     const provinceCodeByAlias = buildProvinceCodeByAliasMap();
@@ -51,6 +52,7 @@
     }
 
     function normalizeProvinceAlias(value) {
+        // 这里把“省/市/自治区/英文后缀/括号补充说明”等噪音统一剥掉，提升跨数据源匹配率。
         return String(value || '')
             .trim()
             .replace(/\s+/g, '')
@@ -169,9 +171,11 @@
         const resolvedLanguage = normalizeLanguage(language);
 
         if (resolvedLanguage === 'zh-CN') {
+            // 简中界面保留完整行政区后缀，和表单、省份统计的显示习惯保持一致。
             return metadata.fullLabels['zh-CN'] || metadata.shortLabels['zh-CN'] || '';
         }
 
+        // 繁中和英文优先用较短标签，地图 tooltip 与图表标签会更紧凑。
         return metadata.shortLabels[resolvedLanguage]
             || metadata.fullLabels[resolvedLanguage]
             || metadata.shortLabels['zh-CN']
@@ -185,6 +189,7 @@
             ? 'name_en'
             : `name_${resolvedLanguage}`;
 
+        // 先用 GeoJSON 自带的多语言字段，缺失时再回退到本地元数据映射。
         return properties[localizedNameKey]
             || getProvinceDisplayName(getProvinceCodeFromFeature(feature), resolvedLanguage)
             || properties.name

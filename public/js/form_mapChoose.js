@@ -1,4 +1,5 @@
 (() => {
+    // 表单地图按需加载 Leaflet，避免普通填表用户为未展开的地图提前下载整套资源。
     let currentMarker = null;
     let formMap = null;
     let formMapTileLayer = null;
@@ -227,6 +228,7 @@
 
             const addressInput = document.getElementById('addr');
             if (addressInput) {
+                // 后端 Apps Script 会识别 latlng 前缀并直接写入经纬度，不再重复地理编码。
                 addressInput.value = `latlng${lat},${lng}`;
             }
 
@@ -248,6 +250,7 @@
             return;
         }
 
+        // 地图区域本身充当“折叠面板”，再次点击按钮即可收起。
         const willShowMap = mapContainer.style.display !== 'block';
         mapContainer.style.display = willShowMap ? 'block' : 'none';
 

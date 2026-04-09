@@ -1,4 +1,6 @@
 (() => {
+// 地图页脚本承担了“数据读取 + 地图渲染 + 图表统计 + 列表筛选”四类职责，
+// 因此这里的注释重点放在模块协作关系和降级策略上，而不是重复解释 Leaflet / Chart API。
 const SCHOOL_MARKER_SCALE = 0.75;
 const SCHOOL_MARKER_DEFAULT_OPACITY = 0.75;
 const SCHOOL_MARKER_MAX_OPACITY = 1.0;
@@ -40,8 +42,12 @@ function getProvinceDensityColor(density, maxDensity) {
     return interpolateHexColor('#FED976', '#800026', densityRatio);
 }
 
+// 地图页所有按钮、统计文案和字段标签都从服务端注入的 I18N 字典读取，
+// 这样前端无需再发一次“加载翻译包”的请求。
 const i18n = window.I18N;
 const MAP_DATA_REFRESH_INTERVAL_SECONDS = 300;
+const PREFERRED_SOURCE_BACKGROUND_CHECK_INTERVAL_MS = 15000;
+const PREFERRED_SOURCE_FORCE_REFRESH_INTERVAL_MS = 120000;
 const { getElapsedSeconds, renderLastSyncedValue } = window.MapTimeUtils;
 const {
     buildSchoolReportStats,
@@ -112,6 +118,68 @@ const BASE_TILE_PROVIDERS = {
     ]
 };
 let mapTileProviderIndex = 0;
+
+function isPreferredMapSourcePending(payload) {
+    return Boolean(
+        payload
+        && payload.isSourceFallback === true
+        && payload.preferredSource === 'google-script'
+    );
+}
+
+function isValidMapPayload(payload) {
+    return Boolean(
+        payload
+        && Array.isArray(payload.data)
+        && Array.isArray(payload.statistics)
+        && typeof payload.avg_age === 'number'
+        && typeof payload.last_synced === 'number'
+    );
+}
+
+function startPreferredSourceUpgradeWatcher(initialPayload) {
+    if (!isPreferredMapSourcePending(initialPayload) || typeof window.fetchSharedMapDataFromNetwork !== 'function') {
+        return;
+    }
+
+    // 页面首次可能拿到公开回退数据，这个后台轮询会在私有源恢复后主动刷新页面。
+    let stopped = false;
+    let nextForceRefreshTimestamp = Date.now() + PREFERRED_SOURCE_FORCE_REFRESH_INTERVAL_MS;
+
+    async function pollForPreferredSource() {
+        if (stopped) {
+            return;
+        }
+
+        const shouldForceRefresh = Date.now() >= nextForceRefreshTimestamp;
+
+        try {
+            const latestPayload = await window.fetchSharedMapDataFromNetwork({
+                forceRefresh: shouldForceRefresh
+            });
+
+            if (shouldForceRefresh) {
+                nextForceRefreshTimestamp = Date.now() + PREFERRED_SOURCE_FORCE_REFRESH_INTERVAL_MS;
+            }
+
+            if (isValidMapPayload(latestPayload) && latestPayload.source === 'google-script') {
+                stopped = true;
+                window.location.reload();
+                return;
+            }
+        } catch (error) {
+            if (shouldForceRefresh) {
+                nextForceRefreshTimestamp = Date.now() + PREFERRED_SOURCE_FORCE_REFRESH_INTERVAL_MS;
+            }
+
+            console.warn('后台切换私有地图数据源失败:', error);
+        }
+
+        window.setTimeout(pollForPreferredSource, PREFERRED_SOURCE_BACKGROUND_CHECK_INTERVAL_MS);
+    }
+
+    window.setTimeout(pollForPreferredSource, PREFERRED_SOURCE_BACKGROUND_CHECK_INTERVAL_MS);
+}
 
 function scaleMarkerDimension(value) {
     return Math.round(value * SCHOOL_MARKER_SCALE);
@@ -381,6 +449,7 @@ function getInputTypeDisplay(value) {
 
 function getProvinceDisplay(value) {
     if (typeof getProvinceDisplayName === 'function') {
+        // 省份显示名优先走前端元数据工具，保证地图 GeoJSON、列表和统计图用同一套本地化规则。
         const localizedProvinceName = getProvinceDisplayName(value, window.APP_LANG);
         if (localizedProvinceName) {
             return localizedProvinceName;
@@ -618,6 +687,7 @@ const CNprov = window.ASSET_VERSION
 let pendingMapLayoutRefreshId = 0;
 
 function ensureProvincePanes() {
+    // 省份底色、边框、学校标记和 tooltip 分 pane 管理，才能稳定控制层级关系。
     if (!map.getPane('provinceFillPane')) {
         map.createPane('provinceFillPane');
     }
@@ -671,6 +741,7 @@ function getProvinceFillOpacity(density) {
 function scheduleMapLayoutRefresh(delayMs = 0) {
     window.clearTimeout(pendingMapLayoutRefreshId);
     pendingMapLayoutRefreshId = window.setTimeout(() => {
+        // 某些浏览器在容器显隐、pageshow 或主题切换后会把 Leaflet 图层尺寸算错，这里统一重算。
         map.invalidateSize({ pan: false, animate: false });
 
         if (provinceFillLayer && typeof provinceFillLayer.bringToFront === 'function') {
@@ -718,6 +789,7 @@ addThemeChangeListener(() => {
 let provList = Array.from({ length: 40 }, () => Array(2).fill());
 window.getSharedMapData()
     .then(jsonResponse => {
+        startPreferredSourceUpgradeWatcher(jsonResponse);
         const data = jsonResponse.data;
         const provinceCountSource = Array.isArray(jsonResponse.statistics) && jsonResponse.statistics.length > 0
             ? jsonResponse.statistics
@@ -797,6 +869,7 @@ window.getSharedMapData()
             .catch(err => console.error('加载地图数据失败:', err));
 
         const statistics = jsonResponse.statistics
+        // 省份统计优先使用后端聚合结果，而不是前端自己从明细里二次汇总。
         const provinceChart = new Chart(document.getElementById('prov'), {//帶批處理的各省數據，這個可以表示所有的分佈數據
             type: 'pie',
             data: {
@@ -933,6 +1006,7 @@ window.getSharedMapData()
             const schoolReportStats = typeof getSchoolReportStats === 'function'
                 ? getSchoolReportStats(schoolReportStatsBySchool, item)
                 : { selfCount: 0, agentCount: 0 };
+            // marker 的颜色和透明度表达“该学校被重复举报的相对强度”，不是简单的分类色。
             const schoolMarkerColor = getSchoolMarkerColor(schoolReportStats, maxReportedMarkerCount);
             const marker = L.marker([item.lat, item.lng], {
                 icon: getSchoolMarkerIcon(schoolMarkerColor),
