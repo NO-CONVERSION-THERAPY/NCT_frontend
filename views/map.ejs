@@ -7,7 +7,7 @@
             --map-content-width: min(70%, 1100px);
         }
 
-        .map-page > *:not(.page-back-link):not(#backToTop):not(script) {
+        .map-page > *:not(.page-back-link):not(#backToTop):not(#map-record-detail-overlay):not(script) {
             width: var(--map-content-width);
             box-sizing: border-box;
         }
@@ -37,6 +37,7 @@
     <script src="/js/map_data_store.js?v=<%= assetVersion %>"></script>
     <script src="/js/map_time_utils.js?v=<%= assetVersion %>"></script>
     <script src="/js/map_record_stats.js?v=<%= assetVersion %>"></script>
+    <script src="/js/map_record_detail.js?v=<%= assetVersion %>"></script>
     <h1><%= t('map.title') %></h1>
     <h2 class="map-section-title"><%= t('map.sections.stats') %></h2>
     <%- include('partials/map_allnum') %>

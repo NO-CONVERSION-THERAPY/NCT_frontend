@@ -50,9 +50,14 @@ const PREFERRED_SOURCE_BACKGROUND_CHECK_INTERVAL_MS = 15000;
 const PREFERRED_SOURCE_FORCE_REFRESH_INTERVAL_MS = 120000;
 const { getElapsedSeconds, renderLastSyncedValue } = window.MapTimeUtils;
 const {
+    buildRecordPaginationHtml,
+    escapeHtml,
+    formatMessage,
+    getRecordRegionSummary
+} = window.MapRecordDetail;
+const {
     buildSchoolReportStats,
     getSchoolReportStats,
-    getSchoolStatsKey,
     groupSchoolRecords
 } = window.MapRecordStats;
 const {
@@ -385,12 +390,6 @@ function normalizeSearchText(value) {
     return String(value || '').trim().toLowerCase().replace(/\s+/g, '');
 }
 
-function formatMessage(template, values) {
-    return Object.entries(values).reduce((result, [key, value]) => {
-        return result.replaceAll(`{${key}}`, value);
-    }, template);
-}
-
 function getSearchTokens(searchText) {
     return String(searchText || '')
         .trim()
@@ -492,13 +491,224 @@ function getRecordAnchorId(index) {
     return `record-${index}`;
 }
 
-function escapeHtml(value) {
-    return String(value || '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
+function buildPopupFieldHtml(label, value) {
+    const normalizedValue = String(value || '').trim();
+    if (!normalizedValue) {
+        return '';
+    }
+
+    return `
+        <div class="map-record-field">
+            <div class="map-record-field__label">${escapeHtml(label)}</div>
+            <div class="map-record-field__value map-record-field__value--prewrap">${escapeHtml(normalizedValue)}</div>
+        </div>
+    `;
+}
+
+function buildPopupSummaryBodyHtml(record) {
+    const regionText = [String(record && (record.city || record.prov) || '').trim(), String(record && record.county || '').trim()]
+        .filter(Boolean)
+        .join(' / ');
+    const summaryFieldsHtml = [
+        buildPopupFieldHtml(i18n.map.list.fields.headmaster, record && record.HMaster),
+        buildPopupFieldHtml(i18n.map.list.fields.province, getProvinceDisplay(record && record.province)),
+        buildPopupFieldHtml(i18n.map.list.fields.region, regionText),
+        buildPopupFieldHtml(i18n.map.list.fields.address, record && record.addr),
+        buildPopupFieldHtml(i18n.map.list.fields.contact, record && record.contact)
+    ].filter(Boolean).join('');
+
+    return summaryFieldsHtml
+        ? `<div class="map-record-fields">${summaryFieldsHtml}</div>`
+        : '';
+}
+
+function normalizePopupSummaryText(value) {
+    return String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+function getPopupSummaryRegionText(record) {
+    return [String(record && (record.city || record.prov) || '').trim(), String(record && record.county || '').trim()]
+        .filter(Boolean)
+        .join(' / ');
+}
+
+function getPopupSummaryPageKey(record) {
+    return [
+        record && record.HMaster,
+        getProvinceDisplay(record && record.province),
+        getPopupSummaryRegionText(record),
+        record && record.addr,
+        record && record.contact
+    ]
+        .map((value) => normalizePopupSummaryText(value))
+        .join('::');
+}
+
+function getPopupSummaryPages(records) {
+    const uniquePages = [];
+    const seenKeys = new Set();
+
+    (Array.isArray(records) ? records : []).forEach((record) => {
+        const pageKey = getPopupSummaryPageKey(record);
+
+        if (seenKeys.has(pageKey)) {
+            return;
+        }
+
+        seenKeys.add(pageKey);
+        uniquePages.push(record);
+    });
+
+    return uniquePages;
+}
+
+function navigateToRecordCard(targetIndex) {
+    const targetHash = `#${getRecordAnchorId(targetIndex)}`;
+    const targetCardId = getRecordAnchorId(targetIndex);
+
+    if (window.location.hash === targetHash) {
+        window.dispatchEvent(new Event('hashchange'));
+    } else {
+        window.location.hash = targetHash;
+    }
+
+    window.requestAnimationFrame(() => {
+        const targetCard = document.getElementById(targetCardId);
+
+        if (!targetCard) {
+            return;
+        }
+
+        targetCard.open = true;
+        targetCard.scrollIntoView({ block: 'start' });
+    });
+}
+
+function createGroupedMarkerPopup(group, targetGroupIndex) {
+    const popupContent = document.createElement('div');
+    const popupPages = getPopupSummaryPages(group && group.pages);
+    const popupPageCount = Math.max(1, popupPages.length);
+    const shouldShowPopupPagination = popupPageCount > 1;
+    let currentPageIndex = 0;
+
+    popupContent.className = 'custom-popup custom-popup--record';
+
+    function stopPopupInteractionPropagation(event) {
+        if (!event) {
+            return;
+        }
+
+        event.stopPropagation();
+
+        if (typeof L !== 'undefined' && L.DomEvent && typeof L.DomEvent.stopPropagation === 'function') {
+            L.DomEvent.stopPropagation(event);
+        }
+    }
+
+    function stopPopupInteraction(event) {
+        if (!event) {
+            return;
+        }
+
+        event.preventDefault();
+        stopPopupInteractionPropagation(event);
+
+        if (typeof L !== 'undefined' && L.DomEvent && typeof L.DomEvent.preventDefault === 'function') {
+            L.DomEvent.preventDefault(event);
+        }
+    }
+
+    function bindPopupControl(node, handler) {
+        if (!node) {
+            return;
+        }
+
+        ['pointerdown', 'mousedown', 'touchstart'].forEach((eventName) => {
+            node.addEventListener(eventName, stopPopupInteractionPropagation);
+        });
+
+        node.addEventListener('click', (event) => {
+            stopPopupInteraction(event);
+            handler();
+        });
+    }
+
+    function renderPopupPage() {
+        const currentRecord = popupPages[currentPageIndex] || group.summaryRecord || {};
+        const regionSummary = getRecordRegionSummary(currentRecord, getProvinceDisplay);
+        const paginationHtml = shouldShowPopupPagination
+            ? buildRecordPaginationHtml(i18n, currentPageIndex, popupPageCount)
+            : '';
+
+        popupContent.innerHTML = `
+            <div class="custom-popup__header">
+                <b>${escapeHtml(group.summaryRecord.name || currentRecord.name || '')}</b>
+                ${regionSummary ? `<small>${escapeHtml(regionSummary)}</small>` : ''}
+            </div>
+            <div class="custom-popup__body">
+                ${buildPopupSummaryBodyHtml(currentRecord)}
+            </div>
+            <div class="custom-popup__actions">
+                <a
+                    href="#${getRecordAnchorId(targetGroupIndex)}"
+                    class="custom-popup__detail-link"
+                    data-popup-detail-link="true"
+                >${escapeHtml(i18n.map.list.viewDetails)}</a>
+            </div>
+            ${paginationHtml}
+        `;
+
+        const prevButton = popupContent.querySelector('[data-page-action="prev"]');
+        const nextButton = popupContent.querySelector('[data-page-action="next"]');
+        const detailLink = popupContent.querySelector('[data-popup-detail-link]');
+
+        bindPopupControl(prevButton, () => {
+            if (currentPageIndex <= 0) {
+                return;
+            }
+
+            currentPageIndex -= 1;
+            renderPopupPage();
+        });
+
+        bindPopupControl(nextButton, () => {
+            if (currentPageIndex >= popupPageCount - 1) {
+                return;
+            }
+
+            currentPageIndex += 1;
+            renderPopupPage();
+        });
+
+        bindPopupControl(detailLink, () => {
+            if (!detailLink) {
+                return;
+            }
+
+            detailLink.blur();
+            navigateToRecordCard(targetGroupIndex);
+        });
+
+        if (detailLink) {
+            detailLink.addEventListener('keydown', (event) => {
+                if (event.key !== 'Enter' && event.key !== ' ') {
+                    return;
+                }
+
+                stopPopupInteraction(event);
+                navigateToRecordCard(targetGroupIndex);
+            });
+        }
+    }
+
+    renderPopupPage();
+
+    if (typeof L !== 'undefined' && L.DomEvent) {
+        L.DomEvent.disableClickPropagation(popupContent);
+        L.DomEvent.disableScrollPropagation(popupContent);
+    }
+
+    return popupContent;
 }
 
 function showMapDataError(message) {
@@ -685,6 +895,21 @@ const CNprov = window.ASSET_VERSION
     ? `/cn.json?v=${encodeURIComponent(window.ASSET_VERSION)}`
     : '/cn.json';
 let pendingMapLayoutRefreshId = 0;
+
+function getMarkerPopupWidthOptions() {
+    const mapWidth = Math.max(0, Math.floor(map.getSize().x || 0));
+    const viewportWidth = Math.max(0, Math.floor(window.innerWidth || 0));
+    const horizontalViewportPadding = viewportWidth > 0 && viewportWidth <= 650 ? 24 : 56;
+    const minPopupWidth = 180;
+    const desiredWidth = Math.floor(mapWidth * 0.75);
+    const maxSafeWidth = Math.max(minPopupWidth, viewportWidth - horizontalViewportPadding);
+    const popupWidth = Math.max(minPopupWidth, Math.min(desiredWidth, maxSafeWidth));
+
+    return {
+        minWidth: popupWidth,
+        maxWidth: popupWidth
+    };
+}
 
 function ensureProvincePanes() {
     // 省份底色、边框、学校标记和 tooltip 分 pane 管理，才能稳定控制层级关系。
@@ -998,11 +1223,8 @@ window.getSharedMapData()
             return getSchoolMarkerReportCount(schoolReportStats);
         }));
         const groupedFilteredData = groupSchoolRecords(filteredData);
-        const groupIndexBySchoolKey = new Map(
-            groupedFilteredData.map((group, index) => [group.schoolKey, index])
-        );
-
-        filteredData.forEach((item, index) => {
+        groupedFilteredData.forEach((group, index) => {
+            const item = group.summaryRecord;
             const schoolReportStats = typeof getSchoolReportStats === 'function'
                 ? getSchoolReportStats(schoolReportStatsBySchool, item)
                 : { selfCount: 0, agentCount: 0 };
@@ -1022,37 +1244,7 @@ window.getSharedMapData()
                 pane: 'schoolTooltipPane'
             });
 
-            // 2. 點擊：顯示所有詳細資訊 (Popup)
-            const popupContent = document.createElement('div');
-            const nameElement = document.createElement('b');
-            const regionElement = document.createElement('small');
-            const headmasterElement = document.createElement('p');
-            const dividerElement = document.createElement('hr');
-            const addressElement = document.createElement('address');
-            const detailLink = document.createElement('a');
-            const schoolKey = getSchoolStatsKey(item);
-            const targetGroupIndex = groupIndexBySchoolKey.has(schoolKey)
-                ? groupIndexBySchoolKey.get(schoolKey)
-                : index;
-
-            popupContent.className = 'custom-popup';
-            nameElement.textContent = item.name || '';
-            regionElement.textContent = item.prov || '';
-            headmasterElement.textContent = item.HMaster || '';
-            addressElement.textContent = item.addr || '';
-            detailLink.href = `#${getRecordAnchorId(targetGroupIndex)}`;
-            detailLink.textContent = i18n.map.list.viewDetails;
-
-            popupContent.appendChild(nameElement);
-            popupContent.appendChild(document.createElement('br'));
-            popupContent.appendChild(regionElement);
-            popupContent.appendChild(headmasterElement);
-            popupContent.appendChild(dividerElement);
-            popupContent.appendChild(addressElement);
-            // 点击弹窗可直接跳到列表中的聚合学校卡片，而不是原始数据行。
-            popupContent.appendChild(detailLink);
-
-            marker.bindPopup(popupContent);
+            marker.bindPopup(createGroupedMarkerPopup(group, index), getMarkerPopupWidthOptions());
         });
     })
     .catch(error => {

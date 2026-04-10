@@ -6,17 +6,50 @@
 
 <div id="data-container" class="map-record-list"></div>
 <div id="data-container-sentinel" class="map-record-list__status" aria-live="polite" hidden></div>
+<div id="map-record-detail-overlay" class="map-record-detail-overlay" hidden aria-hidden="true">
+    <div class="map-record-detail-overlay__backdrop" data-record-detail-close="true"></div>
+    <div class="map-record-detail-panel div" role="dialog" aria-modal="true" aria-labelledby="mapRecordDetailTitle">
+        <div class="map-record-detail-panel__header">
+            <div class="map-record-detail-panel__header-copy">
+                <h3 id="mapRecordDetailTitle" class="map-record-detail-panel__title"></h3>
+                <p id="mapRecordDetailMeta" class="map-record-detail-panel__meta"></p>
+            </div>
+            <button type="button" class="map-record-detail-panel__close" data-record-detail-close="true" aria-label="<%= t('map.list.formDetail.close') %>">×</button>
+        </div>
+        <div class="map-record-detail-panel__table-wrap">
+            <table class="map-record-detail-panel__table">
+                <thead>
+                    <tr>
+                        <th><%= t('submitConfirm.columns.field') %></th>
+                        <th><%= t('submitConfirm.columns.value') %></th>
+                    </tr>
+                </thead>
+                <tbody id="mapRecordDetailTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
 <script>
 (() => {
     const i18n = window.I18N;
     const { buildSchoolReportStats, getSchoolReportStats, groupSchoolRecords } = window.MapRecordStats;
+    const {
+        getRecordConfirmationFields,
+        buildRecordPaginationHtml,
+        escapeHtml,
+        formatFieldLabel
+    } = window.MapRecordDetail;
     const urlParams = new URLSearchParams(window.location.search);
     const inputType = urlParams.get('inputType');
     const inputSearch = (urlParams.get('search') || '').trim();
     const mapSearchInput = document.getElementById('mapSearchInput');
     const dataContainer = document.getElementById('data-container');
     const loadSentinel = document.getElementById('data-container-sentinel');
+    const detailOverlay = document.getElementById('map-record-detail-overlay');
+    const detailTitle = document.getElementById('mapRecordDetailTitle');
+    const detailMeta = document.getElementById('mapRecordDetailMeta');
+    const detailTableBody = document.getElementById('mapRecordDetailTableBody');
     // 简中界面直接显示原始中文字段，其他语言再按需补充翻译块。
     const shouldTranslateDetails = window.APP_LANG !== 'zh-CN';
     const RECORD_BATCH_SIZE = 24;
@@ -27,40 +60,34 @@
     let scrollFallbackAttached = false;
     let schoolReportStatsBySchool = new Map();
     const originalChineseFieldLabels = {
-        experience: '受害者经历：',
-        scandal: '学校丑闻：',
-        other: '其他：'
+        experience: '受害者经历',
+        scandal: '学校丑闻',
+        other: '其他'
     };
     // 地图详情只翻译正文最重的三个字段，避免把联系人、省份等短字段重复翻译一遍。
     const translatableFieldConfigs = [
         {
             key: 'experience',
             sourceKey: 'experience',
-            originalLabel: originalChineseFieldLabels.experience,
-            translatedLabel: i18n.map.list.fields.experience
+            originalLabel: formatFieldLabel(originalChineseFieldLabels.experience),
+            translatedLabel: formatFieldLabel(i18n.map.list.fields.experience)
         },
         {
             key: 'scandal',
             sourceKey: 'scandal',
-            originalLabel: originalChineseFieldLabels.scandal,
-            translatedLabel: i18n.map.list.fields.scandal
+            originalLabel: formatFieldLabel(originalChineseFieldLabels.scandal),
+            translatedLabel: formatFieldLabel(i18n.map.list.fields.scandal)
         },
         {
             key: 'other',
             sourceKey: 'else',
-            originalLabel: originalChineseFieldLabels.other,
-            translatedLabel: i18n.map.list.fields.other
+            originalLabel: formatFieldLabel(originalChineseFieldLabels.other),
+            translatedLabel: formatFieldLabel(i18n.map.list.fields.other)
         }
     ];
 
     mapSearchInput.value = inputSearch;
     loadSentinel.textContent = i18n.common.loading;
-
-    function formatMessage(template, values) {
-        return Object.entries(values).reduce((result, [key, value]) => {
-            return result.replaceAll(`{${key}}`, value);
-        }, String(template || ''));
-    }
 
     function normalizeSearchText(value) {
         return String(value || '').trim().toLowerCase().replace(/\s+/g, '');
@@ -142,15 +169,6 @@
         return searchTokens.every((token) => searchableText.includes(token));
     }
 
-    function escapeHtml(value) {
-        return String(value || '')
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;');
-    }
-
     function getTranslationCacheKey(targetLanguage, text) {
         return `detail-translation:${targetLanguage}:${text}`;
     }
@@ -176,7 +194,7 @@
         return String(item[fieldConfig.sourceKey] || '').trim();
     }
 
-    function buildTranslatableSection(fieldKey, sourceText) {
+    function buildTranslatableSection(fieldKey, label, sourceText) {
         if (!sourceText) {
             return '';
         }
@@ -187,8 +205,9 @@
         }
 
         const originalHtml = `
-            <div class="map-detail-block">
-                <strong>${escapeHtml(fieldConfig.originalLabel)}</strong> ${escapeHtml(sourceText)}
+            <div class="map-detail-block" data-detail-field="${escapeHtml(fieldKey)}">
+                <strong>${escapeHtml(fieldConfig.originalLabel)}</strong>
+                <span class="map-detail-block__value">${escapeHtml(sourceText)}</span>
             </div>
         `;
 
@@ -200,7 +219,7 @@
         return `
             ${originalHtml}
             <div class="map-detail-block map-detail-block--translation" data-translate-field="${fieldKey}">
-                <strong>${escapeHtml(fieldConfig.translatedLabel)}</strong>
+                <strong>${escapeHtml(label ? formatFieldLabel(label) : fieldConfig.translatedLabel)}</strong>
                 <span class="map-detail-translation__text">${escapeHtml(i18n.map.list.translationLoading)}</span>
             </div>
         `;
@@ -330,42 +349,73 @@
         }
     }
 
+    function openRecordDetailPanel(record, currentPage, totalPages, schoolName) {
+        const fields = getRecordConfirmationFields(record, {
+            i18n,
+            getProvinceDisplay,
+            getInputTypeDisplay
+        });
+
+        detailTitle.textContent = schoolName || record.name || i18n.map.list.formDetail.title;
+        detailMeta.textContent = `${i18n.map.list.formDetail.title} · ${i18n.map.list.pagination.form.replace('{current}', currentPage + 1).replace('{total}', totalPages)}`;
+        detailTableBody.innerHTML = fields.map((field) => `
+            <tr>
+                <td>${escapeHtml(field.label)}</td>
+                <td>${escapeHtml(field.value)}</td>
+            </tr>
+        `).join('');
+        detailOverlay.hidden = false;
+        detailOverlay.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('map-record-detail-open');
+    }
+
+    function closeRecordDetailPanel() {
+        detailOverlay.hidden = true;
+        detailOverlay.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('map-record-detail-open');
+    }
+
+    function buildInlineRecordFieldHtml(label, value) {
+        const normalizedValue = String(value || '').trim();
+        if (!normalizedValue) {
+            return '';
+        }
+
+        return `<p><strong>${escapeHtml(label)}</strong>${escapeHtml(normalizedValue)}</p>`;
+    }
+
     function buildRecordBodyHtml(item, currentPage, totalPages) {
-        const experienceHtml = buildTranslatableSection('experience', item.experience);
-        const scandalHtml = buildTranslatableSection('scandal', item.scandal);
-        const elseHtml = buildTranslatableSection('other', item.else);
-        const paginationHtml = totalPages > 1 ? `
-            <div class="map-record-pagination">
-                <button
-                    type="button"
-                    class="map-record-pagination__button"
-                    data-page-action="prev"
-                    ${currentPage === 0 ? 'disabled' : ''}
-                >${escapeHtml(i18n.map.list.pagination.previous)}</button>
-                <span class="map-record-pagination__status">${escapeHtml(formatMessage(i18n.map.list.pagination.page, {
-                    current: currentPage + 1,
-                    total: totalPages
-                }))}</span>
-                <button
-                    type="button"
-                    class="map-record-pagination__button"
-                    data-page-action="next"
-                    ${currentPage >= totalPages - 1 ? 'disabled' : ''}
-                >${escapeHtml(i18n.map.list.pagination.next)}</button>
-            </div>
-        ` : '';
+        const regionText = [String(item.city || item.prov || '').trim(), String(item.county || '').trim()]
+            .filter(Boolean)
+            .join(' / ');
+        const experienceHtml = buildTranslatableSection('experience', i18n.map.list.fields.experience, item.experience);
+        const scandalHtml = buildTranslatableSection('scandal', i18n.map.list.fields.scandal, item.scandal);
+        const otherHtml = buildTranslatableSection('other', i18n.map.list.fields.other, item.else);
+        const topFieldsHtml = [
+            buildInlineRecordFieldHtml(i18n.map.list.fields.headmaster, item.HMaster),
+            buildInlineRecordFieldHtml(i18n.map.list.fields.province, getProvinceDisplay(item.province)),
+            buildInlineRecordFieldHtml(i18n.map.list.fields.region, regionText),
+            buildInlineRecordFieldHtml(i18n.map.list.fields.address, item.addr)
+        ].filter(Boolean).join('');
+        const contactText = String(item.contact || '').trim();
+        const contactHtml = contactText
+            ? `<div class="contact"><strong>${escapeHtml(i18n.map.list.fields.contact)}</strong>\n${escapeHtml(contactText)}</div>`
+            : '';
+        const detailSectionsHtml = [
+            experienceHtml,
+            scandalHtml,
+            otherHtml,
+            contactHtml
+        ].filter(Boolean).join('');
+        const dividerHtml = topFieldsHtml && detailSectionsHtml ? '<hr>' : '';
 
         return `
-            <p><strong>${escapeHtml(i18n.map.list.fields.headmaster)}</strong>${escapeHtml(item.HMaster)}</p>
-            <p><strong>${escapeHtml(i18n.map.list.fields.province)}</strong>${escapeHtml(getProvinceDisplay(item.province))}</p>
-            <p><strong>${escapeHtml(i18n.map.list.fields.region)}</strong>${escapeHtml(item.prov)}</p>
-            <p><strong>${escapeHtml(i18n.map.list.fields.address)}</strong>${escapeHtml(item.addr)}</p>
-            <hr>
-            ${experienceHtml}
-            ${scandalHtml}
-            ${elseHtml}
-            <div class="contact"><strong>${escapeHtml(i18n.map.list.fields.contact)}</strong>\n${escapeHtml(item.contact)}</div>
-            ${paginationHtml}
+            ${topFieldsHtml}
+            ${dividerHtml}
+            ${detailSectionsHtml}
+            ${buildRecordPaginationHtml(i18n, currentPage, totalPages, {
+                detailActionLabel: i18n.map.list.formDetail.button
+            })}
         `;
     }
 
@@ -395,6 +445,38 @@
 
         const bodyContainer = card.querySelector('.map-record-body');
 
+        function stopRecordPaginationPropagation(event) {
+            if (!event) {
+                return;
+            }
+
+            event.stopPropagation();
+        }
+
+        function stopRecordPaginationEvent(event) {
+            if (!event) {
+                return;
+            }
+
+            event.preventDefault();
+            stopRecordPaginationPropagation(event);
+        }
+
+        function bindPageButton(button, handler) {
+            if (!button) {
+                return;
+            }
+
+            ['pointerdown', 'mousedown', 'touchstart'].forEach((eventName) => {
+                button.addEventListener(eventName, stopRecordPaginationPropagation);
+            });
+
+            button.addEventListener('click', (event) => {
+                stopRecordPaginationEvent(event);
+                handler();
+            });
+        }
+
         function renderRecordPage() {
             const currentRecord = pages[currentPageIndex];
             bodyContainer.innerHTML = buildRecordBodyHtml(currentRecord, currentPageIndex, pages.length);
@@ -402,28 +484,29 @@
 
             const prevButton = bodyContainer.querySelector('[data-page-action="prev"]');
             const nextButton = bodyContainer.querySelector('[data-page-action="next"]');
+            const detailButton = bodyContainer.querySelector('[data-record-detail-action]');
 
-            if (prevButton) {
-                prevButton.addEventListener('click', () => {
-                    if (currentPageIndex <= 0) {
-                        return;
-                    }
+            bindPageButton(prevButton, () => {
+                if (currentPageIndex <= 0) {
+                    return;
+                }
 
-                    currentPageIndex -= 1;
-                    renderRecordPage();
-                });
-            }
+                currentPageIndex -= 1;
+                renderRecordPage();
+            });
 
-            if (nextButton) {
-                nextButton.addEventListener('click', () => {
-                    if (currentPageIndex >= pages.length - 1) {
-                        return;
-                    }
+            bindPageButton(nextButton, () => {
+                if (currentPageIndex >= pages.length - 1) {
+                    return;
+                }
 
-                    currentPageIndex += 1;
-                    renderRecordPage();
-                });
-            }
+                currentPageIndex += 1;
+                renderRecordPage();
+            });
+
+            bindPageButton(detailButton, () => {
+                openRecordDetailPanel(currentRecord, currentPageIndex, pages.length, summaryRecord.name);
+            });
 
             if (card.open) {
                 hydrateTranslations(bodyContainer, currentRecord);
@@ -471,6 +554,8 @@
         if (!targetCard) {
             return;
         }
+
+        targetCard.open = true;
 
         window.requestAnimationFrame(() => {
             targetCard.scrollIntoView({ block: 'start' });
@@ -536,6 +621,16 @@
         loadSentinel.hidden = true;
         loadSentinel.textContent = '';
     }
+
+    detailOverlay.querySelectorAll('[data-record-detail-close]').forEach((closeTrigger) => {
+        closeTrigger.addEventListener('click', closeRecordDetailPanel);
+    });
+
+    window.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !detailOverlay.hidden) {
+            closeRecordDetailPanel();
+        }
+    });
 
     async function loadData() {
         try {

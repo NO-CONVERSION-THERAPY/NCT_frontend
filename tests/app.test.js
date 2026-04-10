@@ -456,6 +456,7 @@ test('map page renders the record container and lazy-load sentinel', async () =>
   assert.match(response.body, /id="data-container"/);
   assert.match(response.body, /id="data-container-sentinel"/);
   assert.match(response.body, /\/js\/map_record_stats\.js/);
+  assert.match(response.body, /\/js\/map_record_detail\.js/);
   assert.match(response.body, /\/js\/map_province_utils\.js/);
   assert.match(response.body, /\/js\/map_backTop\.js/);
   assert.match(response.body, /\/js\/queryUpd\.js/);
@@ -1212,6 +1213,41 @@ test('map data service normalizes simplified and traditional province names to o
   assert.equal(normalizeProvinceNameToLegacy('广东'), '廣東');
 });
 
+test('map data service preserves public detail fields needed by map record pagination', () => {
+  clearProjectModules();
+  const { buildNormalizedMapResponse } = require(path.join(projectRoot, 'app/services/mapDataService'));
+
+  const payload = buildNormalizedMapResponse({
+    avg_age: 18,
+    last_synced: 1774925078387,
+    schoolNum: 1,
+    formNum: 2,
+    statistics: [],
+    statisticsForm: [],
+    data: [
+      {
+        學校名稱: '启明学校',
+        省份: '北京市',
+        緯度: 39.9,
+        經度: 116.4,
+        '机构所在城市 / 区县': '北京市',
+        '机构所在县区': '东城区',
+        '首次被送入日期': '2024-01-02',
+        離開日期: '2024-02-03',
+        '请问您是作为什么身份来填写本表单？': '受害者本人',
+        机构联系方式: 'test@example.com'
+      }
+    ]
+  }, Date.now(), 'google-script');
+
+  assert.equal(payload.data[0].city, '北京市');
+  assert.equal(payload.data[0].county, '东城区');
+  assert.equal(payload.data[0].dateStart, '2024-01-02');
+  assert.equal(payload.data[0].dateEnd, '2024-02-03');
+  assert.equal(payload.data[0].inputType, '受害者本人');
+  assert.equal(payload.data[0].contact, 'test@example.com');
+});
+
 test('runtime config resolves bundle paths in workers mode', () => {
   withEnvOverrides({ RUNTIME_TARGET: 'workers' }, () => {
     clearProjectModules();
@@ -1343,13 +1379,54 @@ test('map record stats count self and agent reports per school', () => {
   );
 
   const groupedRecords = groupSchoolRecords([
-    { name: '启明学校', province: '山东', addr: '地址 A', experience: '经历 1', scandal: '', else: '', HMaster: '甲', prov: '青岛', contact: '1' },
-    { name: '启明学校', province: '山东', addr: '地址 A', experience: '经历 1', scandal: '', else: '', HMaster: '甲', prov: '青岛', contact: '1' },
-    { name: '启明学校', province: '山东', addr: '地址 A', experience: '经历 2', scandal: '', else: '', HMaster: '甲', prov: '青岛', contact: '1' }
+    { name: '启明学校', province: '山东', addr: '地址 A', experience: '经历 1', scandal: '', else: '', HMaster: '甲', prov: '青岛', contact: '1', inputType: '受害者本人', dateStart: '2024-01-01' },
+    { name: '启明学校', province: '山东', addr: '地址 A', experience: '经历 1', scandal: '', else: '', HMaster: '甲', prov: '青岛', contact: '1', inputType: '受害者本人', dateStart: '2024-01-01' },
+    { name: '启明学校', province: '山东', addr: '地址 A', experience: '经历 1', scandal: '', else: '', HMaster: '甲', prov: '青岛', contact: '1', inputType: '受害者的代理人', dateStart: '2024-01-01' },
+    { name: '启明学校', province: '山东', addr: '地址 A', experience: '经历 1', scandal: '', else: '', HMaster: '甲', prov: '青岛', contact: '1', inputType: '受害者本人', dateStart: '2024-02-01' }
   ]);
 
   assert.equal(groupedRecords.length, 1);
-  assert.equal(groupedRecords[0].pages.length, 2);
+  assert.equal(groupedRecords[0].pages.length, 4);
+});
+
+test('map record detail helper omits empty fields in confirmation-style detail rows', () => {
+  clearProjectModules();
+  const { getRecordConfirmationFields } = require(path.join(projectRoot, 'public/js/map_record_detail'));
+  const { getMessages } = require(path.join(projectRoot, 'config/i18n'));
+
+  const fields = getRecordConfirmationFields({
+    inputType: '受害者本人',
+    name: '启明学校',
+    province: '山东',
+    city: '青岛市',
+    county: '',
+    dateStart: '2024-01-01',
+    dateEnd: '',
+    addr: '',
+    contact: 'test@example.com',
+    HMaster: '',
+    experience: '',
+    scandal: '存在体罚',
+    else: ''
+  }, {
+    i18n: getMessages('zh-CN'),
+    getProvinceDisplay(value) {
+      return value;
+    },
+    getInputTypeDisplay(value) {
+      return value;
+    }
+  });
+
+  assert.deepEqual(fields.map((field) => field.key), [
+    'identity',
+    'dateStart',
+    'schoolName',
+    'province',
+    'city',
+    'contactInformation',
+    'scandal'
+  ]);
 });
 
 test('map province utils normalize workers GeoJSON names and province aliases to stable codes', () => {

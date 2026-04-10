@@ -431,24 +431,51 @@ function promotePreferredPayloadInBackground(candidatePromise) {
   });
 }
 
+function pickFirstNonEmptyValue(item, keys) {
+  if (!item || typeof item !== 'object') {
+    return '';
+  }
+
+  for (const key of keys) {
+    const value = item[key];
+
+    if (typeof value === 'string' && value.trim()) {
+      return value.trim();
+    }
+
+    if (value !== undefined && value !== null) {
+      const text = String(value).trim();
+      if (text) {
+        return text;
+      }
+    }
+  }
+
+  return '';
+}
+
 // 对外 API 只暴露前端真正需要的字段，原始表格列不直接透出。
 function cleanMapData(rawData) {
   return rawData
     .filter((item) => item && (item.lat || item['緯度']))
     // 同时兼容新字段名与历史中文列名，方便表结构渐进迁移。
     .map((item) => ({
-      name: item.name || item['學校名稱'] || '未填寫名稱',
-      addr: item.addr || item['學校地址'] || '無地址',
-      province: normalizeProvinceNameToLegacy(item.province || item['省份'] || ''),
-      prov: item.prov || item['區、縣'] || '',
-      else: item.else || item['其他'] || '',
+      name: pickFirstNonEmptyValue(item, ['name', 'schoolName', '學校名稱', '学校名称']) || '未填寫名稱',
+      addr: pickFirstNonEmptyValue(item, ['addr', 'schoolAddress', '學校地址', '机构地址', '機構地址']) || '無地址',
+      province: normalizeProvinceNameToLegacy(pickFirstNonEmptyValue(item, ['province', '省份', '機構所在省份', '机构所在省份'])),
+      prov: pickFirstNonEmptyValue(item, ['prov', 'region', '區、縣', '城市 / 區縣', '城市 / 区县', '機構所在城市 / 區縣', '机构所在城市 / 区县']),
+      city: pickFirstNonEmptyValue(item, ['city', 'cityName', '城市 / 區縣', '城市 / 区县', '機構所在城市 / 區縣', '机构所在城市 / 区县']),
+      county: pickFirstNonEmptyValue(item, ['county', 'countyName', '縣區', '县区', '機構所在縣區', '机构所在县区']),
+      else: pickFirstNonEmptyValue(item, ['else', 'other', '其他', '其他補充', '其他补充']),
       lat: parseFloat(item.lat || item['緯度']),
       lng: parseFloat(item.lng || item['經度']),
-      experience: item.experience || item['請問您在那裏都經歷了什麼？'] || '',
-      HMaster: item.HMaster || item['校長名字'] || '',
-      scandal: item.scandal || item['學校的醜聞'] || '',
-      contact: item.contact || item['學校的聯繫方式'] || '',
-      inputType: item.inputType || item['請問您是什麽身份？'] || ''
+      experience: pickFirstNonEmptyValue(item, ['experience', '請問您在那裏都經歷了什麼？', '個人在校經歷描述', '个人在校经历描述']),
+      HMaster: pickFirstNonEmptyValue(item, ['HMaster', 'headmasterName', '校長名字', '負責人/校長姓名', '负责人/校长姓名']),
+      scandal: pickFirstNonEmptyValue(item, ['scandal', '學校的醜聞', '醜聞及暴力行為詳細描述', '丑闻及暴力行为详细描述']),
+      contact: pickFirstNonEmptyValue(item, ['contact', 'contactInformation', '學校的聯繫方式', '機構聯繫方式', '机构联系方式']),
+      inputType: pickFirstNonEmptyValue(item, ['inputType', 'identity', '請問您是什麽身份？', '請問您是作為什麼身份來填寫本表單？', '请问您是作为什么身份来填写本表单？']),
+      dateStart: pickFirstNonEmptyValue(item, ['dateStart', '首次被送入日期', 'First Date Sent There']),
+      dateEnd: pickFirstNonEmptyValue(item, ['dateEnd', '離開日期', '离开日期', 'Departure Date'])
     }));
 }
 

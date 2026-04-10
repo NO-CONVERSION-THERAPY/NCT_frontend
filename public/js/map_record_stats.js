@@ -63,26 +63,11 @@
         return statsBySchool;
     }
 
-    function getRecordBodyPageKey(record) {
-        return [
-            record && record.HMaster,
-            record && record.province,
-            record && record.prov,
-            record && record.addr,
-            record && record.experience,
-            record && record.scandal,
-            record && record.else,
-            record && record.contact
-        ]
-            .map((value) => normalizeSchoolStatsText(value))
-            .join('::');
-    }
-
     function groupSchoolRecords(records) {
         const groupedRecords = [];
         const groupBySchoolKey = new Map();
 
-        // 同一学校下正文完全相同的页面只保留一次，避免列表里重复刷屏。
+        // 同一机构下每一份提交都保留为独立页面，保证地图详情可以逐份翻页查看。
         (Array.isArray(records) ? records : []).forEach((record, index) => {
             const schoolKey = getSchoolStatsKey(record) || `__unknown__:${index}`;
             let group = groupBySchoolKey.get(schoolKey);
@@ -91,18 +76,13 @@
                 group = {
                     schoolKey,
                     summaryRecord: record,
-                    pages: [],
-                    pageKeys: new Set()
+                    pages: []
                 };
                 groupBySchoolKey.set(schoolKey, group);
                 groupedRecords.push(group);
             }
 
-            const pageKey = getRecordBodyPageKey(record);
-            if (!group.pageKeys.has(pageKey)) {
-                group.pageKeys.add(pageKey);
-                group.pages.push(record);
-            }
+            group.pages.push(record);
         });
 
         return groupedRecords.map((group) => ({

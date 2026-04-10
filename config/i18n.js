@@ -227,7 +227,13 @@ const messages = {
         pagination: {
           previous: '上一页',
           next: '下一页',
-          page: '第 {current} / {total} 页'
+          page: '第 {current} / {total} 页',
+          form: '第 {current} / {total} 份表单'
+        },
+        formDetail: {
+          button: '查看表单详细信息',
+          title: '表单详细信息',
+          close: '关闭'
         },
         fields: {
           scandal: '学校丑闻：',
@@ -734,7 +740,13 @@ const messages = {
         pagination: {
           previous: '上一頁',
           next: '下一頁',
-          page: '第 {current} / {total} 頁'
+          page: '第 {current} / {total} 頁',
+          form: '第 {current} / {total} 份表單'
+        },
+        formDetail: {
+          button: '查看表單詳細資訊',
+          title: '表單詳細資訊',
+          close: '關閉'
         },
         fields: {
           scandal: '學校醜聞：',
@@ -1241,7 +1253,13 @@ const messages = {
         pagination: {
           previous: 'Previous',
           next: 'Next',
-          page: 'Page {current} of {total}'
+          page: 'Page {current} of {total}',
+          form: 'Submission {current} of {total}'
+        },
+        formDetail: {
+          button: 'View form details',
+          title: 'Form details',
+          close: 'Close'
         },
         fields: {
           scandal: 'School scandals:',
