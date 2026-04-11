@@ -1,8 +1,10 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const http = require('node:http');
+const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
+const express = require('express');
 
 const projectRoot = path.resolve(__dirname, '..');
 
@@ -431,6 +433,61 @@ test('maintenance mode keeps static assets reachable for the maintenance page', 
 
   assert.equal(response.statusCode, 200);
   assert.match(response.headers['content-type'], /image\/svg\+xml/);
+});
+
+test('bundled static middleware serves large css files without truncation', async () => {
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'nct-static-'));
+  const cssDirectory = path.join(tempRoot, 'css');
+  const cssPayload = `/* middleware truncation regression */\n${'a'.repeat(70 * 1024)}`;
+
+  try {
+    fs.mkdirSync(cssDirectory, { recursive: true });
+    fs.writeFileSync(path.join(cssDirectory, 'main.css'), cssPayload, 'utf8');
+
+    clearProjectModules();
+    const { createBundledStaticMiddleware } = require(path.join(projectRoot, 'app/middleware/bundledStatic'));
+    const app = express();
+
+    app.use(createBundledStaticMiddleware({ rootDirectory: tempRoot }));
+    app.use((_req, res) => {
+      res.status(404).send('not found');
+    });
+
+    const response = await requestApp(app, { path: '/css/main.css' });
+
+    assert.equal(response.statusCode, 200);
+    assert.match(response.headers['content-type'], /text\/css/);
+    assert.equal(response.body.length, cssPayload.length);
+    assert.equal(response.body, cssPayload);
+  } finally {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  }
+});
+
+test('bundled static middleware does not serve files outside its root', async () => {
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'nct-static-'));
+  const outsideFilePath = path.join(tempRoot, '..', 'nct-static-outside.txt');
+
+  try {
+    fs.writeFileSync(outsideFilePath, 'outside bundle root', 'utf8');
+
+    clearProjectModules();
+    const { createBundledStaticMiddleware } = require(path.join(projectRoot, 'app/middleware/bundledStatic'));
+    const app = express();
+
+    app.use(createBundledStaticMiddleware({ rootDirectory: tempRoot }));
+    app.use((_req, res) => {
+      res.status(404).send('not found');
+    });
+
+    const response = await requestApp(app, { path: '/../nct-static-outside.txt' });
+
+    assert.equal(response.statusCode, 404);
+    assert.equal(response.body, 'not found');
+  } finally {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+    fs.rmSync(outsideFilePath, { force: true });
+  }
 });
 
 test('maintenance mode returns JSON errors for API requests', async () => {
