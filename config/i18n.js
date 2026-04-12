@@ -372,7 +372,7 @@ const messages = {
         effectiveDateLabel: '生效日期',
         effectiveDateValue: '2026年4月9日',
         updatedLabel: '最近更新',
-        updatedValue: '2026年4月9日',
+        updatedValue: '2026年4月12日',
         scopeLabel: '适用范围',
         scopeValue: '本站页面、表单提交流程与相关公开展示内容'
       },
@@ -406,6 +406,7 @@ const messages = {
       formItems: [
         '内部处理信息通常包括出生年份、性别等个人基本信息，用于内部整理、核验与统计。',
         '可能公开展示的信息通常包括相关经历、机构名称、所在地区、机构地址、机构联系方式、负责人/校长姓名、丑闻及暴力行为描述和其他补充内容。',
+        '如果您点击“获取当前位置”等定位按钮，浏览器会请求定位权限；定位结果仅用于帮您填充当前地址或经纬度，只有在您确认并提交表单后才会随表单一并发送。',
         '请不要在可能公开的字段中填写身份证号、私人电话、家庭住址、即时通讯账号或其他不适合公开的个人敏感信息。'
       ],
       cookieIntro: '当前网站使用的 Cookie 如下：',
@@ -996,7 +997,7 @@ const messages = {
         effectiveDateLabel: '生效日期',
         effectiveDateValue: '2026年4月9日',
         updatedLabel: '最近更新',
-        updatedValue: '2026年4月9日',
+        updatedValue: '2026年4月12日',
         scopeLabel: '適用範圍',
         scopeValue: '本站頁面、表單提交流程與相關公開展示內容'
       },
@@ -1030,6 +1031,7 @@ const messages = {
       formItems: [
         '內部處理資訊通常包括出生年份、性別等個人基本資訊，用於內部整理、核驗與統計。',
         '可能公開展示的資訊通常包括相關經歷、機構名稱、所在地區、機構地址、機構聯繫方式、負責人／校長姓名、醜聞及暴力行為描述和其他補充內容。',
+        '如果您點擊「取得目前位置」等定位按鈕，瀏覽器會請求定位權限；定位結果僅用於協助填入目前地址或經緯度，只有在您確認並提交表單後才會隨表單一併送出。',
         '請不要在可能公開的欄位中填寫身分證號、私人電話、家庭住址、即時通訊帳號或其他不適合公開的個人敏感資訊。'
       ],
       cookieIntro: '本站目前使用的 Cookie 如下：',
@@ -1620,7 +1622,7 @@ const messages = {
         effectiveDateLabel: 'Effective Date',
         effectiveDateValue: 'April 9, 2026',
         updatedLabel: 'Last Updated',
-        updatedValue: 'April 9, 2026',
+        updatedValue: 'April 12, 2026',
         scopeLabel: 'Scope',
         scopeValue: 'Site pages, the form submission flow, and related public-facing display content'
       },
@@ -1654,6 +1656,7 @@ const messages = {
       formItems: [
         'Internally handled information typically includes personal details such as birth year and sex for internal review, verification, and statistics.',
         'Information that may be shown publicly typically includes related experiences, institution name, region, institution address, institution contact information, principal or headmaster name, descriptions of scandals or violence, and other supplemental content.',
+        'If you click a location button such as "Use current location", your browser will request location permission. The location result is only used to help fill the current address or coordinates and is sent only if you confirm and submit the form.',
         'Please do not place ID numbers, private phone numbers, home addresses, messaging account IDs, or other sensitive personal information in fields that may be made public.'
       ],
       cookieIntro: 'The cookie currently used by this site is listed below:',

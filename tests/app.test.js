@@ -966,6 +966,7 @@ test('privacy page documents the language cookie, form-disclosure flow, and foot
   assert.match(privacyResponse.body, /<code>lang<\/code>/);
   assert.match(privacyResponse.body, /2592000/);
   assert.match(privacyResponse.body, /SameSite=Lax/);
+  assert.match(privacyResponse.body, /your browser will request location permission/i);
   assert.match(String(privacyResponse.headers['set-cookie']), /Max-Age=2592000/);
 });
 
