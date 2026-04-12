@@ -400,3 +400,106 @@ test('institution correction storage backfills missing D1 columns before insert'
 
   clearProjectModules();
 });
+
+test('institution correction storage falls back to prepare().run() when D1 exec fails', async () => {
+  clearProjectModules();
+
+  const runtimeContext = require(path.join(projectRoot, 'app/services/runtimeContext'));
+  const {
+    saveInstitutionCorrectionSubmission,
+    validateInstitutionCorrectionSubmission
+  } = require(path.join(projectRoot, 'app/services/institutionCorrectionService'));
+  const { translate } = require(path.join(projectRoot, 'config/i18n'));
+
+  const calls = [];
+  const fakeDb = {
+    async exec(sql) {
+      calls.push({ type: 'exec', sql });
+      throw new Error('exec is not supported in this runtime');
+    },
+    prepare(sql) {
+      calls.push({ type: 'prepare', sql });
+
+      if (/PRAGMA table_info/i.test(sql)) {
+        return {
+          async all() {
+            return {
+              results: [
+                'id',
+                'school_name',
+                'province_code',
+                'province_name',
+                'city_code',
+                'city_name',
+                'county_code',
+                'county_name',
+                'school_address',
+                'contact_information',
+                'headmaster_name',
+                'correction_content',
+                'status',
+                'lang',
+                'source_path',
+                'client_ip_hash',
+                'user_agent',
+                'created_at'
+              ].map((name) => ({ name }))
+            };
+          }
+        };
+      }
+
+      if (/CREATE TABLE/i.test(sql) || /ALTER TABLE/i.test(sql)) {
+        return {
+          async run() {
+            calls.push({ type: 'schema-run', sql });
+            return { success: true };
+          }
+        };
+      }
+
+      return {
+        bind(...params) {
+          calls.push({ type: 'bind', params });
+
+          return {
+            async run() {
+              calls.push({ type: 'run' });
+              return { success: true };
+            }
+          };
+        }
+      };
+    }
+  };
+
+  const { errors, values } = validateInstitutionCorrectionSubmission({
+    school_name: '回退测试机构'
+  }, (key, variables) => translate('zh-CN', key, variables));
+
+  assert.deepEqual(errors, []);
+
+  await runtimeContext.runWithRuntimeContext({ env: { DB: fakeDb } }, async () => {
+    await saveInstitutionCorrectionSubmission({
+      req: {
+        lang: 'zh-CN',
+        originalUrl: '/map/correction/submit',
+        path: '/map/correction/submit',
+        headers: {
+          'user-agent': 'node-test'
+        },
+        get(name) {
+          return this.headers[String(name || '').toLowerCase()] || '';
+        },
+        ip: '203.0.113.12'
+      },
+      values
+    });
+  });
+
+  assert.ok(calls.some((entry) => entry.type === 'exec' && /CREATE TABLE IF NOT EXISTS institution_correction_submissions/i.test(entry.sql)));
+  assert.ok(calls.some((entry) => entry.type === 'schema-run' && /CREATE TABLE IF NOT EXISTS institution_correction_submissions/i.test(entry.sql)));
+  assert.ok(calls.some((entry) => entry.type === 'run'));
+
+  clearProjectModules();
+});

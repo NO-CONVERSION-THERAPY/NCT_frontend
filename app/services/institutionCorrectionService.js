@@ -90,15 +90,15 @@ function getProvinceByCode(provinceCode) {
 function getConfiguredBindingNames() {
   return [
     String(process.env.D1_BINDING_NAME || '').trim(),
-    'DB',
-    'NCT_DB'
+    'NCT_DB',
+    'DB'
   ].filter(Boolean);
 }
 
 function getInstitutionCorrectionDatabaseBinding() {
   for (const bindingName of getConfiguredBindingNames()) {
     const binding = getRuntimeBinding(bindingName);
-    if (binding && typeof binding.prepare === 'function') {
+    if (binding && (typeof binding.prepare === 'function' || typeof binding.exec === 'function')) {
       return {
         binding,
         bindingName
@@ -123,6 +123,41 @@ async function getInstitutionCorrectionTableColumns(binding) {
   );
 }
 
+async function runSchemaStatement(binding, sql) {
+  const normalizedSql = getTrimmedString(sql);
+  let execError = null;
+
+  if (typeof binding.exec === 'function') {
+    try {
+      return await binding.exec(normalizedSql);
+    } catch (error) {
+      execError = error;
+    }
+  }
+
+  if (typeof binding.prepare === 'function') {
+    const statement = binding.prepare(normalizedSql);
+
+    if (statement && typeof statement.run === 'function') {
+      return statement.run();
+    }
+
+    if (statement && typeof statement.bind === 'function') {
+      const boundStatement = statement.bind();
+
+      if (boundStatement && typeof boundStatement.run === 'function') {
+        return boundStatement.run();
+      }
+    }
+  }
+
+  if (execError) {
+    throw execError;
+  }
+
+  throw new InstitutionCorrectionStorageUnavailableError('Configured D1 binding does not support schema initialization.');
+}
+
 async function reconcileInstitutionCorrectionSchema(binding) {
   const existingColumns = await getInstitutionCorrectionTableColumns(binding);
 
@@ -131,7 +166,7 @@ async function reconcileInstitutionCorrectionSchema(binding) {
       continue;
     }
 
-    await binding.exec(definition.alterSql);
+    await runSchemaStatement(binding, definition.alterSql);
     existingColumns.add(definition.name);
   }
 }
@@ -146,13 +181,13 @@ async function ensureInstitutionCorrectionSchema(binding) {
     return cachedReadyPromise;
   }
 
-  if (typeof binding.exec !== 'function') {
+  if (typeof binding.exec !== 'function' && typeof binding.prepare !== 'function') {
     throw new InstitutionCorrectionStorageUnavailableError('Configured D1 binding does not support schema initialization.');
   }
 
   const readyPromise = Promise.resolve()
     .then(async () => {
-      await binding.exec(CREATE_TABLE_STATEMENT);
+      await runSchemaStatement(binding, CREATE_TABLE_STATEMENT);
       await reconcileInstitutionCorrectionSchema(binding);
     })
     .catch((error) => {

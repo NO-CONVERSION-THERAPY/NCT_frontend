@@ -239,7 +239,7 @@ README 只保留最常用配置；完整变量说明请查看 [`.env.example`](.
 | `GOOGLE_CLOUD_TRANSLATION_API_KEY` | 启用翻译能力时必填 |
 | `MAINTENANCE_MODE` | 全站维护开关 |
 | `MAINTENANCE_NOTICE` | 维护页公告文字 |
-| `D1_BINDING_NAME` | 仅当 D1 绑定名不是默认的 `DB` / `NCT_DB` 时需要配置 |
+| `D1_BINDING_NAME` | 仅当 D1 绑定名不是默认的 `NCT_DB` / `DB` 时需要配置 |
 | `RATE_LIMIT_REDIS_URL` | 多实例部署时建议配置的共享限流存储 |
 
 配置原则：
@@ -248,7 +248,7 @@ README 只保留最常用配置；完整变量说明请查看 [`.env.example`](.
 - `GOOGLE_SCRIPT_URL` 与 `GOOGLE_SCRIPT_URL_ENCRYPTED` 只选一个。
 - `FORM_SUBMIT_TARGET` 支持 `google`、`d1`、`both`，默认值为 `google`。
 - 如果 `FORM_SUBMIT_TARGET` 包含 `google`，仍需配置 `FORM_ID` 或 `FORM_ID_ENCRYPTED`。
-- 如果 `FORM_SUBMIT_TARGET` 包含 `d1`，请确保 Workers 已连接 D1；若绑定名不是 `DB` 或 `NCT_DB`，再额外设置 `D1_BINDING_NAME`。
+- 如果 `FORM_SUBMIT_TARGET` 包含 `d1`，请确保 Workers 已连接 D1；若绑定名不是 `NCT_DB` 或 `DB`，再额外设置 `D1_BINDING_NAME`。
 - 使用密文配置时，必须显式配置 `FORM_PROTECTION_SECRET`。
 - Workers 正式部署时，敏感值请放到 Cloudflare `Variables and Secrets`，不要写进仓库或 `wrangler.jsonc`。
 - 如果暂时不使用密文配置，至少请把 `FORM_ID`、`GOOGLE_SCRIPT_URL` 与 `FORM_PROTECTION_SECRET` 都设为 Secret。
@@ -341,7 +341,8 @@ npm test
 补充：
 
 - 正式部署分支可在 `Settings -> Build -> Branch control` 中调整。
-- 仓库中的 [`wrangler.jsonc`](./wrangler.jsonc) 只保留必要的 `RUNTIME_TARGET="workers"`，其余变量请放到 Dashboard 或本地 `.dev.vars`。
+- 仓库中的 [`wrangler.jsonc`](./wrangler.jsonc) 保留了 `RUNTIME_TARGET="workers"` 与一个最小化的 `NCT_DB` D1 绑定，方便 GitHub / PR 场景下自动 provision D1，而不必把账号专属的 `database_id` 提交进仓库。
+- 其余 Variables / Secrets 仍建议放到 Dashboard 或本地 `.dev.vars`。
 
 ### 4. 补齐 Variables 和 Secrets
 
@@ -364,45 +365,56 @@ npm test
 | `GOOGLE_CLOUD_TRANSLATION_API_KEY` | Secret | 只有启用翻译时才需要 |
 | `MAINTENANCE_MODE` | Text | 需要全站维护时设为 `true` |
 | `MAINTENANCE_NOTICE` | Text | 维护公告文字 |
-| `D1_BINDING_NAME` | Text | 仅当 D1 绑定名不是 `DB` / `NCT_DB` 时填写 |
+| `D1_BINDING_NAME` | Text | 仅当 D1 绑定名不是 `NCT_DB` / `DB` 时填写 |
 | `RATE_LIMIT_REDIS_URL` | Secret | 多实例部署建议配置 |
 
-### 5. 在 Cloudflare 网页手动绑定 D1
+### 5. 部署 D1
 
-在 Cloudflare 网页上为项目绑定 D1 数据库需要按下面步骤操作：
+默认部署方式：
 
-1. 登录 Cloudflare Dashboard，进入 `Workers & Pages`
-2. 选择当前项目
-3. 打开 `Settings -> Bindings`
-4. 点击 `Add binding`
-5. 选择 `D1 database`
-6. 在 `Variable name` 中填写绑定名，推荐直接使用 `DB`
-7. 在数据库下拉框中选择你创建好的 D1 数据库
-8. 点击 `Add binding`
-9. 重新部署项目，让新绑定真正生效
-
-补充：
-
-- 如果你没有使用默认绑定名 `DB` 或 `NCT_DB`，记得同时配置环境变量 `D1_BINDING_NAME`
-- 如果项目区分 Preview / Production 环境，也要分别检查对应环境的 D1 绑定是否齐全
-
-重要：
-
-- Cloudflare 官方文档支持通过 Dashboard 手动添加 D1 绑定，也支持把绑定写进 Wrangler 配置文件
-- 这个项目更推荐把 `d1_databases` 写进 [`wrangler.jsonc`](./wrangler.jsonc)，把配置文件当作部署时的单一来源
-- 如果你只在 Cloudflare 网页上手动绑定，而不把同样的 D1 绑定配置写回 `wrangler.jsonc`，那么后续项目重新部署、重建 Worker / Pages 项目、切换环境时，都应该把“重新到 Dashboard 手动检查并补绑 D1”当作默认步骤
-- 换句话说：为了避免每次重新部署 Workers 后都还要手动补绑 D1，推荐最终还是把下面这段配置写回 `wrangler.jsonc`
+1. 保持仓库中的 [`wrangler.jsonc`](./wrangler.jsonc) 不变，仓库已内置最小 D1 绑定：
 
 ```jsonc
 "d1_databases": [
   {
-    "binding": "DB",
-    "database_name": "nct",
+    "binding": "NCT_DB",
+    "migrations_dir": "migrations"
+  }
+]
+```
+
+2. 在 Cloudflare `Workers & Pages` 中导入仓库
+3. 在 `Settings -> Variables and Secrets` 中补齐上面的运行时变量
+4. 直接部署项目
+5. 首次部署后，到 `Settings -> Bindings` 确认已经出现 `NCT_DB` 绑定
+
+如果你要绑定自己账号里“已有的” D1 数据库：
+
+1. 打开项目的 `Settings -> Bindings`
+2. 点击 `Add binding`
+3. 选择 `D1 database`
+4. `Variable name` 填 `NCT_DB`
+5. 选择现有 D1 数据库
+6. 保存后重新部署一次
+
+需要写死现有 D1 时，可改成下面这种完整写法：
+
+```jsonc
+"d1_databases": [
+  {
+    "binding": "NCT_DB",
+    "database_name": "<your-d1-database-name>",
     "database_id": "<your-d1-database-id>",
     "migrations_dir": "migrations"
   }
 ]
 ```
+
+补充：
+
+- 如果绑定名不是 `NCT_DB` 或 `DB`，再额外配置环境变量 `D1_BINDING_NAME`
+- 如果区分 Preview / Production，请分别检查两个环境的 D1 绑定
+- `D1` 绑定不属于 Variables / Secrets，不能只靠环境变量完成
 
 ### 6. D1 表名与常用查询
 

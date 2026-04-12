@@ -239,7 +239,7 @@ This README only lists the most important variables. For the full set, see [`.en
 | `GOOGLE_CLOUD_TRANSLATION_API_KEY` | Required when translation features are enabled |
 | `MAINTENANCE_MODE` | Global maintenance switch |
 | `MAINTENANCE_NOTICE` | Maintenance page notice text |
-| `D1_BINDING_NAME` | Only needed when the D1 binding name is not the default `DB` / `NCT_DB` |
+| `D1_BINDING_NAME` | Only needed when the D1 binding name is not the default `NCT_DB` / `DB` |
 | `RATE_LIMIT_REDIS_URL` | Shared rate-limit storage recommended for multi-instance deployments |
 
 Configuration rules:
@@ -248,7 +248,7 @@ Configuration rules:
 - Choose only one of `GOOGLE_SCRIPT_URL` and `GOOGLE_SCRIPT_URL_ENCRYPTED`.
 - `FORM_SUBMIT_TARGET` accepts `google`, `d1`, and `both`, with `google` as the default.
 - If `FORM_SUBMIT_TARGET` includes `google`, you still need `FORM_ID` or `FORM_ID_ENCRYPTED`.
-- If `FORM_SUBMIT_TARGET` includes `d1`, make sure your Worker has a D1 binding; if the binding name is not `DB` or `NCT_DB`, also set `D1_BINDING_NAME`.
+- If `FORM_SUBMIT_TARGET` includes `d1`, make sure your Worker has a D1 binding; if the binding name is not `NCT_DB` or `DB`, also set `D1_BINDING_NAME`.
 - If you use encrypted values, `FORM_PROTECTION_SECRET` must be explicitly configured.
 - In production Workers deployments, keep sensitive values in Cloudflare Variables and Secrets instead of committing them or placing them in `wrangler.jsonc`.
 - If you do not use encrypted config yet, at minimum store `FORM_ID`, `GOOGLE_SCRIPT_URL`, and `FORM_PROTECTION_SECRET` as Secrets.
@@ -341,7 +341,8 @@ In the Cloudflare Dashboard:
 Additional notes:
 
 - You can adjust the production branch in `Settings -> Build -> Branch control`.
-- The repository copy of [`wrangler.jsonc`](./wrangler.jsonc) keeps only the required `RUNTIME_TARGET="workers"`. Put the rest of your variables in the Cloudflare Dashboard or local `.dev.vars`.
+- The repository copy of [`wrangler.jsonc`](./wrangler.jsonc) keeps `RUNTIME_TARGET="workers"` plus a minimal `NCT_DB` D1 binding, so GitHub / PR-based deployments can auto-provision D1 without committing an account-specific `database_id`.
+- Put the rest of your runtime Variables / Secrets in the Cloudflare Dashboard or local `.dev.vars`.
 
 ### 4. Add Variables and Secrets
 
@@ -364,45 +365,56 @@ Deployment recommendations:
 | `GOOGLE_CLOUD_TRANSLATION_API_KEY` | Secret | Only needed when translation is enabled |
 | `MAINTENANCE_MODE` | Text | Set to `true` when you need full-site maintenance mode |
 | `MAINTENANCE_NOTICE` | Text | Maintenance announcement text |
-| `D1_BINDING_NAME` | Text | Only set this when the D1 binding name is not `DB` / `NCT_DB` |
+| `D1_BINDING_NAME` | Text | Only set this when the D1 binding name is not `NCT_DB` / `DB` |
 | `RATE_LIMIT_REDIS_URL` | Secret | Recommended for multi-instance deployments |
 
-### 5. Bind D1 in the Cloudflare Dashboard
+### 5. Deploy D1
 
-If you want to bind a D1 database directly in the Cloudflare web UI, follow these steps:
+Default deployment flow:
 
-1. Log in to the Cloudflare Dashboard and open `Workers & Pages`
-2. Select this project
-3. Open `Settings -> Bindings`
-4. Click `Add binding`
-5. Choose `D1 database`
-6. Enter the binding name in `Variable name`; using `DB` is recommended
-7. Select your D1 database from the dropdown
-8. Click `Add binding`
-9. Redeploy the project so the new binding takes effect
-
-Additional notes:
-
-- If you do not use the default binding name `DB` or `NCT_DB`, also set the `D1_BINDING_NAME` environment variable
-- If your project uses separate Preview / Production environments, check the D1 binding for each environment
-
-Important:
-
-- Cloudflare's official docs support both adding a D1 binding in the Dashboard and defining it in the Wrangler configuration file
-- This project recommends writing `d1_databases` into [`wrangler.jsonc`](./wrangler.jsonc) and treating the config file as the deployment source of truth
-- If you only bind D1 manually in the Cloudflare Dashboard and do not write the same binding back to `wrangler.jsonc`, then after future redeploys, project rebuilds, Worker / Pages recreation, or environment changes, you should treat “go back to the Dashboard and manually verify / re-bind D1” as a default step
-- In other words: to avoid having to manually re-bind D1 after each Workers redeploy, it is best to eventually write the configuration back into `wrangler.jsonc`
+1. Keep the repository copy of [`wrangler.jsonc`](./wrangler.jsonc) unchanged. It already contains the minimal D1 binding:
 
 ```jsonc
 "d1_databases": [
   {
-    "binding": "DB",
-    "database_name": "nct",
+    "binding": "NCT_DB",
+    "migrations_dir": "migrations"
+  }
+]
+```
+
+2. Import the repository into Cloudflare `Workers & Pages`
+3. Add the runtime Variables / Secrets in `Settings -> Variables and Secrets`
+4. Deploy the project
+5. After the first deploy, open `Settings -> Bindings` and confirm that the `NCT_DB` binding is present
+
+If you want to use an existing D1 database in your own account:
+
+1. Open `Settings -> Bindings`
+2. Click `Add binding`
+3. Choose `D1 database`
+4. Set `Variable name` to `NCT_DB`
+5. Select the existing D1 database
+6. Save and redeploy once
+
+If you need to pin a specific existing D1 database in config, use the full form below:
+
+```jsonc
+"d1_databases": [
+  {
+    "binding": "NCT_DB",
+    "database_name": "<your-d1-database-name>",
     "database_id": "<your-d1-database-id>",
     "migrations_dir": "migrations"
   }
 ]
 ```
+
+Notes:
+
+- If the binding name is not `NCT_DB` or `DB`, also set `D1_BINDING_NAME`
+- If you use separate Preview / Production environments, verify the D1 binding in both places
+- A `D1` binding is not part of Variables / Secrets, so environment variables alone are not enough
 
 ### 6. D1 Tables and Common Queries
 

@@ -79,15 +79,15 @@ function normalizeNullableValue(value) {
 function getConfiguredBindingNames() {
   return [
     String(process.env.D1_BINDING_NAME || '').trim(),
-    'DB',
-    'NCT_DB'
+    'NCT_DB',
+    'DB'
   ].filter(Boolean);
 }
 
 function getFormSubmissionDatabaseBinding() {
   for (const bindingName of getConfiguredBindingNames()) {
     const binding = getRuntimeBinding(bindingName);
-    if (binding && typeof binding.prepare === 'function') {
+    if (binding && (typeof binding.prepare === 'function' || typeof binding.exec === 'function')) {
       return {
         binding,
         bindingName
@@ -112,6 +112,41 @@ async function getFormSubmissionTableColumns(binding) {
   );
 }
 
+async function runSchemaStatement(binding, sql) {
+  const normalizedSql = getTrimmedString(sql);
+  let execError = null;
+
+  if (typeof binding.exec === 'function') {
+    try {
+      return await binding.exec(normalizedSql);
+    } catch (error) {
+      execError = error;
+    }
+  }
+
+  if (typeof binding.prepare === 'function') {
+    const statement = binding.prepare(normalizedSql);
+
+    if (statement && typeof statement.run === 'function') {
+      return statement.run();
+    }
+
+    if (statement && typeof statement.bind === 'function') {
+      const boundStatement = statement.bind();
+
+      if (boundStatement && typeof boundStatement.run === 'function') {
+        return boundStatement.run();
+      }
+    }
+  }
+
+  if (execError) {
+    throw execError;
+  }
+
+  throw new FormSubmissionStorageUnavailableError('Configured D1 binding does not support schema initialization.');
+}
+
 async function reconcileFormSubmissionSchema(binding) {
   const existingColumns = await getFormSubmissionTableColumns(binding);
 
@@ -120,7 +155,7 @@ async function reconcileFormSubmissionSchema(binding) {
       continue;
     }
 
-    await binding.exec(definition.alterSql);
+    await runSchemaStatement(binding, definition.alterSql);
     existingColumns.add(definition.name);
   }
 }
@@ -135,13 +170,13 @@ async function ensureFormSubmissionSchema(binding) {
     return cachedReadyPromise;
   }
 
-  if (typeof binding.exec !== 'function') {
+  if (typeof binding.exec !== 'function' && typeof binding.prepare !== 'function') {
     throw new FormSubmissionStorageUnavailableError('Configured D1 binding does not support schema initialization.');
   }
 
   const readyPromise = Promise.resolve()
     .then(async () => {
-      await binding.exec(CREATE_TABLE_STATEMENT);
+      await runSchemaStatement(binding, CREATE_TABLE_STATEMENT);
       await reconcileFormSubmissionSchema(binding);
     })
     .catch((error) => {
