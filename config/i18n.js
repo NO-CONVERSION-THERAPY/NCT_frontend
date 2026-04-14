@@ -633,7 +633,9 @@ const messages = {
         google: 'Google Form'
       },
       links: {
-        submitErrorPreview: '查看提交失败页预览'
+        submitErrorPreview: '查看提交失败页预览',
+        submitPreview: '查看提交预览页',
+        submitConfirm: '查看提交确认页'
       }
     },
     data: {
@@ -1258,7 +1260,9 @@ const messages = {
         google: 'Google Form'
       },
       links: {
-        submitErrorPreview: '查看提交失敗頁預覽'
+        submitErrorPreview: '查看提交失敗頁預覽',
+        submitPreview: '查看提交預覽頁',
+        submitConfirm: '查看提交確認頁'
       }
     },
     data: {
@@ -1883,7 +1887,9 @@ const messages = {
         google: 'Google Form'
       },
       links: {
-        submitErrorPreview: 'Open submission error preview'
+        submitErrorPreview: 'Open submission error preview',
+        submitPreview: 'Open submission preview',
+        submitConfirm: 'Open submission confirmation'
       }
     },
     data: {

@@ -22,7 +22,13 @@ const {
   createRateLimiter,
   sensitiveRobotsPolicy
 } = require('../../config/security');
-const { buildGoogleFormPrefillUrl } = require('../services/formService');
+const {
+  buildConfirmationFields,
+  buildGoogleFormFields,
+  buildGoogleFormPrefillUrl,
+  encodeGoogleFormFields
+} = require('../services/formService');
+const { issueFormConfirmationToken } = require('../services/formConfirmationService');
 
 function translateWithFallback(t, key, fallbackValue = '') {
   if (typeof t !== 'function') {
@@ -124,6 +130,87 @@ function buildDebugSubmitErrorPreviewUrl(googleFormUrl) {
   }).toString();
 
   return buildGoogleFormPrefillUrl(googleFormUrl, samplePayload);
+}
+
+function encodeDebugConfirmationPayload(confirmationState) {
+  return Buffer.from(JSON.stringify(confirmationState || {}), 'utf8').toString('base64url');
+}
+
+function buildDebugSampleSubmissionValues(t) {
+  return {
+    birthDate: '2008-01-01',
+    googleFormAge: 17,
+    birthYear: '2008',
+    birthMonth: '1',
+    birthDay: '1',
+    provinceCode: '350000',
+    province: translateWithFallback(t, 'data.provinceNames.350000', '福建'),
+    cityCode: '350500',
+    city: '泉州市',
+    countyCode: '350504',
+    county: '洛江区',
+    schoolName: 'Debug Preview Academy',
+    identity: translateWithFallback(t, 'form.identityOptions.self', 'Survivor'),
+    sex: translateWithFallback(t, 'form.sexOptions.male', 'Male'),
+    schoolAddress: 'Debug Road 12, Luojiang District',
+    experience: 'Debug preview sample content for layout and localization checks.',
+    dateStart: '2026-04-21',
+    dateEnd: '2026-04-25',
+    headmasterName: 'Debug Principal',
+    contactInformation: 'debug-preview@example.com',
+    scandal: 'Debug-only scandal summary placeholder.',
+    other: 'Debug-only additional notes placeholder.'
+  };
+}
+
+function buildDebugSubmitPreviewModel({ googleFormUrl, t }) {
+  const values = buildDebugSampleSubmissionValues(t);
+  const fields = buildGoogleFormFields(values, t);
+
+  return {
+    backFormUrl: '/debug',
+    encodedPayload: encodeGoogleFormFields(fields),
+    fields,
+    googleFormUrl: redactGoogleFormUrlForDebug(googleFormUrl)
+  };
+}
+
+function buildDebugSubmitConfirmModel({ formProtectionSecret, t }) {
+  const values = buildDebugSampleSubmissionValues(t);
+  const encodedPayload = encodeGoogleFormFields(buildGoogleFormFields(values, t));
+  const confirmationPayload = encodeDebugConfirmationPayload({
+    encodedPayload,
+    submissionValues: values
+  });
+
+  return {
+    backFormUrl: '/debug',
+    confirmAction: '/debug/submit-confirm',
+    confirmationPayload,
+    confirmationToken: issueFormConfirmationToken({
+      payload: confirmationPayload,
+      secret: formProtectionSecret
+    }),
+    fields: buildConfirmationFields(values, t).filter((field) => String(field && field.value || '').trim())
+  };
+}
+
+function buildDebugSubmissionDiagnostics(t) {
+  const attemptedTargets = [
+    { id: 'google', label: t('submitStatus.targets.google') },
+    { id: 'd1', label: t('submitStatus.targets.d1') }
+  ];
+
+  return {
+    attemptedTargets,
+    successfulTargets: attemptedTargets.filter((target) => target.id === 'google'),
+    failedTargets: attemptedTargets
+      .filter((target) => target.id === 'd1')
+      .map((target) => ({
+        ...target,
+        error: 'Debug simulation skipped the real D1 write.'
+      }))
+  };
 }
 
 function redactGoogleFormUrlForDebug(googleFormUrl) {
@@ -532,8 +619,21 @@ function createPageRoutes({
         translationProviderTimeoutMs,
         trustProxy
       }),
+      debugTools: [
+        {
+          href: '/debug/submit-error',
+          label: req.t('debug.links.submitErrorPreview')
+        },
+        {
+          href: '/debug/submit-preview',
+          label: req.t('debug.links.submitPreview')
+        },
+        {
+          href: '/debug/submit-confirm',
+          label: req.t('debug.links.submitConfirm')
+        }
+      ],
       debugMode: debugMod,
-      submitErrorPreviewUrl: '/debug/submit-error',
       title: req.t('pageTitles.debug', { title })
     });
   });
@@ -545,11 +645,58 @@ function createPageRoutes({
 
     applySensitivePageHeaders(res);
     res.render('submit_error', {
+      backFormUrl: '/debug',
       fallbackUrl: buildDebugSubmitErrorPreviewUrl(googleFormUrl),
       pageRobots: sensitiveRobotsPolicy,
       showSubmissionDiagnostics: false,
       submissionDiagnostics: null,
       title: req.t('pageTitles.submitError', { title })
+    });
+  });
+
+  router.get('/debug/submit-preview', pageReadLimiter, (req, res) => {
+    if (debugMod !== 'true') {
+      return res.status(404).send(req.t('common.notFound'));
+    }
+
+    applySensitivePageHeaders(res);
+    res.render('submit_preview', {
+      ...buildDebugSubmitPreviewModel({
+        googleFormUrl,
+        t: req.t
+      }),
+      pageRobots: sensitiveRobotsPolicy,
+      title: req.t('pageTitles.submitPreview', { title })
+    });
+  });
+
+  router.get('/debug/submit-confirm', pageReadLimiter, (req, res) => {
+    if (debugMod !== 'true') {
+      return res.status(404).send(req.t('common.notFound'));
+    }
+
+    applySensitivePageHeaders(res);
+    res.render('submit_confirm', {
+      ...buildDebugSubmitConfirmModel({
+        formProtectionSecret,
+        t: req.t
+      }),
+      pageRobots: sensitiveRobotsPolicy,
+      title: req.t('pageTitles.submitConfirm', { title })
+    });
+  });
+
+  router.post('/debug/submit-confirm', (req, res) => {
+    if (debugMod !== 'true') {
+      return res.status(404).send(req.t('common.notFound'));
+    }
+
+    applySensitivePageHeaders(res);
+    res.render('submit', {
+      pageRobots: sensitiveRobotsPolicy,
+      showSubmissionDiagnostics: true,
+      submissionDiagnostics: buildDebugSubmissionDiagnostics(req.t),
+      title: req.t('common.siteName')
     });
   });
 

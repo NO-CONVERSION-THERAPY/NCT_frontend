@@ -344,10 +344,12 @@ h3 {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: fit-content;
+    width: 100%;
     max-width: 100%;
+    align-self: stretch;
     min-height: 2.9rem;
     padding: 0.85rem 1.15rem;
+    box-sizing: border-box;
     border-radius: 14px;
     border: 1px solid var(--secondary-button-border);
     background: linear-gradient(135deg, var(--secondary-button-bg-start), var(--secondary-button-bg-end));
@@ -358,6 +360,11 @@ h3 {
     font-size: 0.95rem;
     font-weight: 700;
     letter-spacing: 0.01em;
+    line-height: 1.35;
+    text-align: center;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
     transition:
         transform 0.18s ease,
         border-color 0.18s ease,
@@ -389,6 +396,7 @@ h3 {
     margin: 0 auto 1.25rem;
     text-align: center;
     color: var(--text-muted);
+    overflow-wrap: anywhere;
 }
 
 .privacy-page__eyebrow {
@@ -401,11 +409,29 @@ h3 {
     color: var(--primary);
 }
 
+.privacy-page {
+    display: grid;
+    gap: 1.25rem;
+}
+
+.privacy-page > .div {
+    margin: 0;
+    min-width: 0;
+}
+
 .privacy-hero {
     padding: 1.6rem 1.7rem;
     background:
         radial-gradient(circle at top right, rgba(52, 152, 219, 0.14), transparent 34%),
         linear-gradient(180deg, var(--surface-elevated), var(--surface-soft));
+}
+
+.privacy-hero h1 {
+    margin: 0 0 1rem;
+    font-size: clamp(2rem, 6vw, 3.9rem);
+    line-height: 1.12;
+    letter-spacing: 0.01em;
+    overflow-wrap: anywhere;
 }
 
 .privacy-meta {
@@ -434,8 +460,10 @@ h3 {
 
 .privacy-meta__row dd {
     margin: 0;
+    min-width: 0;
     color: var(--text);
     font-weight: 600;
+    overflow-wrap: anywhere;
 }
 
 .privacy-toc {
@@ -455,6 +483,7 @@ h3 {
     color: var(--text);
     font-weight: 600;
     box-shadow: var(--shadow-soft);
+    overflow-wrap: anywhere;
 }
 
 .privacy-toc__link:hover {
@@ -1350,8 +1379,9 @@ button:hover { background: var(--button-hover); }
     align-items: center;
     justify-content: flex-end;
     gap: 0.55rem;
-    flex-shrink: 0;
+    flex: 0 1 auto;
     min-width: 0;
+    max-width: 100%;
 }
 
 .map-record-summary__title {
@@ -1368,7 +1398,10 @@ button:hover { background: var(--button-hover); }
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
+    box-sizing: border-box;
+    flex-shrink: 1;
+    min-width: 0;
+    max-width: 100%;
     min-height: 1.9rem;
     padding: 0.2rem 0.58rem;
     border: 1px solid rgba(52, 152, 219, 0.18);
@@ -1381,7 +1414,9 @@ button:hover { background: var(--button-hover); }
     line-height: 1.1;
     text-align: center;
     text-decoration: none;
-    white-space: nowrap;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 .map-record-summary__detail-button:hover,
@@ -1402,6 +1437,7 @@ button:hover { background: var(--button-hover); }
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    max-width: 100%;
     padding: 0.28rem 0.58rem;
     border-radius: 999px;
     background: linear-gradient(135deg, rgba(52, 152, 219, 0.08), rgba(93, 173, 226, 0.18));
@@ -1409,6 +1445,7 @@ button:hover { background: var(--button-hover); }
     font-size: 0.76rem;
     font-weight: 700;
     line-height: 1.35;
+    white-space: normal;
     word-break: break-word;
 }
 
@@ -2246,6 +2283,7 @@ a:hover {
     margin: 1.2rem auto 2rem;
     padding: 1rem 1.15rem;
     box-sizing: border-box;
+    max-width: 100%;
     align-items: center;
     text-align: center;
     color: var(--text-muted);
@@ -2253,6 +2291,8 @@ a:hover {
 
 .site-footer__meta {
     margin: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
 }
 
 .site-footer__links {
@@ -2260,6 +2300,7 @@ a:hover {
     flex-wrap: wrap;
     justify-content: center;
     gap: 0.9rem;
+    max-width: 100%;
 }
 
 .form-page .site-footer {
@@ -2930,6 +2971,20 @@ hr {
         margin-top: 1rem;
     }
 
+    .privacy-toc {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.65rem;
+    }
+
+    .privacy-toc__link {
+        justify-content: center;
+        min-height: 3.4rem;
+        padding: 0.75rem 0.78rem;
+        font-size: 0.9rem;
+        line-height: 1.35;
+        text-align: center;
+    }
+
     .friends-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 1rem;
@@ -2940,9 +2995,20 @@ hr {
         border-radius: 20px;
     }
 
+    .friend-card__link {
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 0.9rem;
+    }
+
     .friend-card__avatar {
         width: 64px;
         height: 64px;
+        flex-shrink: 0;
+    }
+
+    .friend-card__body {
+        gap: 0.65rem;
     }
 
     .friend-card__name {
@@ -3063,7 +3129,7 @@ hr {
         padding: 0.8rem 0.88rem 0.66rem;
         flex-direction: row;
         flex-wrap: wrap;
-        align-items: center;
+        align-items: flex-start;
     }
 
     .map-record-summary::before {
@@ -3074,11 +3140,34 @@ hr {
 
     .map-record-summary__title-group {
         flex: 1 1 calc(100% - 1.5rem);
+        width: 100%;
     }
 
     .map-record-summary__title {
         font-size: clamp(0.96rem, 4.8vw, 1.18rem);
         line-height: 1.2;
+    }
+
+    .map-record-summary__actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 6.8rem));
+        flex: 1 1 100%;
+        width: 100%;
+        justify-content: flex-start;
+        gap: 0.5rem;
+    }
+
+    .map-record-summary__detail-button {
+        width: 100%;
+        flex: 0 0 auto;
+        max-width: 100%;
+        min-height: 2.3rem;
+        padding: 0.42rem 0.58rem;
+        font-size: 0.72rem;
+        line-height: 1.15;
+        white-space: nowrap;
+        overflow-wrap: normal;
+        word-break: keep-all;
     }
 
     .map-record-summary__count {
@@ -3087,8 +3176,11 @@ hr {
     }
 
     .map-record-summary__tag {
+        grid-column: 1 / -1;
+        flex: 1 1 100%;
         max-width: 100%;
-        margin-left: calc(0.8rem + 0.7rem);
+        margin-left: 0;
+        justify-content: flex-start;
     }
 
     .map-record-body {
@@ -3156,13 +3248,42 @@ hr {
         padding: 1rem 0.95rem;
     }
 
+    .privacy-page {
+        gap: 0.9rem;
+    }
+
+    .privacy-page__eyebrow {
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+    }
+
+    .privacy-hero h1 {
+        font-size: clamp(1.9rem, 11vw, 2.55rem);
+        line-height: 1.16;
+    }
+
+    .privacy-page__intro {
+        font-size: 0.98rem;
+    }
+
     .privacy-meta {
         grid-template-columns: 1fr;
     }
 
-    .privacy-highlight-grid,
-    .privacy-toc {
+    .privacy-highlight-grid {
         grid-template-columns: 1fr;
+    }
+
+    .privacy-toc {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.55rem;
+    }
+
+    .privacy-toc__link {
+        min-height: 3.1rem;
+        padding: 0.68rem 0.58rem;
+        font-size: 0.82rem;
+        line-height: 1.3;
     }
 
     .privacy-cookie-list__row {
@@ -3185,12 +3306,19 @@ hr {
     }
 
     .friend-card__link {
-        gap: 0.95rem;
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 0.82rem;
     }
 
     .friend-card__avatar {
         width: 60px;
         height: 60px;
+        flex-shrink: 0;
+    }
+
+    .friend-card__body {
+        gap: 0.55rem;
     }
 
     .friend-card__name {
@@ -3265,6 +3393,17 @@ hr {
     .map-record-summary__title {
         font-size: 0.95rem;
         line-height: 1.18;
+    }
+
+    .map-record-summary__actions {
+        grid-template-columns: repeat(2, minmax(0, 6.2rem));
+        gap: 0.42rem;
+    }
+
+    .map-record-summary__detail-button {
+        min-height: 2.2rem;
+        padding: 0.38rem 0.5rem;
+        font-size: 0.64rem;
     }
 
     .map-record-summary__count {

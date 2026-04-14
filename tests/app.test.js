@@ -863,6 +863,8 @@ test('debug page renders when debug mode is enabled', async () => {
   assert.equal(response.statusCode, 200);
   assert.match(response.body, /调试|Debug/);
   assert.match(response.body, /href="\/debug\/submit-error"/);
+  assert.match(response.body, /href="\/debug\/submit-preview"/);
+  assert.match(response.body, /href="\/debug\/submit-confirm"/);
   assert.match(response.body, /站点配置|Site Configuration/);
 });
 
@@ -876,6 +878,8 @@ test('debug page respects explicit language selection', async () => {
   assert.match(englishResponse.body, /Back to Home/);
   assert.match(englishResponse.body, /Site Configuration/);
   assert.match(englishResponse.body, /Open submission error preview/);
+  assert.match(englishResponse.body, /Open submission preview/);
+  assert.match(englishResponse.body, /Open submission confirmation/);
   assert.match(String(englishResponse.headers['set-cookie']), /lang=en/);
 
   assert.equal(traditionalChineseResponse.statusCode, 200);
@@ -883,6 +887,8 @@ test('debug page respects explicit language selection', async () => {
   assert.match(traditionalChineseResponse.body, /返回首頁/);
   assert.match(traditionalChineseResponse.body, /站點配置/);
   assert.match(traditionalChineseResponse.body, /查看提交失敗頁預覽/);
+  assert.match(traditionalChineseResponse.body, /查看提交預覽頁/);
+  assert.match(traditionalChineseResponse.body, /查看提交確認頁/);
   assert.match(String(traditionalChineseResponse.headers['set-cookie']), /lang=zh-TW/);
 });
 
@@ -906,6 +912,15 @@ test('standalone submit error preview is hidden when debug mode is disabled', as
   assert.equal(response.statusCode, 404);
 });
 
+test('standalone submit preview and confirmation debug routes are hidden when debug mode is disabled', async () => {
+  const app = loadApp({ DEBUG_MOD: 'false' });
+  const previewResponse = await requestPath(app, '/debug/submit-preview');
+  const confirmResponse = await requestPath(app, '/debug/submit-confirm');
+
+  assert.equal(previewResponse.statusCode, 404);
+  assert.equal(confirmResponse.statusCode, 404);
+});
+
 test('standalone submit error preview renders a prefilled Google Form link when debug mode is enabled', async () => {
   const app = loadApp({ DEBUG_MOD: 'true' });
   const response = await requestPath(app, '/debug/submit-error');
@@ -914,6 +929,41 @@ test('standalone submit error preview renders a prefilled Google Form link when 
   assert.match(response.body, /viewform\?usp=pp_url&amp;entry\.842223433=11/);
   assert.match(response.body, /entry\.1422578992=%E7%94%B7/);
   assert.match(response.body, /打开 Google Form 页面可能需要网络代理|opening the Google Form page may require a network proxy/);
+});
+
+test('standalone submit preview debug route renders mock preview data when debug mode is enabled', async () => {
+  const app = loadApp({ DEBUG_MOD: 'true' });
+  const response = await requestPath(app, '/debug/submit-preview');
+
+  assert.equal(response.statusCode, 200);
+  assert.match(response.body, /提交预览|Submission Preview/);
+  assert.match(response.body, /Debug Preview Academy/);
+  assert.match(response.body, /debug-preview@example\.com/);
+  assert.match(response.body, /href="\/debug"/);
+});
+
+test('standalone submit confirm debug route renders mock confirmation data and supports simulated submit', async () => {
+  const app = loadApp({ DEBUG_MOD: 'true' });
+  const getResponse = await requestPath(app, '/debug/submit-confirm');
+
+  assert.equal(getResponse.statusCode, 200);
+  assert.match(getResponse.body, /提交确认|Submission Confirmation/);
+  assert.match(getResponse.body, /Debug Preview Academy/);
+  assert.match(getResponse.body, /action="\/debug\/submit-confirm"/);
+  assert.match(getResponse.body, /href="\/debug"/);
+
+  const postResponse = await requestApp(app, {
+    path: '/debug/submit-confirm',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: 'confirmation_token=debug&confirmation_payload=debug'
+  });
+
+  assert.equal(postResponse.statusCode, 200);
+  assert.match(postResponse.body, /提交成功|Submission Successful/);
+  assert.match(postResponse.body, /调试提交结果|Debug Submission Result|调試提交結果/);
 });
 
 test('standalone submit error preview respects explicit language selection', async () => {

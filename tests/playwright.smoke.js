@@ -461,6 +461,28 @@ test('playwright smoke screenshots cover page routes and submission flows', asyn
           },
           manifestEntries
         });
+
+        await capturePageScreenshot({
+          baseUrl,
+          browser,
+          fileName: 'submit-preview-debug',
+          pathName: '/debug/submit-preview',
+          ready: async (page) => {
+            await page.waitForSelector('.preview-container', { timeout: NAVIGATION_TIMEOUT_MS });
+          },
+          manifestEntries
+        });
+
+        await capturePageScreenshot({
+          baseUrl,
+          browser,
+          fileName: 'submit-confirm-debug',
+          pathName: '/debug/submit-confirm',
+          ready: async (page) => {
+            await page.waitForSelector('.confirm-container', { timeout: NAVIGATION_TIMEOUT_MS });
+          },
+          manifestEntries
+        });
       });
     });
 

@@ -120,7 +120,7 @@
                 <% if (fallbackUrl) { %>
                     <div class="submit-error-actions">
                         <a href="<%= fallbackUrl %>" target="_blank" rel="noopener noreferrer"><%= t('submitError.openFallback') %></a>
-                        <a href="/form"><%= t('submitError.backForm') %></a>
+                        <a href="<%= typeof backFormUrl !== 'undefined' && backFormUrl ? backFormUrl : '/form' %>"><%= t('submitError.backForm') %></a>
                     </div>
                     <p class="submit-error-note"><%= t('submitError.privacyNote') %></p>
                     <p class="submit-error-note"><%= t('submitError.proxyNote') %></p>
@@ -128,7 +128,7 @@
                     <textarea id="fallbackUrlBox" class="submit-error-url" readonly><%= fallbackUrl %></textarea>
                 <% } else { %>
                     <div class="submit-error-actions">
-                        <a href="/form"><%= t('submitError.backForm') %></a>
+                        <a href="<%= typeof backFormUrl !== 'undefined' && backFormUrl ? backFormUrl : '/form' %>"><%= t('submitError.backForm') %></a>
                     </div>
                 <% } %>
             </div>
