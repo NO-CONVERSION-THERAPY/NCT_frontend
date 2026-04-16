@@ -2,6 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const { getAreaOptions } = require('../../config/areaSelector');
+const { getLocalizedInstitutionCorrectionRules } = require('../../config/institutionCorrectionConfig');
 const { getClientProvinceMetadata } = require('../../config/provinceMetadata');
 const {
   getLocalizedFormRules,
@@ -21,7 +22,14 @@ const {
   createRateLimiter,
   sensitiveRobotsPolicy
 } = require('../../config/security');
-const { buildGoogleFormPrefillUrl } = require('../services/formService');
+const {
+  buildConfirmationFields,
+  buildGoogleFormFields,
+  buildGoogleFormPrefillUrl,
+  encodeGoogleFormFields
+} = require('../services/formService');
+const { issueFormConfirmationToken } = require('../services/formConfirmationService');
+const { buildInstitutionCorrectionGoogleFormFields } = require('../services/institutionCorrectionService');
 
 function translateWithFallback(t, key, fallbackValue = '') {
   if (typeof t !== 'function') {
@@ -125,6 +133,108 @@ function buildDebugSubmitErrorPreviewUrl(googleFormUrl) {
   return buildGoogleFormPrefillUrl(googleFormUrl, samplePayload);
 }
 
+function encodeDebugConfirmationPayload(confirmationState) {
+  return Buffer.from(JSON.stringify(confirmationState || {}), 'utf8').toString('base64url');
+}
+
+function buildDebugSampleSubmissionValues(t) {
+  return {
+    birthDate: '2008-01-01',
+    googleFormAge: 17,
+    birthYear: '2008',
+    birthMonth: '1',
+    birthDay: '1',
+    provinceCode: '350000',
+    province: translateWithFallback(t, 'data.provinceNames.350000', '福建'),
+    cityCode: '350500',
+    city: '泉州市',
+    countyCode: '350504',
+    county: '洛江区',
+    schoolName: t('debug.samples.form.schoolName'),
+    identity: translateWithFallback(t, 'form.identityOptions.self', 'Survivor'),
+    sex: translateWithFallback(t, 'form.sexOptions.male', 'Male'),
+    schoolAddress: t('debug.samples.form.schoolAddress'),
+    experience: t('debug.samples.form.experience'),
+    dateStart: '2026-04-21',
+    dateEnd: '2026-04-25',
+    headmasterName: t('debug.samples.form.headmasterName'),
+    contactInformation: t('debug.samples.form.contactInformation'),
+    scandal: t('debug.samples.form.scandal'),
+    other: t('debug.samples.form.other')
+  };
+}
+
+function buildDebugSubmitPreviewModel({ googleFormUrl, t }) {
+  const values = buildDebugSampleSubmissionValues(t);
+  const fields = buildGoogleFormFields(values, t);
+
+  return {
+    backFormUrl: '/debug',
+    encodedPayload: encodeGoogleFormFields(fields),
+    fields,
+    googleFormUrl: redactGoogleFormUrlForDebug(googleFormUrl)
+  };
+}
+
+function buildDebugSubmitConfirmModel({ formProtectionSecret, t }) {
+  const values = buildDebugSampleSubmissionValues(t);
+  const encodedPayload = encodeGoogleFormFields(buildGoogleFormFields(values, t));
+  const confirmationPayload = encodeDebugConfirmationPayload({
+    encodedPayload,
+    submissionValues: values
+  });
+
+  return {
+    backFormUrl: '/debug',
+    confirmAction: '/debug/submit-confirm',
+    confirmationPayload,
+    confirmationToken: issueFormConfirmationToken({
+      payload: confirmationPayload,
+      secret: formProtectionSecret
+    }),
+    fields: buildConfirmationFields(values, t).filter((field) => String(field && field.value || '').trim())
+  };
+}
+
+function buildDebugSubmissionDiagnostics(t) {
+  const attemptedTargets = [
+    { id: 'google', label: t('submitStatus.targets.google') },
+    { id: 'd1', label: t('submitStatus.targets.d1') }
+  ];
+
+  return {
+    attemptedTargets,
+    successfulTargets: attemptedTargets.filter((target) => target.id === 'google'),
+    failedTargets: attemptedTargets
+      .filter((target) => target.id === 'd1')
+      .map((target) => ({
+        ...target,
+        error: t('debug.samples.d1SkippedError')
+      }))
+  };
+}
+
+function buildDebugInstitutionCorrectionSampleValues(t) {
+  return {
+    schoolName: t('debug.samples.correction.schoolName'),
+    provinceCode: '350000',
+    province: translateWithFallback(t, 'data.provinceNames.350000', '福建'),
+    cityCode: '350500',
+    city: '泉州市',
+    countyCode: '350504',
+    county: '洛江区',
+    schoolAddress: t('debug.samples.correction.schoolAddress'),
+    contactInformation: t('debug.samples.correction.contactInformation'),
+    headmasterName: t('debug.samples.correction.headmasterName'),
+    correctionContent: t('debug.samples.correction.correctionContent')
+  };
+}
+
+function buildDebugCorrectionSubmitErrorPreviewUrl({ correctionGoogleFormUrl, t }) {
+  const fields = buildInstitutionCorrectionGoogleFormFields(buildDebugInstitutionCorrectionSampleValues(t), t);
+  return buildGoogleFormPrefillUrl(correctionGoogleFormUrl, encodeGoogleFormFields(fields));
+}
+
 function redactGoogleFormUrlForDebug(googleFormUrl) {
   const normalizedUrl = String(googleFormUrl || '').trim();
 
@@ -185,8 +295,11 @@ function redactRedisUrlForDebug(redisUrl) {
 function buildDebugSections({
   apiUrl,
   assetVersion,
+  correctionGoogleFormUrl,
+  correctionSubmitTarget,
   debugMod,
   formDryRun,
+  formSubmitTarget,
   formProtectionMaxAgeMs,
   formProtectionMinFillMs,
   formProtectionSecretConfigured,
@@ -251,6 +364,16 @@ function buildDebugSections({
           badgeTone: formDryRun ? 'positive' : 'neutral'
         },
         {
+          label: t('debug.labels.formSubmitTarget'),
+          value: t(`debug.submitTargets.${formSubmitTarget}`),
+          badgeTone: 'neutral'
+        },
+        {
+          label: t('debug.labels.correctionSubmitTarget'),
+          value: t(`debug.submitTargets.${correctionSubmitTarget}`),
+          badgeTone: 'neutral'
+        },
+        {
           label: t('debug.labels.maintenanceMode'),
           value: maintenanceMode ? statusValue.enabled : statusValue.disabled,
           badgeTone: maintenanceMode ? 'caution' : 'neutral',
@@ -271,6 +394,12 @@ function buildDebugSections({
           value: googleFormUrl ? statusValue.configured : statusValue.missing,
           badgeTone: googleFormUrl ? 'positive' : 'caution',
           hint: redactGoogleFormUrlForDebug(googleFormUrl)
+        },
+        {
+          label: t('debug.labels.correctionGoogleForm'),
+          value: correctionGoogleFormUrl ? statusValue.configured : statusValue.missing,
+          badgeTone: correctionGoogleFormUrl ? 'positive' : 'caution',
+          hint: redactGoogleFormUrlForDebug(correctionGoogleFormUrl)
         },
         {
           label: t('debug.labels.googleScript'),
@@ -342,8 +471,11 @@ function buildDebugSections({
 // 页面路由只负责渲染模板，不承载表单提交或 API 逻辑。
 function createPageRoutes({
   apiUrl,
+  correctionGoogleFormUrl,
+  correctionSubmitTarget,
   debugMod,
   formDryRun,
+  formSubmitTarget,
   formProtectionMaxAgeMs,
   formProtectionMinFillMs,
   formProtectionSecret,
@@ -426,6 +558,28 @@ function createPageRoutes({
     });
   });
 
+  router.get(['/map/correction', '/correction'], pageReadLimiter, (req, res) => {
+    const t = req.t;
+    const { provinces } = getAreaOptions(req.lang);
+    const institutionCorrectionRules = getLocalizedInstitutionCorrectionRules(t);
+    const initialSchoolName = typeof req.query.school_name === 'string'
+      ? req.query.school_name.trim().slice(0, institutionCorrectionRules.schoolName.maxLength)
+      : '';
+    const correctionBasePath = req.path.startsWith('/correction') ? '/correction' : '/map/correction';
+
+    applySensitivePageHeaders(res);
+    res.render('institution_correction', {
+      title: t('pageTitles.institutionCorrection', { title }),
+      apiUrl,
+      areaOptions: { provinces },
+      correctionFormAction: `${correctionBasePath}/submit`,
+      formProtectionToken: issueFormProtectionToken({ secret: formProtectionSecret }),
+      initialSchoolName,
+      institutionCorrectionRules,
+      pageRobots: sensitiveRobotsPolicy
+    });
+  });
+
   // 地圖頁：展示汇总后的机构数据。
   router.get('/map', pageReadLimiter, (req, res) => {
     res.render('map', {
@@ -475,8 +629,11 @@ function createPageRoutes({
       debugSections: buildDebugSections({
         apiUrl,
         assetVersion: req.app.locals.assetVersion,
+        correctionGoogleFormUrl,
+        correctionSubmitTarget,
         debugMod,
         formDryRun,
+        formSubmitTarget,
         formProtectionMaxAgeMs,
         formProtectionMinFillMs,
         formProtectionSecretConfigured,
@@ -503,8 +660,29 @@ function createPageRoutes({
         translationProviderTimeoutMs,
         trustProxy
       }),
+      debugTools: [
+        {
+          href: '/debug/submit-error',
+          label: req.t('debug.links.submitErrorPreview')
+        },
+        {
+          href: '/debug/submit-preview',
+          label: req.t('debug.links.submitPreview')
+        },
+        {
+          href: '/debug/submit-confirm',
+          label: req.t('debug.links.submitConfirm')
+        },
+        {
+          href: '/debug/correction-submit-success',
+          label: req.t('debug.links.correctionSubmitSuccessPreview')
+        },
+        {
+          href: '/debug/correction-submit-error',
+          label: req.t('debug.links.correctionSubmitErrorPreview')
+        }
+      ],
       debugMode: debugMod,
-      submitErrorPreviewUrl: '/debug/submit-error',
       title: req.t('pageTitles.debug', { title })
     });
   });
@@ -516,9 +694,92 @@ function createPageRoutes({
 
     applySensitivePageHeaders(res);
     res.render('submit_error', {
+      backFormUrl: '/debug',
       fallbackUrl: buildDebugSubmitErrorPreviewUrl(googleFormUrl),
       pageRobots: sensitiveRobotsPolicy,
+      showSubmissionDiagnostics: false,
+      submissionDiagnostics: null,
       title: req.t('pageTitles.submitError', { title })
+    });
+  });
+
+  router.get('/debug/submit-preview', pageReadLimiter, (req, res) => {
+    if (debugMod !== 'true') {
+      return res.status(404).send(req.t('common.notFound'));
+    }
+
+    applySensitivePageHeaders(res);
+    res.render('submit_preview', {
+      ...buildDebugSubmitPreviewModel({
+        googleFormUrl,
+        t: req.t
+      }),
+      pageRobots: sensitiveRobotsPolicy,
+      title: req.t('pageTitles.submitPreview', { title })
+    });
+  });
+
+  router.get('/debug/submit-confirm', pageReadLimiter, (req, res) => {
+    if (debugMod !== 'true') {
+      return res.status(404).send(req.t('common.notFound'));
+    }
+
+    applySensitivePageHeaders(res);
+    res.render('submit_confirm', {
+      ...buildDebugSubmitConfirmModel({
+        formProtectionSecret,
+        t: req.t
+      }),
+      pageRobots: sensitiveRobotsPolicy,
+      title: req.t('pageTitles.submitConfirm', { title })
+    });
+  });
+
+  router.post('/debug/submit-confirm', (req, res) => {
+    if (debugMod !== 'true') {
+      return res.status(404).send(req.t('common.notFound'));
+    }
+
+    applySensitivePageHeaders(res);
+    res.render('submit', {
+      pageRobots: sensitiveRobotsPolicy,
+      showSubmissionDiagnostics: true,
+      submissionDiagnostics: buildDebugSubmissionDiagnostics(req.t),
+      title: req.t('common.siteName')
+    });
+  });
+
+  router.get('/debug/correction-submit-success', pageReadLimiter, (req, res) => {
+    if (debugMod !== 'true') {
+      return res.status(404).send(req.t('common.notFound'));
+    }
+
+    applySensitivePageHeaders(res);
+    res.render('institution_correction_submit', {
+      pageRobots: sensitiveRobotsPolicy,
+      showSubmissionDiagnostics: true,
+      submissionDiagnostics: buildDebugSubmissionDiagnostics(req.t),
+      title: req.t('pageTitles.institutionCorrectionSuccess', { title })
+    });
+  });
+
+  router.get('/debug/correction-submit-error', pageReadLimiter, (req, res) => {
+    if (debugMod !== 'true') {
+      return res.status(404).send(req.t('common.notFound'));
+    }
+
+    applySensitivePageHeaders(res);
+    res.render('institution_correction_submit_error', {
+      backFormUrl: '/debug',
+      errorMessage: req.t('institutionCorrection.errors.submitFailed'),
+      fallbackUrl: buildDebugCorrectionSubmitErrorPreviewUrl({
+        correctionGoogleFormUrl,
+        t: req.t
+      }),
+      pageRobots: sensitiveRobotsPolicy,
+      showSubmissionDiagnostics: true,
+      submissionDiagnostics: buildDebugSubmissionDiagnostics(req.t),
+      title: req.t('pageTitles.institutionCorrectionError', { title })
     });
   });
 

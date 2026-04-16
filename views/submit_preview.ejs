@@ -150,7 +150,7 @@
             <pre><%= encodedPayload %></pre>
 
             <div class="preview-actions">
-                <a href="/form"><%= t('submitPreview.backForm') %></a>
+                <a href="<%= typeof backFormUrl !== 'undefined' && backFormUrl ? backFormUrl : '/form' %>"><%= t('submitPreview.backForm') %></a>
             </div>
         </div>
         <%- include('partials/foot') %>

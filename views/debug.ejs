@@ -35,11 +35,13 @@
         <section class="debug-section" aria-label="<%= t('debug.sections.tools') %>">
             <h2 class="debug-section__title"><%= t('debug.sections.tools') %></h2>
             <div class="debug-grid">
-                <article class="div debug-card debug-card--wide">
-                    <p class="debug-card__label"><%= t('debug.links.submitErrorPreview') %></p>
-                    <a class="debug-card__link" href="<%= submitErrorPreviewUrl %>"><%= t('debug.links.submitErrorPreview') %></a>
-                    <p class="debug-card__hint"><%= submitErrorPreviewUrl %></p>
-                </article>
+                <% debugTools.forEach((tool) => { %>
+                    <article class="div debug-card">
+                        <p class="debug-card__label"><%= tool.label %></p>
+                        <a class="debug-card__link" href="<%= tool.href %>"><%= tool.label %></a>
+                        <p class="debug-card__hint"><%= tool.href %></p>
+                    </article>
+                <% }) %>
             </div>
         </section>
     </main>

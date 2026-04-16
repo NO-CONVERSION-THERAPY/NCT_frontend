@@ -68,6 +68,7 @@ N·C·T 是一個用來記錄、整理、公開展示「扭轉治療」相關機
 | 模組 | 說明 |
 | --- | --- |
 | 匿名表單 | 支援匿名提交，帶基礎防刷、限流與審計日誌 |
+| 機構修正 | 提供 `/map/correction` 補充 / 修正提交通道，並寫入 D1 |
 | 公開地圖 | 對外展示機構資料，並提供 `GET /api/map-data` 介面 |
 | 部落格內容 | 支援部落格列表、文章詳情與 Markdown 渲染 |
 | 多語言介面 | 支援簡體中文、繁體中文、英文，以及部分動態翻譯 |
@@ -82,7 +83,7 @@ N·C·T 是一個用來記錄、整理、公開展示「扭轉治療」相關機
 | 模板引擎 | EJS |
 | 前端 | 原生 JavaScript + Leaflet + Chart.js |
 | 部署運行時 | Node.js / Cloudflare Workers |
-| 資料寫入 | Google Form |
+| 資料寫入 | Google Form / D1（依配置啟用） |
 | 地圖資料源 | Google Apps Script 私有源，可回退到公開 API |
 | 翻譯能力 | Google Cloud Translation API，可選啟用 |
 | 配置安全 | 內建 `secure-config` 密文生成工具 |
@@ -103,16 +104,23 @@ flowchart TD
   A --> M[中介層<br/>Helmet / i18n / Maintenance / Body Parser]
   A --> P[頁面路由<br/>app/routes/pageRoutes.js]
   A --> F[表單路由<br/>app/routes/formRoutes.js]
+  A --> IC[機構修正路由<br/>app/routes/institutionCorrectionRoutes.js]
   A --> I[API 路由<br/>app/routes/apiRoutes.js]
 
   P --> V[視圖模板<br/>views/*.ejs]
   P --> C1[內容與站點資料<br/>blog/*.md / data.json / friends.json]
   P --> S1[站點輸出<br/>robots.txt / sitemap.xml]
 
-  F --> FS[formService<br/>表單校驗 + Google Form 欄位映射]
+  F --> FS[formService<br/>表單校驗 + 提交欄位整理]
   F --> FP[formProtectionService<br/>honeypot + 填寫耗時 token]
   F --> FC[formConfirmationService<br/>確認簽名]
+  F --> FD1[formSubmissionStorageService<br/>D1 儲存]
   F --> GF[(Google Form)]
+  F --> D1[(D1)]
+
+  IC --> FP
+  IC --> ICS[institutionCorrectionService<br/>校驗 + D1 持久化]
+  ICS --> D1
 
   I --> MD[mapDataService<br/>地圖快取 + 私有源優先 + 公開源回退]
   I --> TS[textTranslationService<br/>翻譯快取 + 冷卻機制]
@@ -132,7 +140,7 @@ flowchart TD
 補充說明：
 
 - Node.js 與 Workers 共用同一套 Express 業務邏輯，Workers 只在入口層額外保護大 JSON 響應。
-- 頁面、表單、API 三類路由分開管理，主要業務邏輯沉到 `service` 層。
+- 頁面、匿名表單、機構修正、API 四類路由分開管理，主要業務邏輯沉到 `service` 層。
 - 地圖頁、表單聯動與自動補全共用 `/api/*` 能力，避免維護多套資料入口。
 
 ## 倉庫結構
@@ -149,8 +157,13 @@ flowchart TD
 ├── public/                # 靜態資源、GeoJSON、前端腳本與樣式
 ├── views/                 # EJS 模板
 ├── blog/                  # Markdown 部落格文章
+├── migrations/            # D1 資料庫遷移
 ├── scripts/               # 運維腳本，例如 secure-config
 ├── tests/                 # 自動化測試
+├── data.json              # 部落格索引等站點資料
+├── friends.json           # 關於頁友鏈 / 致謝資料
+├── server.js              # Vercel / Node 相容入口
+├── vercel.json            # Vercel 部署配置
 └── worker.mjs             # Cloudflare Workers 入口
 ```
 
@@ -169,7 +182,6 @@ npm install
 Node 模式：
 
 ```bash
-cp .env.example .env
 npm start
 ```
 
@@ -182,9 +194,10 @@ npm run dev:workers
 
 建議：
 
-- 本地開發先保持 `FORM_DRY_RUN="true"`，避免誤提交到正式 Google Form。
+- 倉庫目前未附帶 `.env.example`；如果需要自訂 Node 環境變數，請手動建立 `.env`，變數名可參考 [`.dev.vars.example`](./.dev.vars.example)，並移除 Workers 專用的 `RUNTIME_TARGET`。
+- 本地開發先保持 `FORM_DRY_RUN="true"`，避免誤提交到正式環境的實際接收端。
 - Node 模式使用 `.env`，Workers 模式使用 `.dev.vars`，不要混用。
-- 完整配置註解請直接查看 [`.env.example`](./.env.example) 與 [`.dev.vars.example`](./.dev.vars.example)。
+- 完整配置註解目前以 [`.dev.vars.example`](./.dev.vars.example) 為準；Node 模式可沿用同名變數寫入 `.env`。
 
 ## 常用命令
 
@@ -223,28 +236,33 @@ npm run test:smoke
 
 ## 關鍵配置
 
-README 只保留最常用配置；完整變數說明請查看 [`.env.example`](./.env.example)。
+README 只保留最常用配置；完整變數說明請查看 [`.dev.vars.example`](./.dev.vars.example)。Node 模式請按相同變數名寫入 `.env`。
 
 | 變數 | 用途 |
 | --- | --- |
 | `SITE_URL` | 站點正式網址，用於 sitemap、robots 與 canonical 輸出 |
-| `FORM_DRY_RUN` | `true` 時只預覽提交，不真正發往 Google Form |
-| `FORM_PROTECTION_SECRET` | 表單保護與密文解密的核心 secret，正式環境務必顯式配置 |
+| `FORM_DRY_RUN` | `true` 時只預覽提交，不真正發往已配置的提交目標 |
+| `FORM_SUBMIT_TARGET` | `/form` 提交目標，可選 `google`、`d1`、`both`，預設 `both` |
+| `FORM_PROTECTION_SECRET` | 表單保護與密文解密的核心 secret；留空時會自動生成派生密鑰 |
 | `FORM_ID` / `FORM_ID_ENCRYPTED` | Google Form ID，二選一 |
 | `GOOGLE_SCRIPT_URL` / `GOOGLE_SCRIPT_URL_ENCRYPTED` | 私有 Apps Script 資料源，二選一 |
 | `PUBLIC_MAP_DATA_URL` | 公開地圖回退源，私有源慢或暫時不可用時會先頂上 |
 | `GOOGLE_CLOUD_TRANSLATION_API_KEY` | 啟用翻譯能力時必填 |
 | `MAINTENANCE_MODE` | 全站維護開關 |
 | `MAINTENANCE_NOTICE` | 維護頁公告文字 |
-| `RATE_LIMIT_REDIS_URL` | 多實例部署時建議配置的共享限流儲存 |
+| `D1_BINDING_NAME` | 僅當 D1 綁定名不是預設的 `NCT_DB` / `DB` 時需要配置 |
+| `RATE_LIMIT_REDIS_URL` | 多實例部署時建議配置的共享限流儲存；預設留空 |
 
 配置原則：
 
 - `FORM_ID` 與 `FORM_ID_ENCRYPTED` 只選一個。
 - `GOOGLE_SCRIPT_URL` 與 `GOOGLE_SCRIPT_URL_ENCRYPTED` 只選一個。
-- 使用密文配置時，必須顯式配置 `FORM_PROTECTION_SECRET`。
+- `FORM_SUBMIT_TARGET` 支援 `google`、`d1`、`both`，預設值為 `both`。
+- 如果 `FORM_SUBMIT_TARGET` 包含 `google`，仍需配置 `FORM_ID` 或 `FORM_ID_ENCRYPTED`。
+- 如果 `FORM_SUBMIT_TARGET` 包含 `d1`，請確認 Workers 已連接 D1；若綁定名不是 `NCT_DB` 或 `DB`，再額外設定 `D1_BINDING_NAME`。
+- 如果使用 `FORM_ID_ENCRYPTED` 或 `GOOGLE_SCRIPT_URL_ENCRYPTED`，仍必須顯式配置 `FORM_PROTECTION_SECRET`。
 - Workers 正式部署時，敏感值請放到 Cloudflare `Variables and Secrets`，不要寫進倉庫或 `wrangler.jsonc`。
-- 如果暫時不使用密文配置，至少請把 `FORM_ID`、`GOOGLE_SCRIPT_URL` 與 `FORM_PROTECTION_SECRET` 都設為 Secret。
+- 如果暫時不使用密文配置，至少請把 `FORM_ID` 與 `GOOGLE_SCRIPT_URL` 設為 Secret；`FORM_PROTECTION_SECRET` 可顯式配置，也可留空讓系統自動生成派生密鑰。
 - 如果使用密文配置，推薦把 `FORM_PROTECTION_SECRET` 設為 Secret，而 `FORM_ID_ENCRYPTED` 與 `GOOGLE_SCRIPT_URL_ENCRYPTED` 可用 Text 或 Secret。
 
 ## 保護敏感配置
@@ -270,7 +288,7 @@ Workers 本地調試時，也可以改讀 `.dev.vars`：
 npm run secure-config -- bootstrap-env --env-file ".dev.vars"
 ```
 
-> 提示：本地運行環境在中國大陸地區時，表單實際提交到 Google Form 可能受到網路環境影響。開發時建議先使用 `FORM_DRY_RUN="true"`。
+> 提示：如果你的提交目標包含 Google Form，本地運行環境在中國大陸地區時，實際提交可能受到網路環境影響。開發時建議先使用 `FORM_DRY_RUN="true"`。
 
 如果你只想分步操作，也可以先生成 secret，再分別加密：
 
@@ -287,13 +305,13 @@ npm run secure-config -- encrypt --purpose google-script-url --secret "你的_FO
 
 - 這能降低明文出現在倉庫、日誌、普通配置欄位或調試頁中的風險。
 - 這不是替代後端鑑權的方案。如果攻擊者能讀取服務端所有 secrets，密文與解密 secret 最終仍可能一起暴露。
-- 真正要防止繞過網站驗證，最可靠的方法仍然是不要把最終寫入入口設計成可匿名直打的公開 Google Form。
+- 真正要防止繞過網站驗證，最可靠的方法仍然是不要把最終寫入入口設計成可匿名直打的公開 Google Form，或其他公開匿名寫入端點。
 
 ## 表單隱私說明
 
 目前表單頁與 `/privacy` 頁面對外使用的說明如下：
 
-> 隱私說明：本問卷中填寫的出生年份、性別等個人基本資訊將被嚴格保密，相關經歷、機構曝光資訊可能在本站公開頁面展示。提交內容會透過 Google Form / Google 試算表保存和整理；請勿在可能公開的欄位中填寫身分證字號、私人電話、家庭住址等個人敏感資訊。
+> 隱私說明：本問卷中填寫的出生年份、性別等個人基本資訊將被嚴格保密，相關經歷、機構曝光資訊可能在本站公開頁面展示。提交內容會依站點配置寫入 Google Form、D1 資料庫，或同時寫入兩者進行保存和整理；請勿在可能公開的欄位中填寫身分證字號、私人電話、家庭住址等個人敏感資訊。
 
 如果你後續調整了公開欄位範圍，記得同步更新：
 
@@ -334,20 +352,22 @@ npm test
 補充：
 
 - 正式部署分支可在 `Settings -> Build -> Branch control` 中調整。
-- 倉庫中的 [`wrangler.jsonc`](./wrangler.jsonc) 只保留必要的 `RUNTIME_TARGET="workers"`，其餘變數請放到 Dashboard 或本地 `.dev.vars`。
+- 倉庫中的 [`wrangler.jsonc`](./wrangler.jsonc) 保留了 `RUNTIME_TARGET="workers"` 與一個最小化的 `NCT_DB` D1 綁定，方便 GitHub / PR 場景下自動 provision D1，而不必把帳號專屬的 `database_id` 提交進倉庫。
+- 其餘 Variables / Secrets 仍建議放到 Dashboard 或本地 `.dev.vars`。
 
 ### 4. 補齊 Variables 和 Secrets
 
 部署建議：
 
-- 最簡單且正確的做法，是把 `FORM_ID`、`GOOGLE_SCRIPT_URL`、`FORM_PROTECTION_SECRET` 都設成 Secret。
+- 最簡單且正確的做法，是把 `FORM_ID` 與 `GOOGLE_SCRIPT_URL` 設成 Secret；`FORM_PROTECTION_SECRET` 可顯式配置為 Secret，也可留空讓系統自動生成派生密鑰。
 - 如果你要進一步降低明文誤暴露風險，再改用 `FORM_ID_ENCRYPTED`、`GOOGLE_SCRIPT_URL_ENCRYPTED`，並保留 `FORM_PROTECTION_SECRET` 為 Secret。
 
 | 名稱 | 類型 | 說明 |
 | --- | --- | --- |
 | `SITE_URL` | Text | 正式站點網址 |
 | `FORM_DRY_RUN` | Text | 正式環境建議為 `false` |
-| `FORM_PROTECTION_SECRET` | Secret | 表單保護與密文解密所需 |
+| `FORM_SUBMIT_TARGET` | Text | `/form` 提交目標：`google`、`d1` 或 `both`，預設 `both` |
+| `FORM_PROTECTION_SECRET` | Secret | 表單保護與密文解密所需；留空時會自動生成派生密鑰 |
 | `FORM_ID` | Secret | 明文 Google Form ID，簡單方案推薦這樣配置 |
 | `FORM_ID_ENCRYPTED` | Text 或 Secret | 加密後的 Google Form ID，使用時留空 `FORM_ID` |
 | `GOOGLE_SCRIPT_URL` | Secret | 明文私有資料源 URL，簡單方案推薦這樣配置 |
@@ -356,37 +376,161 @@ npm test
 | `GOOGLE_CLOUD_TRANSLATION_API_KEY` | Secret | 只有啟用翻譯時才需要 |
 | `MAINTENANCE_MODE` | Text | 需要全站維護時設為 `true` |
 | `MAINTENANCE_NOTICE` | Text | 維護公告文字 |
-| `RATE_LIMIT_REDIS_URL` | Secret | 多實例部署建議配置 |
+| `D1_BINDING_NAME` | Text | 僅當 D1 綁定名不是 `NCT_DB` / `DB` 時填寫 |
+| `RATE_LIMIT_REDIS_URL` | Secret | 多實例部署建議配置；預設留空 |
 
-### 5. 綁定正式網域
+### 5. 部署 D1
+
+預設部署方式：
+
+1. 保持倉庫中的 [`wrangler.jsonc`](./wrangler.jsonc) 不變，倉庫已內建最小 D1 綁定：
+
+```jsonc
+"d1_databases": [
+  {
+    "binding": "NCT_DB",
+    "migrations_dir": "migrations"
+  }
+]
+```
+
+2. 在 Cloudflare `Workers & Pages` 中匯入倉庫
+3. 在 `Settings -> Variables and Secrets` 中補齊執行期變數
+4. 直接部署專案
+5. 首次部署後，到 `Settings -> Bindings` 確認已出現 `NCT_DB` 綁定
+
+如果你要綁定自己帳號裡「既有的」D1 資料庫：
+
+1. 打開專案的 `Settings -> Bindings`
+2. 點擊 `Add binding`
+3. 選擇 `D1 database`
+4. `Variable name` 填 `NCT_DB`
+5. 選擇既有的 D1 資料庫
+6. 儲存後重新部署一次
+
+如果需要在設定檔裡指定現有 D1，可改成下面這種完整寫法：
+
+```jsonc
+"d1_databases": [
+  {
+    "binding": "NCT_DB",
+    "database_name": "<your-d1-database-name>",
+    "database_id": "<your-d1-database-id>",
+    "migrations_dir": "migrations"
+  }
+]
+```
+
+補充：
+
+- 如果綁定名不是 `NCT_DB` 或 `DB`，再額外設定環境變數 `D1_BINDING_NAME`
+- 如果區分 Preview / Production，請分別檢查兩個環境的 D1 綁定
+- `D1` 綁定不屬於 Variables / Secrets，不能只靠環境變數完成
+
+### 6. D1 表名與常用查詢
+
+目前專案寫入 D1 時主要會使用這兩張表：
+
+| 路徑 / 功能 | D1 表名 | 說明 |
+| --- | --- | --- |
+| `/form` | `form_submissions` | 匿名表單主提交流程寫入的記錄 |
+| `/map/correction` | `institution_correction_submissions` | 機構資訊補充 / 修正表單寫入的記錄 |
+
+先查看目前帳號下有哪些 D1 資料庫：
+
+```bash
+npx wrangler d1 list
+```
+
+查詢遠端正式資料庫時，建議先將資料庫名稱代入下面命令中的 `<your-database-name>`，並保留 `--remote`：
+
+```bash
+npx wrangler d1 execute <your-database-name> --remote --command="SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;"
+```
+
+常用查詢示例：
+
+```bash
+# 查看 /form 最新 20 筆
+npx wrangler d1 execute <your-database-name> --remote --command="SELECT id, school_name, contact_information, created_at FROM form_submissions ORDER BY created_at DESC LIMIT 20;"
+
+# 查看 /map/correction 最新 20 筆
+npx wrangler d1 execute <your-database-name> --remote --command="SELECT id, school_name, correction_content, status, created_at FROM institution_correction_submissions ORDER BY created_at DESC LIMIT 20;"
+
+# 依機構名稱搜尋 /form
+npx wrangler d1 execute <your-database-name> --remote --command="SELECT id, school_name, province_name, city_name, created_at FROM form_submissions WHERE school_name LIKE '%機構名%' ORDER BY created_at DESC;"
+
+# 依機構名稱搜尋 /map/correction
+npx wrangler d1 execute <your-database-name> --remote --command="SELECT id, school_name, correction_content, status, created_at FROM institution_correction_submissions WHERE school_name LIKE '%機構名%' ORDER BY created_at DESC;"
+```
+
+如果你只想記 SQL，也可以直接使用下面這些語句：
+
+```sql
+SELECT name
+FROM sqlite_master
+WHERE type = 'table'
+ORDER BY name;
+
+SELECT id, school_name, contact_information, created_at
+FROM form_submissions
+ORDER BY created_at DESC
+LIMIT 20;
+
+SELECT id, school_name, correction_content, status, created_at
+FROM institution_correction_submissions
+ORDER BY created_at DESC
+LIMIT 20;
+
+SELECT *
+FROM form_submissions
+WHERE school_name LIKE '%機構名%'
+ORDER BY created_at DESC;
+
+SELECT *
+FROM institution_correction_submissions
+WHERE school_name LIKE '%機構名%'
+ORDER BY created_at DESC;
+```
+
+補充：
+
+- 想看某張表的欄位結構，可執行 `PRAGMA table_info(form_submissions);` 或 `PRAGMA table_info(institution_correction_submissions);`
+- `--remote` 查的是 Cloudflare 上的真實資料庫，`--local` 查的是本地 Wrangler 開發資料庫
+
+### 7. 綁定正式網域
 
 如果你不想使用 `*.workers.dev`，可以在 `Settings -> Domains & Routes` 中新增自訂網域。綁定完成後，記得同步更新：
 
 - `SITE_URL`
 - `PUBLIC_MAP_DATA_URL`
 
-### 6. 上線後檢查清單
+### 8. 上線後檢查清單
 
 正式部署完成後，建議至少手動驗證以下路徑：
 
 - `/`
 - `/map`
 - `/form`
+- `/map/correction`
 - `/blog`
 - `/api/map-data`
+- `/api/area-options?provinceCode=110000`
+- `/cn.json`
 - `/sitemap.xml`
 - `/robots.txt`
 
-如果 `FORM_DRY_RUN="false"`，也要實測表單是否能成功送到 Google Form。
+如果 `FORM_DRY_RUN="false"`，也要實測表單是否能成功送到目前配置的提交目標（Google Form、D1，或兩者）。
+如果已配置翻譯服務，也建議再補測 `POST /api/translate-text`。
 
-### 7. Workers 上的已知差異
+### 9. Workers 上的已知差異
 
 - 模板、部落格 Markdown 與 JSON 檔案會從 Workers 的 `/bundle` 讀取。
 - 翻譯服務已移除 `curl` 子程序兜底，現在固定使用 Google Cloud Translation API。
 - `sitemap.xml` 在 Workers 上會優先使用文章中繼資料的 `CreationDate` 作為 `lastmod`。
 - 若未配置共享 Redis，限流會退回單實例記憶體模式，跨實例一致性較弱。
 
-### 8. 常見問題
+### 10. 常見問題
 
 **Q: 本地 `npm start` 和 Workers 版本會衝突嗎？**<br>
 A: 不會。兩者只是不同的本地運行入口。
@@ -401,10 +545,15 @@ A: 因為它會呼叫 `npx wrangler deploy`，並且與本倉庫的 `package.jso
 
 預設情況下，所有頁面路由都會經過 i18n 中介層，因此都支援透過 `?lang=zh-CN`、`?lang=zh-TW`、`?lang=en` 切換介面語言。若開啟維護模式，頁面與 API 還會先經過維護攔截。
 
+### 頁面路由
+
 | 路徑 | 說明 | 備註 |
 | --- | --- | --- |
+| `/robots.txt` | 自動生成 robots 策略 | 由 `robotsService` 輸出 |
+| `/sitemap.xml` | 自動生成站點地圖 | 會讀取 `blog/` 與 `data.json` |
 | `/` | 站點首頁，提供表單、地圖、文庫等入口 | 對應 `views/index.ejs` |
 | `/form` | 匿名表單頁，下發地區選項、前端校驗規則與防刷 token | 會附帶敏感頁面回應標頭，禁止索引 |
+| `/map/correction` | 機構資訊補充 / 修正頁 | 提交到 `POST /map/correction/submit`；實際寫入時需要可用 D1 綁定 |
 | `/map` | 地圖總覽頁，展示機構分布、統計與公開資料列表 | 支援 `?inputType=` 預設篩選 |
 | `/map/record/:recordSlug` | 地圖提交詳情頁，獨立展示單筆提交內容並支援同機構記錄上下翻頁 | 從 `/map` 的「查看詳情頁」進入，對應 `views/map_record.ejs` |
 | `/aboutus` | 關於頁，展示專案說明與友鏈／致謝資訊 | 會讀取 `friends.json` |
@@ -414,10 +563,29 @@ A: 因為它會呼叫 `npx wrangler deploy`，並且與本倉庫的 `package.jso
 | `/debug` | 調試頁，展示目前語言、API 位址、調試模式等資訊 | 僅 `DEBUG_MOD=true` 時可訪問 |
 | `/debug/submit-error` | 提交失敗頁預覽，方便單獨查看錯誤頁樣式與預填 Google Form 連結 | 僅 `DEBUG_MOD=true` 時可訪問 |
 
+### 提交流程路由
+
+| 路徑 | 說明 | 備註 |
+| --- | --- | --- |
+| `POST /submit` | 匿名表單提交入口 | `FORM_DRY_RUN=true` 時返回預覽頁，否則進入確認頁 |
+| `POST /submit/confirm` | 匿名表單確認後的最終提交入口 | 依 `FORM_SUBMIT_TARGET` 寫入 Google Form、D1，或同時寫入兩者 |
+| `POST /map/correction/submit` | 機構補充 / 修正提交入口 | 僅寫入 D1；未配置可用綁定時會返回 503 |
+
+### API 與靜態資料路由
+
+| 路徑 | 說明 | 備註 |
+| --- | --- | --- |
+| `/api/area-options` | 返回省 / 市 / 縣區聯動選項 | 傳 `provinceCode` 取城市，傳 `cityCode` 取縣區 |
+| `/api/map-data` | 返回地圖聚合資料 | 支援 `?refresh=1` 強制重新整理，並受更嚴格限流保護 |
+| `POST /api/translate-text` | 對地圖詳情中的少量欄位做按需翻譯 | 需要配置 `GOOGLE_CLOUD_TRANSLATION_API_KEY` |
+| `/cn.json` | 返回地圖使用的中國 GeoJSON | Node 與 Workers 都做了大檔完整性保護 |
+
 ## 相關檔案
 
-- [`.env.example`](./.env.example)：Node 模式環境變數示例
-- [`.dev.vars.example`](./.dev.vars.example)：Workers 本地調試示例
+- [`.dev.vars.example`](./.dev.vars.example)：本地環境變數模板；Node 模式可按同名變數手動建立 `.env`
+- [`migrations/`](./migrations)：D1 表結構遷移
+- [`server.js`](./server.js)：Vercel / Node 相容入口
+- [`vercel.json`](./vercel.json)：Vercel 部署配置
 - [`wrangler.jsonc`](./wrangler.jsonc)：Workers 配置
 - [`scripts/secure-config.js`](./scripts/secure-config.js)：敏感配置加密工具
 - [`worker.mjs`](./worker.mjs)：Cloudflare Workers 入口
@@ -490,6 +658,14 @@ https://你的網域/api/map-data
 ```
 
 如果你想把資料做成地圖，可直接搭配 [Leaflet](https://leafletjs.com) 等前端地圖函式庫使用；本專案自己的 `/map` 頁面就是一個完整示例。
+
+### 其他前端介面
+
+| 介面 | 用途 | 請求方式 / 參數 |
+| --- | --- | --- |
+| `/api/area-options` | 表單與機構修正頁的省市區聯動選項 | `GET`；傳 `provinceCode` 或 `cityCode` |
+| `/api/translate-text` | 地圖詳情欄位的小批量翻譯 | `POST` JSON；需傳 `items` 與 `targetLanguage`，且服務端已配置翻譯能力 |
+| `/cn.json` | 地圖底圖使用的中國 GeoJSON 資料 | `GET` |
 
 ---
 

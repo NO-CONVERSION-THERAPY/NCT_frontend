@@ -10,6 +10,7 @@
     // Deployment-specific runtime env vars such as SITE_URL, PAGE_READ_RATE_LIMIT_MAX,
     // MAP_READ_RATE_LIMIT_MAX, MAINTENANCE_MODE, MAINTENANCE_NOTICE,
     // FORM_PROTECTION_SECRET, FORM_ID / FORM_ID_ENCRYPTED,
+    // CORRECTION_SUBMIT_TARGET, CORRECTION_FORM_ID / CORRECTION_GOOGLE_FORM_URL,
     // GOOGLE_SCRIPT_URL / GOOGLE_SCRIPT_URL_ENCRYPTED,
     // PUBLIC_MAP_DATA_URL (public fallback source), MAP_DATA_UPSTREAM_TIMEOUT_MS,
     // and API keys
@@ -17,6 +18,15 @@
     // .dev.vars instead of being checked in here.
     "RUNTIME_TARGET": "workers"
   },
+  // Keep only a minimal D1 binding in the repository so shared PRs /
+  // third-party deployers do not need to commit account-specific IDs.
+  // Cloudflare can auto-provision and keep the binding linked on deploy.
+  "d1_databases": [
+    {
+      "binding": "NCT_DB",
+      "migrations_dir": "migrations"
+    }
+  ],
   "find_additional_modules": true,
   "base_dir": ".",
   "preserve_file_names": true,

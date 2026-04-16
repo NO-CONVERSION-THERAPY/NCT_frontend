@@ -7,7 +7,7 @@
         <% if (typeof pageRobots !== 'undefined' && pageRobots) { %>
         <meta name="robots" content="<%= pageRobots %>">
         <% } %>
-        <title><%= t('common.siteName') %></title>
+        <title><%= title %></title>
         <link rel="stylesheet" href="/css/index.css?v=<%= assetVersion %>">
         <script>
             window.APP_LANG = "<%= lang %>";
@@ -16,10 +16,8 @@
     </head>
     <body class="submit-page">
         <div class="hero">
-            <h1><%= t('submitSuccess.title') %></h1>
-            <p>
-                <%= t('submitSuccess.message') %>
-            </p>
+            <h1><%= t('institutionCorrection.success.title') %></h1>
+            <p><%= t('institutionCorrection.success.message') %></p>
             <% if (showSubmissionDiagnostics && submissionDiagnostics) { %>
                 <div class="submit-status-card">
                     <h2><%= t('submitStatus.title') %></h2>
@@ -36,8 +34,8 @@
                 </div>
             <% } %>
             <div class="hero__actions submit-page__actions">
+                <a href="/map?lang=<%= lang %>" class="btn"><%= t('institutionCorrection.success.backToMap') %></a>
                 <a href="/" class="btn"><%= t('submitSuccess.backHome') %></a>
-                <a href="https://github.com/HosinoEJ/No-Torsion" class="btn"><%= t('submitSuccess.petition') %></a>
             </div>
         </div>
 
@@ -68,6 +66,7 @@
                 color: var(--text-muted);
             }
         </style>
+
         <%- include('partials/foot') %>
     </body>
 </html>

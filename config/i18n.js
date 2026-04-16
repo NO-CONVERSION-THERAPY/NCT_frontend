@@ -37,6 +37,9 @@ const messages = {
     pageTitles: {
       home: '首页|{title}',
       form: '填写表单|{title}',
+      institutionCorrection: '机构信息补充 / 修正|{title}',
+      institutionCorrectionSuccess: '补充 / 修正已提交|{title}',
+      institutionCorrectionError: '补充 / 修正提交失败|{title}',
       map: '地图|{title}',
       mapRecord: '提交详情|{title}',
       about: '关于我们|{title}',
@@ -89,7 +92,7 @@ const messages = {
     form: {
       title: 'NO CONVERSION THERAPY FORM',
       subtitle: '记录黑暗，是为了迎接光明',
-      privacyNotice: '隐私说明：本问卷中填写的出生年份、性别等个人基本信息将被严格保密，相关经历、机构曝光信息可能在本站公开页面展示。提交内容会通过 Google Form / Google 表格保存和整理；请勿在可能公开的字段中填写身份证号、私人电话、家庭住址等您的个人敏感信息。',
+      privacyNotice: '隐私说明：本问卷中填写的出生年份、性别等个人基本信息将被严格保密，相关经历、机构曝光信息可能在本站公开页面展示。提交内容会根据站点配置写入 Google Form、D1 数据库，或同时写入两者进行保存和整理；请勿在可能公开的字段中填写身份证号、私人电话、家庭住址等您的个人敏感信息。',
       sections: {
         basic: '个人基本信息',
         experience: '相关经历',
@@ -157,7 +160,9 @@ const messages = {
       },
       buttons: {
         openMap: '点击可直接在地图上选点',
+        getCurrentLocation: '获取当前位置',
         submit: '确认并提交信息',
+        locating: '定位中...',
         submitting: '提交中...'
       },
       hints: {
@@ -166,6 +171,14 @@ const messages = {
         experience: '若描述别人经历请在“其他补充”中填写',
         otherSex: '请选择 MtF / FtM / X / Queer，或点击输入框填写其它性别认同或补充说明',
         selectedPoint: '选取点: {lat}, {lng}'
+      },
+      location: {
+        filled: '已获取当前位置: {lat}, {lng}',
+        unsupported: '当前环境不支持定位，请使用 HTTPS 打开网页，或手动填写经纬度 / 在地图上选点。',
+        permissionDenied: '定位权限已被拒绝，请允许访问位置信息后重试。',
+        positionUnavailable: '暂时无法获取当前位置，请稍后重试。',
+        timeout: '获取当前位置超时，请稍后重试。',
+        failed: '获取当前位置失败，请稍后重试。'
       },
       validation: {
         selectIdentity: '请选择填写身份',
@@ -184,6 +197,82 @@ const messages = {
         specifyOtherSex: '请选择 MtF / FtM / X / Queer，或选择输入框填写其它性别认同或补充说明',
         fillOtherSex: '请输入其它性别认同或补充说明',
         endDateBeforeStart: '离开日期不能早于首次被送入日期'
+      }
+    },
+    institutionCorrection: {
+      title: '机构信息补充 / 修正',
+      subtitle: '如果地图中的机构信息需要补充、修正或更新，可以在这里提交。',
+      privacyNotice: '隐私说明：此表单提交内容会根据站点配置写入 Google Form、D1 数据库，或同时写入两者进行保存和整理。请尽量只填写机构公开信息，不要提交与此无关的个人敏感信息。',
+      backToMap: '返回地图',
+      sections: {
+        institution: '机构信息',
+        correction: '补充 / 修正说明'
+      },
+      fields: {
+        schoolName: '机构名称',
+        province: '机构所在省份',
+        city: '机构所在城市 / 区县',
+        county: '机构所在县区',
+        schoolAddress: '机构地址',
+        contactInformation: '机构联系方式',
+        headmasterName: '负责人/校长姓名',
+        correctionContent: '补充修正内容'
+      },
+      placeholders: {
+        province: '可选：选择机构所在省份',
+        city: '可选：请先选择机构所在省份',
+        countyInitial: '可选：请先选择机构所在城市 / 区县',
+        county: '可选：选择机构所在县区',
+        countyUnavailable: '可选：当前机构所在城市无县区可选',
+        schoolName: '请填写需要补充或修正的机构名称',
+        schoolAddress: '可选：填写最新地址，或直接在地图上选点 / 获取当前位置',
+        contactInformation: '可选：电话、邮箱或其它公开联系方式',
+        headmasterName: '可选：负责人 / 校长姓名',
+        correctionContent: '请说明需要补充或修正的内容'
+      },
+      buttons: {
+        openMap: '点击可直接在地图上选点',
+        getCurrentLocation: '获取当前位置',
+        submit: '提交补充/修正',
+        locating: '定位中...',
+        submitting: '提交中...'
+      },
+      hints: {
+        selectedPoint: '选取点: {lat}, {lng}',
+        correctionContent: '例如：地址搬迁、联系方式变更、负责人信息补充、地图坐标修正等。'
+      },
+      location: {
+        filled: '已获取当前位置: {lat}, {lng}',
+        unsupported: '当前环境不支持定位，请使用 HTTPS 打开网页，或手动填写经纬度 / 在地图上选点。',
+        permissionDenied: '定位权限已被拒绝，请允许访问位置信息后重试。',
+        positionUnavailable: '暂时无法获取当前位置，请稍后重试。',
+        timeout: '获取当前位置超时，请稍后重试。',
+        failed: '获取当前位置失败，请稍后重试。'
+      },
+      validation: {
+        fillSchoolName: '请填写机构名称',
+        invalidProvince: '请选择有效的机构所在省份',
+        provinceCityMismatch: '所选机构所在省份与城市 / 区县不匹配',
+        cityCountyMismatch: '所选机构所在城市 / 区县与县区不匹配'
+      },
+      success: {
+        title: '补充 / 修正请求已收到',
+        message: '感谢你的补充。我们会在核实后处理这条机构信息修正请求。',
+        backToMap: '返回地图'
+      },
+      errorPage: {
+        title: '补充 / 修正提交失败',
+        intro: '站内提交没有成功。如果下方提供了已预填内容的 Google Form 链接，你也可以继续在那里提交。',
+        privacyNote: '注意：下面这个链接包含你刚刚填写的补充 / 修正内容，请不要随意分享。',
+        proxyNote: '提示：如果你当前网络无法直接访问 Google 服务，打开 Google Form 页面可能需要网络代理。',
+        openFallback: '打开 Google Form 继续提交',
+        urlLabel: '带预填内容的 Google Form 链接',
+        backToForm: '返回补充 / 修正表单'
+      },
+      errors: {
+        submitFailedPrefix: '提交失败：',
+        storageUnavailable: '机构信息补充 / 修正功能暂时不可用，请稍后再试。',
+        submitFailed: '提交失败，请稍后再试。'
       }
     },
     map: {
@@ -267,7 +356,9 @@ const messages = {
         opinionTitle: '我们的看法：',
         opinionBody: '我们很希望你们使用这个 API 并接入到你们的网站上。即使网站被封禁，资料仍然可以透过 API 在不同网络中继续传播。这也是一种去中心化。',
         cta: '知道了这些，你就可以使用我们的 API 了。欢迎把它接入到你们的网站。',
-        link: '获取 API 数据源'
+        link: '获取 API 数据源',
+        correctionHint: '如果你发现地图中的机构资料需要补充或修正，也可以通过下面的表单告诉我们。',
+        correctionButton: '机构信息补充/修正'
       }
     },
     about: {
@@ -291,7 +382,7 @@ const messages = {
         effectiveDateLabel: '生效日期',
         effectiveDateValue: '2026年4月9日',
         updatedLabel: '最近更新',
-        updatedValue: '2026年4月9日',
+        updatedValue: '2026年4月12日',
         scopeLabel: '适用范围',
         scopeValue: '本站页面、表单提交流程与相关公开展示内容'
       },
@@ -325,6 +416,7 @@ const messages = {
       formItems: [
         '内部处理信息通常包括出生年份、性别等个人基本信息，用于内部整理、核验与统计。',
         '可能公开展示的信息通常包括相关经历、机构名称、所在地区、机构地址、机构联系方式、负责人/校长姓名、丑闻及暴力行为描述和其他补充内容。',
+        '如果您点击“获取当前位置”等定位按钮，浏览器会请求定位权限；定位结果仅用于帮您填充当前地址或经纬度，只有在您确认并提交表单后才会随表单一并发送。',
         '请不要在可能公开的字段中填写身份证号、私人电话、家庭住址、即时通讯账号或其他不适合公开的个人敏感信息。'
       ],
       cookieIntro: '当前网站使用的 Cookie 如下：',
@@ -372,10 +464,23 @@ const messages = {
       backHome: '返回首页',
       petition: '抵制扭转机构签名会'
     },
+    submitStatus: {
+      title: '调试提交结果',
+      mode: '提交模式：',
+      successfulTargets: '成功目标：',
+      failedTargets: '失败目标：',
+      error: '错误：',
+      none: '无',
+      targets: {
+        both: 'Google Form + D1',
+        d1: 'D1 数据库',
+        google: 'Google Form'
+      }
+    },
     submitPreview: {
       title: '表单 Dry Run 预览',
-      intro: '这次提交没有发送到 Google Form。下面是本次本地组装出的最终字段和值。',
-      targetUrl: '目标网址：',
+      intro: '这次提交还没有发送到实际提交目标。下面是本次本地组装出的最终字段和值。',
+      targetUrl: 'Google Form 目标网址（若已启用）：',
       columns: {
         entry: 'Google Form Entry',
         field: '字段',
@@ -386,7 +491,7 @@ const messages = {
     },
     submitConfirm: {
       title: '提交确认',
-      intro: '这一步还没有发送到 Google Form。请确认以下内容无误后，再正式提交。',
+      intro: '这一步还没有发送到实际提交目标。请确认以下内容无误后，再正式提交。',
       targetUrl: '目标网址：',
       columns: {
         entry: 'Google Form Entry',
@@ -399,7 +504,7 @@ const messages = {
     },
     submitError: {
       title: '提交失败',
-      intro: '站内提交没有成功。你可以打开下面这个已预填内容的 Google Form 链接继续提交。',
+      intro: '站内提交没有成功。如果下方提供了已预填内容的 Google Form 链接，你也可以继续在那里提交。',
       privacyNote: '注意：下面这个链接包含你刚刚填写的表单内容，请不要随意分享。',
       proxyNote: '提示：如果你当前网络无法直接访问 Google 服务，打开 Google Form 页面可能需要网络代理。',
       openFallback: '打开 Google Form 继续提交',
@@ -497,11 +602,14 @@ const messages = {
         apiUrl: 'API 地址',
         debugMode: '调试模式',
         formDryRun: '表单干跑',
+        formSubmitTarget: '表单提交目标',
+        correctionSubmitTarget: '补充 / 修正提交目标',
         maintenanceMode: '维护模式',
         maintenanceRetryAfter: '维护重试时间',
         trustProxy: 'Trust Proxy',
         mapNodeTransport: 'Node 地图传输覆写',
         googleForm: 'Google Form 提交地址',
+        correctionGoogleForm: '补充 / 修正 Google Form',
         googleScript: '私有地图上游',
         publicMapDataUrl: '公开地图回退源',
         translationProvider: '翻译服务',
@@ -531,8 +639,36 @@ const messages = {
         milliseconds: '{count} ms',
         seconds: '{count} s'
       },
+      samples: {
+        d1SkippedError: '调试模拟跳过了真实的 D1 写入。',
+        form: {
+          schoolName: '调试预览学院',
+          schoolAddress: '洛江区调试路 12 号',
+          experience: '用于检查布局与多语言展示的调试预览内容。',
+          headmasterName: '调试负责人',
+          contactInformation: 'debug-preview@example.com',
+          scandal: '仅用于调试的丑闻摘要占位内容。',
+          other: '仅用于调试的其他补充内容。'
+        },
+        correction: {
+          schoolName: '调试修正学院',
+          schoolAddress: '洛江区修正调试路 5 号',
+          contactInformation: 'debug-correction@example.com',
+          headmasterName: '调试修正负责人',
+          correctionContent: '用于检查 Google Form 回退链接和结果页布局的调试修正内容。'
+        }
+      },
+      submitTargets: {
+        both: 'Google Form + D1',
+        d1: 'D1 数据库',
+        google: 'Google Form'
+      },
       links: {
-        submitErrorPreview: '查看提交失败页预览'
+        submitErrorPreview: '查看提交失败页预览',
+        submitPreview: '查看提交预览页',
+        submitConfirm: '查看提交确认页',
+        correctionSubmitSuccessPreview: '查看补充 / 修正成功页预览',
+        correctionSubmitErrorPreview: '查看补充 / 修正失败页预览'
       }
     },
     data: {
@@ -561,6 +697,9 @@ const messages = {
     pageTitles: {
       home: '主頁|{title}',
       form: '填寫表單|{title}',
+      institutionCorrection: '機構資訊補充 / 修正|{title}',
+      institutionCorrectionSuccess: '補充 / 修正已提交|{title}',
+      institutionCorrectionError: '補充 / 修正提交失敗|{title}',
       map: '地圖|{title}',
       mapRecord: '提交詳情|{title}',
       about: '關於我們|{title}',
@@ -613,7 +752,7 @@ const messages = {
     form: {
       title: 'NO CONVERSION THERAPY FORM',
       subtitle: '記錄黑暗，是為了迎接光明',
-      privacyNotice: '隱私說明：本問卷中填寫的出生年份、性別等個人基本資訊將被嚴格保密，相關經歷、機構曝光資訊可能在本站公開頁面展示。提交內容會透過 Google Form / Google 試算表保存和整理；請勿在可能公開的欄位中填寫身分證號、私人電話、家庭住址等您的個人敏感資訊。',
+      privacyNotice: '隱私說明：本問卷中填寫的出生年份、性別等個人基本資訊將被嚴格保密，相關經歷、機構曝光資訊可能在本站公開頁面展示。提交內容會依站點配置寫入 Google Form、D1 資料庫，或同時寫入兩者進行保存和整理；請勿在可能公開的欄位中填寫身分證號、私人電話、家庭住址等您的個人敏感資訊。',
       sections: {
         basic: '個人基本資訊',
         experience: '相關經歷',
@@ -681,7 +820,9 @@ const messages = {
       },
       buttons: {
         openMap: '點擊可直接在地圖上選點',
+        getCurrentLocation: '獲取目前位置',
         submit: '確認並提交信息',
+        locating: '定位中...',
         submitting: '提交中...'
       },
       hints: {
@@ -690,6 +831,14 @@ const messages = {
         experience: '若描述別人經歷請在「其他補充」中填寫',
         otherSex: '請選擇 MtF / FtM / X / Queer，或點擊輸入框填寫其他性別認同或補充說明',
         selectedPoint: '選取點: {lat}, {lng}'
+      },
+      location: {
+        filled: '已獲取目前位置: {lat}, {lng}',
+        unsupported: '目前環境不支援定位，請使用 HTTPS 開啟網頁，或手動填寫經緯度 / 在地圖上選點。',
+        permissionDenied: '定位權限已被拒絕，請允許存取位置信息後再試。',
+        positionUnavailable: '暫時無法獲取目前位置，請稍後再試。',
+        timeout: '獲取目前位置逾時，請稍後再試。',
+        failed: '獲取目前位置失敗，請稍後再試。'
       },
       validation: {
         selectIdentity: '請選擇填寫身份',
@@ -708,6 +857,82 @@ const messages = {
         specifyOtherSex: '請選擇 MtF / FtM / X / Queer，或選擇輸入框填寫其他性別認同或補充說明',
         fillOtherSex: '請輸入其他性別認同或補充說明',
         endDateBeforeStart: '離開日期不能早於首次被送入日期'
+      }
+    },
+    institutionCorrection: {
+      title: '機構資訊補充 / 修正',
+      subtitle: '如果地圖中的機構資訊需要補充、修正或更新，可以在這裡提交。',
+      privacyNotice: '隱私說明：此表單提交內容會依站點配置寫入 Google Form、D1 資料庫，或同時寫入兩者進行保存和整理。請盡量只填寫機構公開資訊，不要提交與此無關的個人敏感資訊。',
+      backToMap: '返回地圖',
+      sections: {
+        institution: '機構資訊',
+        correction: '補充 / 修正說明'
+      },
+      fields: {
+        schoolName: '機構名稱',
+        province: '機構所在省份',
+        city: '機構所在城市 / 區縣',
+        county: '機構所在縣區',
+        schoolAddress: '機構地址',
+        contactInformation: '機構聯繫方式',
+        headmasterName: '負責人/校長姓名',
+        correctionContent: '補充修正內容'
+      },
+      placeholders: {
+        province: '可選：選擇機構所在省份',
+        city: '可選：請先選擇機構所在省份',
+        countyInitial: '可選：請先選擇機構所在城市 / 區縣',
+        county: '可選：選擇機構所在縣區',
+        countyUnavailable: '可選：當前機構所在城市無縣區可選',
+        schoolName: '請填寫需要補充或修正的機構名稱',
+        schoolAddress: '可選：填寫最新地址，或直接在地圖上選點 / 取得目前位置',
+        contactInformation: '可選：電話、郵箱或其他公開聯繫方式',
+        headmasterName: '可選：負責人 / 校長姓名',
+        correctionContent: '請說明需要補充或修正的內容'
+      },
+      buttons: {
+        openMap: '點擊可直接在地圖上選點',
+        getCurrentLocation: '獲取目前位置',
+        submit: '提交補充/修正',
+        locating: '定位中...',
+        submitting: '提交中...'
+      },
+      hints: {
+        selectedPoint: '選取點: {lat}, {lng}',
+        correctionContent: '例如：地址搬遷、聯繫方式變更、負責人資訊補充、地圖座標修正等。'
+      },
+      location: {
+        filled: '已獲取目前位置: {lat}, {lng}',
+        unsupported: '目前環境不支援定位，請使用 HTTPS 開啟網頁，或手動填寫經緯度 / 在地圖上選點。',
+        permissionDenied: '定位權限已被拒絕，請允許存取位置信息後再試。',
+        positionUnavailable: '暫時無法獲取目前位置，請稍後再試。',
+        timeout: '獲取目前位置逾時，請稍後再試。',
+        failed: '獲取目前位置失敗，請稍後再試。'
+      },
+      validation: {
+        fillSchoolName: '請填寫機構名稱',
+        invalidProvince: '請選擇有效的機構所在省份',
+        provinceCityMismatch: '所選機構所在省份與城市 / 區縣不匹配',
+        cityCountyMismatch: '所選機構所在城市 / 區縣與縣區不匹配'
+      },
+      success: {
+        title: '補充 / 修正請求已收到',
+        message: '感謝你的補充。我們會在核實後處理這條機構資訊修正請求。',
+        backToMap: '返回地圖'
+      },
+      errorPage: {
+        title: '補充 / 修正提交失敗',
+        intro: '站內提交沒有成功。如果下方提供了已預填內容的 Google Form 連結，你也可以繼續在那裡提交。',
+        privacyNote: '注意：下面這個連結包含你剛剛填寫的補充 / 修正內容，請不要隨意分享。',
+        proxyNote: '提示：如果你目前的網路無法直接存取 Google 服務，打開 Google Form 頁面可能需要網路代理。',
+        openFallback: '打開 Google Form 繼續提交',
+        urlLabel: '帶預填內容的 Google Form 連結',
+        backToForm: '返回補充 / 修正表單'
+      },
+      errors: {
+        submitFailedPrefix: '提交失敗：',
+        storageUnavailable: '機構資訊補充 / 修正功能暫時不可用，請稍後再試。',
+        submitFailed: '提交失敗，請稍後再試。'
       }
     },
     map: {
@@ -791,7 +1016,9 @@ const messages = {
         opinionTitle: '我們的看法：',
         opinionBody: '我們很希望你們使用這個 API 並接入到你們的網站上。即使網站被封禁，資料仍然可以透過 API 在不同網絡中繼續傳播。這也是一種去中心化。',
         cta: '知道了這些，你就可以使用我們的 API 了。歡迎把它接入到你們的網站。',
-        link: '獲取 API 數據源'
+        link: '獲取 API 數據源',
+        correctionHint: '如果你發現地圖中的機構資料需要補充或修正，也可以透過下面的表單告訴我們。',
+        correctionButton: '機構資訊補充/修正'
       }
     },
     about: {
@@ -815,7 +1042,7 @@ const messages = {
         effectiveDateLabel: '生效日期',
         effectiveDateValue: '2026年4月9日',
         updatedLabel: '最近更新',
-        updatedValue: '2026年4月9日',
+        updatedValue: '2026年4月12日',
         scopeLabel: '適用範圍',
         scopeValue: '本站頁面、表單提交流程與相關公開展示內容'
       },
@@ -849,6 +1076,7 @@ const messages = {
       formItems: [
         '內部處理資訊通常包括出生年份、性別等個人基本資訊，用於內部整理、核驗與統計。',
         '可能公開展示的資訊通常包括相關經歷、機構名稱、所在地區、機構地址、機構聯繫方式、負責人／校長姓名、醜聞及暴力行為描述和其他補充內容。',
+        '如果您點擊「取得目前位置」等定位按鈕，瀏覽器會請求定位權限；定位結果僅用於協助填入目前地址或經緯度，只有在您確認並提交表單後才會隨表單一併送出。',
         '請不要在可能公開的欄位中填寫身分證號、私人電話、家庭住址、即時通訊帳號或其他不適合公開的個人敏感資訊。'
       ],
       cookieIntro: '本站目前使用的 Cookie 如下：',
@@ -896,10 +1124,23 @@ const messages = {
       backHome: '返回首頁',
       petition: '抵制扭轉機構簽名會'
     },
+    submitStatus: {
+      title: '調試提交結果',
+      mode: '提交模式：',
+      successfulTargets: '成功目標：',
+      failedTargets: '失敗目標：',
+      error: '錯誤：',
+      none: '無',
+      targets: {
+        both: 'Google Form + D1',
+        d1: 'D1 資料庫',
+        google: 'Google Form'
+      }
+    },
     submitPreview: {
       title: '表單乾跑預覽',
-      intro: '這次提交沒有發送到 Google Form。下面是本次本地組裝出的最終欄位和值。',
-      targetUrl: '目標網址：',
+      intro: '這次提交還沒有發送到實際提交目標。下面是本次本地組裝出的最終欄位和值。',
+      targetUrl: 'Google Form 目標網址（若已啟用）：',
       columns: {
         entry: 'Google Form Entry',
         field: '欄位',
@@ -910,7 +1151,7 @@ const messages = {
     },
     submitConfirm: {
       title: '提交確認',
-      intro: '這一步還沒有發送到 Google Form。請確認以下內容無誤後，再正式提交。',
+      intro: '這一步還沒有發送到實際提交目標。請確認以下內容無誤後，再正式提交。',
       targetUrl: '目標網址：',
       columns: {
         entry: 'Google Form Entry',
@@ -923,7 +1164,7 @@ const messages = {
     },
     submitError: {
       title: '提交失敗',
-      intro: '站內提交沒有成功。你可以打開下面這個已預填內容的 Google Form 連結繼續提交。',
+      intro: '站內提交沒有成功。如果下方提供了已預填內容的 Google Form 連結，你也可以繼續在那裡提交。',
       privacyNote: '注意：下面這個連結包含你剛剛填寫的表單內容，請不要隨意分享。',
       proxyNote: '提示：如果你目前的網路無法直接存取 Google 服務，打開 Google Form 頁面可能需要網路代理。',
       openFallback: '打開 Google Form 繼續提交',
@@ -1021,11 +1262,14 @@ const messages = {
         apiUrl: 'API 位址',
         debugMode: '調試模式',
         formDryRun: '表單 Dry Run',
+        formSubmitTarget: '表單提交目標',
+        correctionSubmitTarget: '補充 / 修正提交目標',
         maintenanceMode: '維護模式',
         maintenanceRetryAfter: '維護重試時間',
         trustProxy: 'Trust Proxy',
         mapNodeTransport: 'Node 地圖傳輸覆寫',
         googleForm: 'Google Form 提交位址',
+        correctionGoogleForm: '補充 / 修正 Google Form',
         googleScript: '私有地圖上游',
         publicMapDataUrl: '公開地圖回退源',
         translationProvider: '翻譯服務',
@@ -1055,8 +1299,36 @@ const messages = {
         milliseconds: '{count} ms',
         seconds: '{count} s'
       },
+      samples: {
+        d1SkippedError: '調試模擬略過了真實的 D1 寫入。',
+        form: {
+          schoolName: '調試預覽學院',
+          schoolAddress: '洛江區調試路 12 號',
+          experience: '用於檢查版面與多語言展示的調試預覽內容。',
+          headmasterName: '調試負責人',
+          contactInformation: 'debug-preview@example.com',
+          scandal: '僅用於調試的醜聞摘要佔位內容。',
+          other: '僅用於調試的其他補充內容。'
+        },
+        correction: {
+          schoolName: '調試修正學院',
+          schoolAddress: '洛江區修正調試路 5 號',
+          contactInformation: 'debug-correction@example.com',
+          headmasterName: '調試修正負責人',
+          correctionContent: '用於檢查 Google Form 回退連結和結果頁版面的調試修正內容。'
+        }
+      },
+      submitTargets: {
+        both: 'Google Form + D1',
+        d1: 'D1 資料庫',
+        google: 'Google Form'
+      },
       links: {
-        submitErrorPreview: '查看提交失敗頁預覽'
+        submitErrorPreview: '查看提交失敗頁預覽',
+        submitPreview: '查看提交預覽頁',
+        submitConfirm: '查看提交確認頁',
+        correctionSubmitSuccessPreview: '查看補充 / 修正成功頁預覽',
+        correctionSubmitErrorPreview: '查看補充 / 修正失敗頁預覽'
       }
     },
     data: {
@@ -1085,6 +1357,9 @@ const messages = {
     pageTitles: {
       home: 'Home | {title}',
       form: 'Form | {title}',
+      institutionCorrection: 'Institution Correction | {title}',
+      institutionCorrectionSuccess: 'Correction Submitted | {title}',
+      institutionCorrectionError: 'Correction Submission Failed | {title}',
       map: 'Map | {title}',
       mapRecord: 'Submission Detail | {title}',
       about: 'About | {title}',
@@ -1137,7 +1412,7 @@ const messages = {
     form: {
       title: 'NO CONVERSION THERAPY FORM',
       subtitle: 'We document the darkness in order to welcome the light.',
-      privacyNotice: 'Privacy notice: personal details such as birth year and sex provided in this questionnaire will be kept strictly confidential, while related experiences and institution exposure information may be shown on public pages of this site. Submitted content is stored and organized through Google Forms / Google Sheets. Please do not include ID numbers, private phone numbers, home addresses, or other sensitive personal information in fields that may be made public.',
+      privacyNotice: 'Privacy notice: personal details such as birth year and sex provided in this questionnaire will be kept strictly confidential, while related experiences and institution exposure information may be shown on public pages of this site. Submitted content may be written to Google Form, the D1 database, or both, depending on the site configuration. Please do not include ID numbers, private phone numbers, home addresses, or other sensitive personal information in fields that may be made public.',
       sections: {
         basic: 'Personal Information',
         experience: 'Related Experience',
@@ -1205,7 +1480,9 @@ const messages = {
       },
       buttons: {
         openMap: 'Pick a point directly on the map',
+        getCurrentLocation: 'Use current location',
         submit: 'Confirm and Submit',
+        locating: 'Locating...',
         submitting: 'Submitting...'
       },
       hints: {
@@ -1214,6 +1491,14 @@ const messages = {
         experience: 'If you are describing someone else’s experience, please add that in "Other Notes".',
         otherSex: 'Choose MtF / FtM / X / Queer, or use the text field for another gender identity or additional notes.',
         selectedPoint: 'Selected point: {lat}, {lng}'
+      },
+      location: {
+        filled: 'Current location captured: {lat}, {lng}',
+        unsupported: 'Location is not available in this environment. Please open the page over HTTPS, or enter coordinates manually / pick a point on the map.',
+        permissionDenied: 'Location permission was denied. Please allow access to your location and try again.',
+        positionUnavailable: 'Your current location is temporarily unavailable. Please try again later.',
+        timeout: 'Getting your current location timed out. Please try again.',
+        failed: 'Failed to get your current location. Please try again.'
       },
       validation: {
         selectIdentity: 'Please choose your submission role',
@@ -1232,6 +1517,82 @@ const messages = {
         specifyOtherSex: 'Please choose MtF / FtM / X / Queer, or choose the text field and enter another gender identity or additional notes',
         fillOtherSex: 'Please enter another gender identity or additional notes',
         endDateBeforeStart: 'Departure date cannot be earlier than the first date sent there'
+      }
+    },
+    institutionCorrection: {
+      title: 'Institution Information Correction',
+      subtitle: 'Use this form if an institution shown on the map needs additional details, corrections, or updates.',
+      privacyNotice: 'Privacy notice: submissions from this form may be written to Google Form, the D1 database, or both depending on the site configuration. Please provide institution-facing public information only, and avoid unrelated personal sensitive information.',
+      backToMap: 'Back to Map',
+      sections: {
+        institution: 'Institution Information',
+        correction: 'Correction Details'
+      },
+      fields: {
+        schoolName: 'Institution Name',
+        province: 'Institution Province',
+        city: 'Institution City / District',
+        county: 'Institution County / District',
+        schoolAddress: 'Institution Address',
+        contactInformation: 'Institution Contact Information',
+        headmasterName: 'Principal / Person in Charge',
+        correctionContent: 'Correction Details'
+      },
+      placeholders: {
+        province: 'Optional: select the institution province',
+        city: 'Optional: select the institution province first',
+        countyInitial: 'Optional: select the institution city / district first',
+        county: 'Optional: select the institution county / district',
+        countyUnavailable: 'Optional: no county / district is available for the selected city',
+        schoolName: 'Enter the institution name that needs correction or supplementation',
+        schoolAddress: 'Optional: provide an updated address, or pick a point on the map / use the current location',
+        contactInformation: 'Optional: phone, email, or another public contact method',
+        headmasterName: 'Optional: principal / person in charge',
+        correctionContent: 'Describe what should be corrected or added'
+      },
+      buttons: {
+        openMap: 'Pick a point directly on the map',
+        getCurrentLocation: 'Use current location',
+        submit: 'Submit Correction',
+        locating: 'Locating...',
+        submitting: 'Submitting...'
+      },
+      hints: {
+        selectedPoint: 'Selected point: {lat}, {lng}',
+        correctionContent: 'Examples: relocation, updated contacts, added principal information, corrected map coordinates.'
+      },
+      location: {
+        filled: 'Current location captured: {lat}, {lng}',
+        unsupported: 'Location is not available in this environment. Please open the page over HTTPS, or enter coordinates manually / pick a point on the map.',
+        permissionDenied: 'Location permission was denied. Please allow access to your location and try again.',
+        positionUnavailable: 'Your current location is temporarily unavailable. Please try again later.',
+        timeout: 'Getting your current location timed out. Please try again.',
+        failed: 'Failed to get your current location. Please try again.'
+      },
+      validation: {
+        fillSchoolName: 'Please enter the institution name',
+        invalidProvince: 'Please choose a valid institution province',
+        provinceCityMismatch: 'The selected institution province and city / district do not match',
+        cityCountyMismatch: 'The selected institution city / district and county / district do not match'
+      },
+      success: {
+        title: 'Correction request received',
+        message: 'Thank you for the update. We will review this institution correction request and process it after verification.',
+        backToMap: 'Back to Map'
+      },
+      errorPage: {
+        title: 'Correction submission failed',
+        intro: 'The in-site correction submission did not complete successfully. If a prefilled Google Form fallback link is available below, you can continue there.',
+        privacyNote: 'Note: the link below contains the correction details you just entered, so please do not share it casually.',
+        proxyNote: 'Note: if your current network cannot access Google services directly, opening the Google Form page may require a network proxy.',
+        openFallback: 'Open Google Form to Continue',
+        urlLabel: 'Prefilled Google Form Link',
+        backToForm: 'Back to Correction Form'
+      },
+      errors: {
+        submitFailedPrefix: 'Submission failed: ',
+        storageUnavailable: 'The institution correction form is temporarily unavailable. Please try again later.',
+        submitFailed: 'Submission failed. Please try again later.'
       }
     },
     map: {
@@ -1315,7 +1676,9 @@ const messages = {
         opinionTitle: 'Why we want this used:',
         opinionBody: 'We genuinely hope you will use this API and integrate it into your own websites. Even if the main site is blocked, the data can continue to circulate through the API. That is one form of decentralization.',
         cta: 'Now that you know how it works, feel free to use the API and integrate it into your site.',
-        link: 'Get the API data source'
+        link: 'Get the API data source',
+        correctionHint: 'If any institution information on the map needs to be supplemented or corrected, you can also tell us through the form below.',
+        correctionButton: 'Institution Correction'
       }
     },
     about: {
@@ -1339,7 +1702,7 @@ const messages = {
         effectiveDateLabel: 'Effective Date',
         effectiveDateValue: 'April 9, 2026',
         updatedLabel: 'Last Updated',
-        updatedValue: 'April 9, 2026',
+        updatedValue: 'April 12, 2026',
         scopeLabel: 'Scope',
         scopeValue: 'Site pages, the form submission flow, and related public-facing display content'
       },
@@ -1373,6 +1736,7 @@ const messages = {
       formItems: [
         'Internally handled information typically includes personal details such as birth year and sex for internal review, verification, and statistics.',
         'Information that may be shown publicly typically includes related experiences, institution name, region, institution address, institution contact information, principal or headmaster name, descriptions of scandals or violence, and other supplemental content.',
+        'If you click a location button such as "Use current location", your browser will request location permission. The location result is only used to help fill the current address or coordinates and is sent only if you confirm and submit the form.',
         'Please do not place ID numbers, private phone numbers, home addresses, messaging account IDs, or other sensitive personal information in fields that may be made public.'
       ],
       cookieIntro: 'The cookie currently used by this site is listed below:',
@@ -1420,10 +1784,23 @@ const messages = {
       backHome: 'Back to Home',
       petition: 'Anti-Conversion Institution Petition'
     },
+    submitStatus: {
+      title: 'Debug Submission Result',
+      mode: 'Submission Mode:',
+      successfulTargets: 'Successful Targets:',
+      failedTargets: 'Failed Targets:',
+      error: 'Error:',
+      none: 'None',
+      targets: {
+        both: 'Google Form + D1',
+        d1: 'D1 Database',
+        google: 'Google Form'
+      }
+    },
     submitPreview: {
       title: 'Dry Run Preview',
-      intro: 'This submission was not sent to Google Form. Below is the final field set and value payload assembled locally.',
-      targetUrl: 'Target URL:',
+      intro: 'This submission has not been sent to the live submission target yet. Below is the final field set and value payload assembled locally.',
+      targetUrl: 'Google Form Target URL (if enabled):',
       columns: {
         entry: 'Google Form Entry',
         field: 'Field',
@@ -1434,7 +1811,7 @@ const messages = {
     },
     submitConfirm: {
       title: 'Confirm Submission',
-      intro: 'This step has not sent anything to Google Form yet. Please review the content below before confirming the final submission.',
+      intro: 'This step has not sent anything to the live submission target yet. Please review the content below before confirming the final submission.',
       targetUrl: 'Target URL:',
       columns: {
         entry: 'Google Form Entry',
@@ -1447,7 +1824,7 @@ const messages = {
     },
     submitError: {
       title: 'Submission Failed',
-      intro: 'The in-site submission did not complete successfully. You can continue by opening the Google Form link below with your data prefilled.',
+      intro: 'The in-site submission did not complete successfully. If a prefilled Google Form fallback link is available below, you can continue there.',
       privacyNote: 'Note: the link below contains the form content you just entered, so please do not share it casually.',
       proxyNote: 'Note: if your current network cannot access Google services directly, opening the Google Form page may require a network proxy.',
       openFallback: 'Open Google Form to Continue',
@@ -1545,11 +1922,14 @@ const messages = {
         apiUrl: 'API URL',
         debugMode: 'Debug Mode',
         formDryRun: 'Form Dry Run',
+        formSubmitTarget: 'Form Submission Target',
+        correctionSubmitTarget: 'Correction Submission Target',
         maintenanceMode: 'Maintenance Mode',
         maintenanceRetryAfter: 'Maintenance Retry-After',
         trustProxy: 'Trust Proxy',
         mapNodeTransport: 'Node Map Transport Override',
         googleForm: 'Google Form Submit URL',
+        correctionGoogleForm: 'Correction Google Form',
         googleScript: 'Private Map Upstream',
         publicMapDataUrl: 'Public Map Fallback URL',
         translationProvider: 'Translation Provider',
@@ -1579,8 +1959,36 @@ const messages = {
         milliseconds: '{count} ms',
         seconds: '{count} s'
       },
+      samples: {
+        d1SkippedError: 'Debug simulation skipped the real D1 write.',
+        form: {
+          schoolName: 'Debug Preview Academy',
+          schoolAddress: 'Debug Road 12, Luojiang District',
+          experience: 'Debug preview sample content for layout and localization checks.',
+          headmasterName: 'Debug Principal',
+          contactInformation: 'debug-preview@example.com',
+          scandal: 'Debug-only scandal summary placeholder.',
+          other: 'Debug-only additional notes placeholder.'
+        },
+        correction: {
+          schoolName: 'Debug Correction Academy',
+          schoolAddress: 'Debug Correction Road 5, Luojiang District',
+          contactInformation: 'debug-correction@example.com',
+          headmasterName: 'Debug Correction Principal',
+          correctionContent: 'Debug correction preview content for Google Form fallback and result-page checks.'
+        }
+      },
+      submitTargets: {
+        both: 'Google Form + D1',
+        d1: 'D1 Database',
+        google: 'Google Form'
+      },
       links: {
-        submitErrorPreview: 'Open submission error preview'
+        submitErrorPreview: 'Open submission error preview',
+        submitPreview: 'Open submission preview',
+        submitConfirm: 'Open submission confirmation',
+        correctionSubmitSuccessPreview: 'Open correction success preview',
+        correctionSubmitErrorPreview: 'Open correction error preview'
       }
     },
     data: {

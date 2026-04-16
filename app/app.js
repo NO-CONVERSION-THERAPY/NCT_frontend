@@ -5,8 +5,11 @@ const nodePath = require('path');
 const helmet = require('helmet');
 const {
   apiUrl,
+  correctionGoogleFormUrl,
+  correctionSubmitTarget,
   debugMod,
   formDryRun,
+  formSubmitTarget,
   formProtectionMaxAgeMs,
   formProtectionMinFillMs,
   formProtectionSecret,
@@ -37,6 +40,7 @@ const { createI18nMiddleware } = require('./middleware/i18n');
 const { createMaintenanceMiddleware } = require('./middleware/maintenance');
 const createApiRoutes = require('./routes/apiRoutes');
 const createFormRoutes = require('./routes/formRoutes');
+const createInstitutionCorrectionRoutes = require('./routes/institutionCorrectionRoutes');
 const createPageRoutes = require('./routes/pageRoutes');
 const configuredAssetVersion = String(process.env.ASSET_VERSION || '').trim();
 const assetVersion = configuredAssetVersion && configuredAssetVersion !== '0'
@@ -122,6 +126,9 @@ app.use(createPageRoutes({
   apiUrl,
   debugMod,
   formDryRun,
+  formSubmitTarget,
+  correctionGoogleFormUrl,
+  correctionSubmitTarget,
   formProtectionMaxAgeMs,
   formProtectionMinFillMs,
   formProtectionSecret,
@@ -145,11 +152,24 @@ app.use(createPageRoutes({
   title
 }));
 app.use(createFormRoutes({
+  debugMod,
   formDryRun,
+  formSubmitTarget,
   formProtectionMaxAgeMs,
   formProtectionMinFillMs,
   formProtectionSecret,
   googleFormUrl,
+  rateLimitRedisUrl,
+  submitRateLimitMax,
+  title
+}));
+app.use(createInstitutionCorrectionRoutes({
+  correctionGoogleFormUrl,
+  correctionSubmitTarget,
+  debugMod,
+  formProtectionMaxAgeMs,
+  formProtectionMinFillMs,
+  formProtectionSecret,
   rateLimitRedisUrl,
   submitRateLimitMax,
   title

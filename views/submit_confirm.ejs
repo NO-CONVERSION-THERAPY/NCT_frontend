@@ -133,11 +133,11 @@
                 </table>
             </div>
 
-            <form action="/submit/confirm" method="POST" id="confirmForm">
+            <form action="<%= typeof confirmAction !== 'undefined' && confirmAction ? confirmAction : '/submit/confirm' %>" method="POST" id="confirmForm">
                 <input type="hidden" name="confirmation_token" value="<%= confirmationToken %>">
                 <textarea name="confirmation_payload" hidden><%= confirmationPayload %></textarea>
                 <div class="confirm-actions">
-                    <a href="/form"><%= t('submitConfirm.backForm') %></a>
+                    <a href="<%= typeof backFormUrl !== 'undefined' && backFormUrl ? backFormUrl : '/form' %>"><%= t('submitConfirm.backForm') %></a>
                     <button type="submit" id="confirmSubmitButton"><%= t('submitConfirm.confirm') %></button>
                 </div>
             </form>

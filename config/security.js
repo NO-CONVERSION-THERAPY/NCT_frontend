@@ -28,13 +28,12 @@ const requestBodyLimits = {
   json: '50kb',
   urlencoded: '50kb'
 };
-const sensitiveRobotsPolicy = 'noindex, nofollow, noarchive, nosnippet';
+const sensitiveRobotsPolicy = '';
 const sensitiveResponseHeaders = {
   'Cache-Control': 'private, no-store, no-cache, max-age=0, must-revalidate',
   Pragma: 'no-cache',
   Expires: '0',
-  'Surrogate-Control': 'no-store',
-  'X-Robots-Tag': sensitiveRobotsPolicy
+  'Surrogate-Control': 'no-store'
 };
 
 // 复用 Redis client 和 rate-limit store，避免每个 limiter 单独建连接。
@@ -149,7 +148,7 @@ function createSubmitRateLimiter({ max, onLimit, getMessage, redisUrl }) {
 }
 
 function applySensitivePageHeaders(res) {
-  // 预览页、确认页、维护页都不应被缓存或被搜索引擎索引。
+  // 预览页、确认页、维护页都不应被缓存，避免令牌和动态状态被中间层复用。
   res.set(sensitiveResponseHeaders);
   return res;
 }

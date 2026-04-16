@@ -68,6 +68,7 @@ N·C·T is a site for documenting, organizing, and publicly presenting informati
 | Area | Description |
 | --- | --- |
 | Anonymous submission | Anonymous form flow with anti-abuse protection, rate limiting, and audit logging |
+| Institution correction | Provides `/map/correction` and `/correction` supplement / correction flows and can write to Google Form, D1, or both depending on config |
 | Public map | Public institution map plus `GET /api/map-data` for downstream reuse |
 | Blog content | Blog index, article pages, and Markdown rendering |
 | Multilingual UI | Simplified Chinese, Traditional Chinese, English, plus selective dynamic translation |
@@ -82,7 +83,7 @@ N·C·T is a site for documenting, organizing, and publicly presenting informati
 | Template engine | EJS |
 | Frontend | Vanilla JavaScript + Leaflet + Chart.js |
 | Runtime targets | Node.js / Cloudflare Workers |
-| Submission sink | Google Form |
+| Submission sink | Google Form / D1 (configurable) |
 | Map data source | Private Google Apps Script source with public API fallback |
 | Translation provider | Google Cloud Translation API, optional |
 | Config security | Built-in `secure-config` encryption helper |
@@ -103,16 +104,23 @@ flowchart TD
   A --> M[Middleware layer<br/>Helmet / i18n / Maintenance / Body Parser]
   A --> P[Page routes<br/>app/routes/pageRoutes.js]
   A --> F[Form routes<br/>app/routes/formRoutes.js]
+  A --> IC[Institution correction routes<br/>app/routes/institutionCorrectionRoutes.js]
   A --> I[API routes<br/>app/routes/apiRoutes.js]
 
   P --> V[View templates<br/>views/*.ejs]
   P --> C1[Content and site data<br/>blog/*.md / data.json / friends.json]
   P --> S1[Site outputs<br/>robots.txt / sitemap.xml]
 
-  F --> FS[formService<br/>validation + Google Form field mapping]
+  F --> FS[formService<br/>validation + submission field normalization]
   F --> FP[formProtectionService<br/>honeypot + fill-time token]
   F --> FC[formConfirmationService<br/>confirmation signing]
+  F --> FD1[formSubmissionStorageService<br/>D1 persistence]
   F --> GF[(Google Form)]
+  F --> D1[(D1)]
+
+  IC --> FP
+  IC --> ICS[institutionCorrectionService<br/>validation + D1 persistence]
+  ICS --> D1
 
   I --> MD[mapDataService<br/>cache + private-source priority + public fallback]
   I --> TS[textTranslationService<br/>translation cache + cooldown logic]
@@ -132,7 +140,7 @@ flowchart TD
 Notes:
 
 - Node.js and Workers share the same Express business logic. Workers only add entry-layer protection for large JSON responses.
-- Page routes, form routes, and API routes are separated, while core logic is pushed down into the `service` layer.
+- Page routes, anonymous form routes, institution correction routes, and API routes are separated, while core logic is pushed down into the `service` layer.
 - The map page, form cascading selectors, and autocomplete reuse the same `/api/*` endpoints instead of maintaining parallel data flows.
 
 ## Repository Layout
@@ -149,8 +157,13 @@ Notes:
 ├── public/                # static assets, GeoJSON, frontend scripts, styles
 ├── views/                 # EJS templates
 ├── blog/                  # Markdown blog articles
+├── migrations/            # D1 database migrations
 ├── scripts/               # utility scripts such as secure-config
 ├── tests/                 # automated tests
+├── data.json              # blog index and other site data
+├── friends.json           # about page links / acknowledgements
+├── server.js              # Vercel / Node compatible entry
+├── vercel.json            # Vercel deployment config
 └── worker.mjs             # Cloudflare Workers entry
 ```
 
@@ -169,7 +182,6 @@ npm install
 Node mode:
 
 ```bash
-cp .env.example .env
 npm start
 ```
 
@@ -182,9 +194,10 @@ npm run dev:workers
 
 Recommendations:
 
-- Keep `FORM_DRY_RUN="true"` during local development to avoid accidental writes to a production Google Form.
+- The repository currently does not include `.env.example`. If you need custom Node environment variables, create `.env` manually by following [`.dev.vars.example`](./.dev.vars.example) and remove the Workers-only `RUNTIME_TARGET`.
+- Keep `FORM_DRY_RUN="true"` during local development to avoid accidental writes to live production targets.
 - Use `.env` for Node mode and `.dev.vars` for Workers mode. Do not mix them.
-- For full inline configuration notes, read [`.env.example`](./.env.example) and [`.dev.vars.example`](./.dev.vars.example).
+- Full inline configuration notes currently live in [`.dev.vars.example`](./.dev.vars.example). For Node mode, write the same variable names into `.env`.
 
 ## Common Commands
 
@@ -223,28 +236,38 @@ Environment notes:
 
 ## Key Configuration
 
-This README only lists the most important variables. For the full set, see [`.env.example`](./.env.example).
+This README only lists the most important variables. For the full set, see [`.dev.vars.example`](./.dev.vars.example). In Node mode, put the same variable names into `.env`.
 
 | Variable | Purpose |
 | --- | --- |
 | `SITE_URL` | Canonical site URL for sitemap, robots, and canonical outputs |
-| `FORM_DRY_RUN` | When `true`, submissions are previewed but not sent to Google Form |
-| `FORM_PROTECTION_SECRET` | Core secret for form protection and encrypted config decryption |
+| `FORM_DRY_RUN` | When `true`, submissions are previewed but not sent to the configured live target |
+| `FORM_SUBMIT_TARGET` | `/form` submission target: `google`, `d1`, or `both`; defaults to `both` |
+| `CORRECTION_SUBMIT_TARGET` | `/map/correction` and `/correction` submission target: `google`, `d1`, or `both`; defaults to `d1` |
+| `FORM_PROTECTION_SECRET` | Core secret for form protection and encrypted config decryption; when empty, the app derives one automatically |
 | `FORM_ID` / `FORM_ID_ENCRYPTED` | Google Form ID, choose one |
+| `CORRECTION_FORM_ID` / `CORRECTION_GOOGLE_FORM_URL` | Google Form used by institution correction; accepts a Form ID or full URL and falls back to the built-in default when omitted |
 | `GOOGLE_SCRIPT_URL` / `GOOGLE_SCRIPT_URL_ENCRYPTED` | Private Apps Script data source, choose one |
 | `PUBLIC_MAP_DATA_URL` | Public fallback source when the private source is slow or unavailable |
 | `GOOGLE_CLOUD_TRANSLATION_API_KEY` | Required when translation features are enabled |
 | `MAINTENANCE_MODE` | Global maintenance switch |
 | `MAINTENANCE_NOTICE` | Maintenance page notice text |
-| `RATE_LIMIT_REDIS_URL` | Shared rate-limit storage recommended for multi-instance deployments |
+| `D1_BINDING_NAME` | Only needed when the D1 binding name is not the default `NCT_DB` / `DB` |
+| `RATE_LIMIT_REDIS_URL` | Shared rate-limit storage recommended for multi-instance deployments; defaults to empty |
 
 Configuration rules:
 
 - Choose only one of `FORM_ID` and `FORM_ID_ENCRYPTED`.
 - Choose only one of `GOOGLE_SCRIPT_URL` and `GOOGLE_SCRIPT_URL_ENCRYPTED`.
-- If you use encrypted values, `FORM_PROTECTION_SECRET` must be explicitly configured.
+- `FORM_SUBMIT_TARGET` accepts `google`, `d1`, and `both`, with `both` as the default.
+- `CORRECTION_SUBMIT_TARGET` accepts `google`, `d1`, and `both`, with `d1` as the default.
+- If `FORM_SUBMIT_TARGET` includes `google`, you still need `FORM_ID` or `FORM_ID_ENCRYPTED`.
+- If `CORRECTION_SUBMIT_TARGET` includes `google`, configure `CORRECTION_FORM_ID` or `CORRECTION_GOOGLE_FORM_URL`, or let the app use the built-in default correction form.
+- If `FORM_SUBMIT_TARGET` includes `d1`, make sure your Worker has a D1 binding; if the binding name is not `NCT_DB` or `DB`, also set `D1_BINDING_NAME`.
+- If `CORRECTION_SUBMIT_TARGET` includes `d1`, the same D1 binding requirement applies.
+- If you use `FORM_ID_ENCRYPTED` or `GOOGLE_SCRIPT_URL_ENCRYPTED`, `FORM_PROTECTION_SECRET` must still be explicitly configured.
 - In production Workers deployments, keep sensitive values in Cloudflare Variables and Secrets instead of committing them or placing them in `wrangler.jsonc`.
-- If you do not use encrypted config yet, at minimum store `FORM_ID`, `GOOGLE_SCRIPT_URL`, and `FORM_PROTECTION_SECRET` as Secrets.
+- If you do not use encrypted config yet, at minimum store `FORM_ID` and `GOOGLE_SCRIPT_URL` as Secrets; `FORM_PROTECTION_SECRET` can be set explicitly or left empty so the app derives one automatically.
 - If you do use encrypted config, keep `FORM_PROTECTION_SECRET` as a Secret, while `FORM_ID_ENCRYPTED` and `GOOGLE_SCRIPT_URL_ENCRYPTED` can be Text or Secret.
 
 ## Protecting Sensitive Configuration
@@ -270,7 +293,7 @@ For local Workers development, you can also read from `.dev.vars`:
 npm run secure-config -- bootstrap-env --env-file ".dev.vars"
 ```
 
-> Note: if your local runtime is in mainland China, real submissions to Google Form may be affected by network conditions. During development, it is safer to keep `FORM_DRY_RUN="true"` first.
+> Note: if your configured target includes Google Form and your local runtime is in mainland China, live submissions may be affected by network conditions. During development, it is safer to keep `FORM_DRY_RUN="true"` first.
 
 If you prefer a step-by-step flow, generate a secret first and then encrypt each value:
 
@@ -287,13 +310,13 @@ Important boundaries:
 
 - This reduces the risk of plain-text exposure in the repository, logs, generic config panels, or debug pages.
 - It does not replace backend trust boundaries. If an attacker can read all server-side secrets, encrypted values and their decryption secret may still be exposed together.
-- The most reliable way to prevent bypassing site-side validation is still to avoid exposing a final write endpoint as a publicly writable anonymous Google Form.
+- The most reliable way to prevent bypassing site-side validation is still to avoid exposing the final write path as a publicly writable anonymous Google Form or any other anonymous public write endpoint.
 
 ## Form Privacy Notice
 
 The current public notice used on the form page and `/privacy` is:
 
-> Privacy notice: personal basic information such as birth year and sex entered in this questionnaire will be kept strictly confidential. Experience descriptions and exposed institution information may be shown on public pages of this site. Submitted content is stored and organized through Google Form / Google Sheets. Please do not enter highly sensitive personal data such as ID numbers, private phone numbers, or home addresses in fields that may become public.
+> Privacy notice: personal basic information such as birth year and sex entered in this questionnaire will be kept strictly confidential. Experience descriptions and exposed institution information may be shown on public pages of this site. Submitted content may be written to Google Form, the D1 database, or both depending on the site configuration. Please do not enter highly sensitive personal data such as ID numbers, private phone numbers, or home addresses in fields that may become public.
 
 If you later change which fields are public, update all of the following together:
 
@@ -334,20 +357,22 @@ In the Cloudflare Dashboard:
 Additional notes:
 
 - You can adjust the production branch in `Settings -> Build -> Branch control`.
-- The repository copy of [`wrangler.jsonc`](./wrangler.jsonc) keeps only the required `RUNTIME_TARGET="workers"`. Put the rest of your variables in the Cloudflare Dashboard or local `.dev.vars`.
+- The repository copy of [`wrangler.jsonc`](./wrangler.jsonc) keeps `RUNTIME_TARGET="workers"` plus a minimal `NCT_DB` D1 binding, so GitHub / PR-based deployments can auto-provision D1 without committing an account-specific `database_id`.
+- Put the rest of your runtime Variables / Secrets in the Cloudflare Dashboard or local `.dev.vars`.
 
 ### 4. Add Variables and Secrets
 
 Deployment recommendations:
 
-- The simplest correct setup is to store `FORM_ID`, `GOOGLE_SCRIPT_URL`, and `FORM_PROTECTION_SECRET` as Secrets.
+- The simplest correct setup is to store `FORM_ID` and `GOOGLE_SCRIPT_URL` as Secrets; `FORM_PROTECTION_SECRET` can be stored as a Secret explicitly or left empty so the app derives one automatically.
 - If you want to further reduce the risk of accidental plain-text exposure, switch to `FORM_ID_ENCRYPTED` and `GOOGLE_SCRIPT_URL_ENCRYPTED`, while keeping `FORM_PROTECTION_SECRET` as a Secret.
 
 | Name | Type | Description |
 | --- | --- | --- |
 | `SITE_URL` | Text | Production site URL |
 | `FORM_DRY_RUN` | Text | Usually `false` in production |
-| `FORM_PROTECTION_SECRET` | Secret | Required for form protection and encrypted config decryption |
+| `FORM_SUBMIT_TARGET` | Text | `/form` submission target: `google`, `d1`, or `both`; defaults to `both` |
+| `FORM_PROTECTION_SECRET` | Secret | Used for form protection and encrypted config decryption; when empty, the app derives one automatically |
 | `FORM_ID` | Secret | Plain Google Form ID for the simple setup |
 | `FORM_ID_ENCRYPTED` | Text or Secret | Encrypted Google Form ID, leave `FORM_ID` empty when using this |
 | `GOOGLE_SCRIPT_URL` | Secret | Plain private data source URL for the simple setup |
@@ -356,37 +381,161 @@ Deployment recommendations:
 | `GOOGLE_CLOUD_TRANSLATION_API_KEY` | Secret | Only needed when translation is enabled |
 | `MAINTENANCE_MODE` | Text | Set to `true` when you need full-site maintenance mode |
 | `MAINTENANCE_NOTICE` | Text | Maintenance announcement text |
-| `RATE_LIMIT_REDIS_URL` | Secret | Recommended for multi-instance deployments |
+| `D1_BINDING_NAME` | Text | Only set this when the D1 binding name is not `NCT_DB` / `DB` |
+| `RATE_LIMIT_REDIS_URL` | Secret | Recommended for multi-instance deployments; defaults to empty |
 
-### 5. Bind the production domain
+### 5. Deploy D1
+
+Default deployment flow:
+
+1. Keep the repository copy of [`wrangler.jsonc`](./wrangler.jsonc) unchanged. It already contains the minimal D1 binding:
+
+```jsonc
+"d1_databases": [
+  {
+    "binding": "NCT_DB",
+    "migrations_dir": "migrations"
+  }
+]
+```
+
+2. Import the repository into Cloudflare `Workers & Pages`
+3. Add the runtime Variables / Secrets in `Settings -> Variables and Secrets`
+4. Deploy the project
+5. After the first deploy, open `Settings -> Bindings` and confirm that the `NCT_DB` binding is present
+
+If you want to use an existing D1 database in your own account:
+
+1. Open `Settings -> Bindings`
+2. Click `Add binding`
+3. Choose `D1 database`
+4. Set `Variable name` to `NCT_DB`
+5. Select the existing D1 database
+6. Save and redeploy once
+
+If you need to pin a specific existing D1 database in config, use the full form below:
+
+```jsonc
+"d1_databases": [
+  {
+    "binding": "NCT_DB",
+    "database_name": "<your-d1-database-name>",
+    "database_id": "<your-d1-database-id>",
+    "migrations_dir": "migrations"
+  }
+]
+```
+
+Notes:
+
+- If the binding name is not `NCT_DB` or `DB`, also set `D1_BINDING_NAME`
+- If you use separate Preview / Production environments, verify the D1 binding in both places
+- A `D1` binding is not part of Variables / Secrets, so environment variables alone are not enough
+
+### 6. D1 Tables and Common Queries
+
+This project mainly writes to these two D1 tables:
+
+| Route / feature | D1 table name | Description |
+| --- | --- | --- |
+| `/form` | `form_submissions` | Records written by the main anonymous form submission flow |
+| `/map/correction` | `institution_correction_submissions` | Records written by the institution information supplement / correction form |
+
+First, list the D1 databases available in your account:
+
+```bash
+npx wrangler d1 list
+```
+
+To query the remote production database, replace `<your-database-name>` in the command below and keep `--remote`:
+
+```bash
+npx wrangler d1 execute <your-database-name> --remote --command="SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;"
+```
+
+Common query examples:
+
+```bash
+# Latest 20 /form submissions
+npx wrangler d1 execute <your-database-name> --remote --command="SELECT id, school_name, contact_information, created_at FROM form_submissions ORDER BY created_at DESC LIMIT 20;"
+
+# Latest 20 /map/correction submissions
+npx wrangler d1 execute <your-database-name> --remote --command="SELECT id, school_name, correction_content, status, created_at FROM institution_correction_submissions ORDER BY created_at DESC LIMIT 20;"
+
+# Search /form by institution name
+npx wrangler d1 execute <your-database-name> --remote --command="SELECT id, school_name, province_name, city_name, created_at FROM form_submissions WHERE school_name LIKE '%institution name%' ORDER BY created_at DESC;"
+
+# Search /map/correction by institution name
+npx wrangler d1 execute <your-database-name> --remote --command="SELECT id, school_name, correction_content, status, created_at FROM institution_correction_submissions WHERE school_name LIKE '%institution name%' ORDER BY created_at DESC;"
+```
+
+If you only need the SQL itself, use:
+
+```sql
+SELECT name
+FROM sqlite_master
+WHERE type = 'table'
+ORDER BY name;
+
+SELECT id, school_name, contact_information, created_at
+FROM form_submissions
+ORDER BY created_at DESC
+LIMIT 20;
+
+SELECT id, school_name, correction_content, status, created_at
+FROM institution_correction_submissions
+ORDER BY created_at DESC
+LIMIT 20;
+
+SELECT *
+FROM form_submissions
+WHERE school_name LIKE '%institution name%'
+ORDER BY created_at DESC;
+
+SELECT *
+FROM institution_correction_submissions
+WHERE school_name LIKE '%institution name%'
+ORDER BY created_at DESC;
+```
+
+Notes:
+
+- To inspect table columns, run `PRAGMA table_info(form_submissions);` or `PRAGMA table_info(institution_correction_submissions);`
+- `--remote` queries the real Cloudflare database, while `--local` queries the local Wrangler development database
+
+### 7. Bind the production domain
 
 If you do not want to use `*.workers.dev`, add a custom domain in `Settings -> Domains & Routes`. After binding the domain, remember to update:
 
 - `SITE_URL`
 - `PUBLIC_MAP_DATA_URL`
 
-### 6. Post-launch checklist
+### 8. Post-launch checklist
 
 After production deployment, it is a good idea to manually verify at least these paths:
 
 - `/`
 - `/map`
 - `/form`
+- `/map/correction`
 - `/blog`
 - `/api/map-data`
+- `/api/area-options?provinceCode=110000`
+- `/cn.json`
 - `/sitemap.xml`
 - `/robots.txt`
 
-If `FORM_DRY_RUN="false"`, also perform a real form submission test to confirm that data reaches Google Form successfully.
+If `FORM_DRY_RUN="false"`, also perform a real submission test to confirm that data reaches the currently configured target backend(s) successfully.
+If translation is enabled, also test `POST /api/translate-text`.
 
-### 7. Known differences on Workers
+### 9. Known differences on Workers
 
 - Templates, blog Markdown, and JSON files are read from the Workers `/bundle`.
 - The translation service no longer uses a `curl` subprocess fallback and now always uses Google Cloud Translation API directly.
 - On Workers, `sitemap.xml` prefers each article's `CreationDate` metadata as `lastmod`.
 - If shared Redis is not configured, rate limiting falls back to single-instance memory mode, so cross-instance consistency is weaker.
 
-### 8. FAQ
+### 10. FAQ
 
 **Q: Will local `npm start` conflict with the Workers version?**<br>
 A: No. They are simply two different local entry points.
@@ -401,10 +550,15 @@ A: Because it calls `npx wrangler deploy` and stays aligned with this repository
 
 By default, every page route passes through the i18n middleware, so the UI language can be switched with `?lang=zh-CN`, `?lang=zh-TW`, or `?lang=en`. If maintenance mode is enabled, both pages and APIs are intercepted by the maintenance layer first.
 
+### Page Routes
+
 | Path | Description | Notes |
 | --- | --- | --- |
+| `/robots.txt` | Generated robots policy | Produced by `robotsService` |
+| `/sitemap.xml` | Generated sitemap | Reads `blog/` and `data.json` |
 | `/` | Home page with links to the form, map, and library | Renders `views/index.ejs` |
 | `/form` | Anonymous form page that injects area options, frontend validation rules, and anti-abuse tokens | Sends sensitive-page headers and is excluded from indexing |
+| `/map/correction` | Institution information supplement / correction page | Submits to `POST /map/correction/submit`; the write step requires a working D1 binding |
 | `/map` | Map overview page showing institution distribution, statistics, and the public data list | Supports `?inputType=` preset filtering |
 | `/map/record/:recordSlug` | Map submission detail page that renders a standalone submission view and supports previous / next navigation within the same institution | Entered from the `/map` "View detail page" action and renders `views/map_record.ejs` |
 | `/aboutus` | About page with project information and acknowledgements / friend links | Reads `friends.json` |
@@ -414,10 +568,29 @@ By default, every page route passes through the i18n middleware, so the UI langu
 | `/debug` | Debug page showing the current language, API URL, debug mode, and related runtime details | Only available when `DEBUG_MOD=true` |
 | `/debug/submit-error` | Standalone preview of the submission error page with a prefilled Google Form fallback link | Only available when `DEBUG_MOD=true` |
 
+### Submission Routes
+
+| Path | Description | Notes |
+| --- | --- | --- |
+| `POST /submit` | Entry point for anonymous form submissions | Returns a preview page when `FORM_DRY_RUN=true`, otherwise moves to the confirmation step |
+| `POST /submit/confirm` | Final submission step after confirmation | Writes to Google Form, D1, or both depending on `FORM_SUBMIT_TARGET` |
+| `POST /map/correction/submit` / `POST /correction/submit` | Entry point for institution supplement / correction submissions | Writes to Google Form, D1, or both based on `CORRECTION_SUBMIT_TARGET`; any successful target counts as success, and the failure page is shown only when every target fails |
+
+### API and Static Data Routes
+
+| Path | Description | Notes |
+| --- | --- | --- |
+| `/api/area-options` | Returns province / city / county cascading options | Pass `provinceCode` for cities or `cityCode` for counties |
+| `/api/map-data` | Returns aggregated map payload | Supports `?refresh=1` for a forced refresh and has stricter refresh rate limiting |
+| `POST /api/translate-text` | On-demand translation for a small set of map detail fields | Requires `GOOGLE_CLOUD_TRANSLATION_API_KEY` |
+| `/cn.json` | Returns the China GeoJSON used by the map | Both Node and Workers add large-file integrity protection |
+
 ## Related Files
 
-- [`.env.example`](./.env.example): example environment variables for Node mode
-- [`.dev.vars.example`](./.dev.vars.example): example local Workers variables
+- [`.dev.vars.example`](./.dev.vars.example): local environment variable template; for Node mode, create `.env` with the same variable names
+- [`migrations/`](./migrations): D1 schema migrations
+- [`server.js`](./server.js): Vercel / Node compatible entry
+- [`vercel.json`](./vercel.json): Vercel deployment config
 - [`wrangler.jsonc`](./wrangler.jsonc): Workers configuration
 - [`scripts/secure-config.js`](./scripts/secure-config.js): encryption helper for sensitive config
 - [`worker.mjs`](./worker.mjs): Cloudflare Workers entry
@@ -490,6 +663,14 @@ Field notes:
 ```
 
 If you want to turn the data into a map, you can use it directly with frontend mapping libraries such as [Leaflet](https://leafletjs.com). This project's own `/map` page is a complete example.
+
+### Other Frontend-Facing Endpoints
+
+| Endpoint | Purpose | Method / Parameters |
+| --- | --- | --- |
+| `/api/area-options` | Cascading province/city/county options for the form and institution correction page | `GET`; pass `provinceCode` or `cityCode` |
+| `/api/translate-text` | Small-batch translation for map detail fields | `POST` JSON; send `items` and `targetLanguage`, and configure a translation provider on the server |
+| `/cn.json` | China GeoJSON consumed by the map | `GET` |
 
 ---
 

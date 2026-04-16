@@ -98,8 +98,12 @@
     <body>
         <div class="submit-error-container">
             <div class="submit-error-card">
-                <h1><%= t('submitError.title') %></h1>
-                <p><%= t('submitError.intro') %></p>
+                <h1><%= t('institutionCorrection.errorPage.title') %></h1>
+                <p><%= t('institutionCorrection.errorPage.intro') %></p>
+
+                <% if (errorMessage) { %>
+                    <p class="submit-error-note"><%= errorMessage %></p>
+                <% } %>
 
                 <% if (showSubmissionDiagnostics && submissionDiagnostics) { %>
                     <div class="submit-error-debug">
@@ -119,16 +123,16 @@
 
                 <% if (fallbackUrl) { %>
                     <div class="submit-error-actions">
-                        <a href="<%= fallbackUrl %>" target="_blank" rel="noopener noreferrer"><%= t('submitError.openFallback') %></a>
-                        <a href="<%= typeof backFormUrl !== 'undefined' && backFormUrl ? backFormUrl : '/form' %>"><%= t('submitError.backForm') %></a>
+                        <a href="<%= fallbackUrl %>" target="_blank" rel="noopener noreferrer"><%= t('institutionCorrection.errorPage.openFallback') %></a>
+                        <a href="<%= typeof backFormUrl !== 'undefined' && backFormUrl ? backFormUrl : '/map/correction' %>"><%= t('institutionCorrection.errorPage.backToForm') %></a>
                     </div>
-                    <p class="submit-error-note"><%= t('submitError.privacyNote') %></p>
-                    <p class="submit-error-note"><%= t('submitError.proxyNote') %></p>
-                    <label for="fallbackUrlBox"><strong><%= t('submitError.urlLabel') %></strong></label>
+                    <p class="submit-error-note"><%= t('institutionCorrection.errorPage.privacyNote') %></p>
+                    <p class="submit-error-note"><%= t('institutionCorrection.errorPage.proxyNote') %></p>
+                    <label for="fallbackUrlBox"><strong><%= t('institutionCorrection.errorPage.urlLabel') %></strong></label>
                     <textarea id="fallbackUrlBox" class="submit-error-url" readonly><%= fallbackUrl %></textarea>
                 <% } else { %>
                     <div class="submit-error-actions">
-                        <a href="<%= typeof backFormUrl !== 'undefined' && backFormUrl ? backFormUrl : '/form' %>"><%= t('submitError.backForm') %></a>
+                        <a href="<%= typeof backFormUrl !== 'undefined' && backFormUrl ? backFormUrl : '/map/correction' %>"><%= t('institutionCorrection.errorPage.backToForm') %></a>
                     </div>
                 <% } %>
             </div>
