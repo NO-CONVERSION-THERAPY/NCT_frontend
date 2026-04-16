@@ -4,10 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "node -e \"require('./server'); console.log('Build sanity check passed.')\"",
+    "build": "npm run frontend:build && node -e \"require('./server'); console.log('Build sanity check passed.')\"",
+    "frontend:build": "vite build",
+    "frontend:dev": "vite --host",
     "start": "node app/server.js",
-    "test": "node --test",
-    "test:smoke": "node --test tests/playwright.smoke.js",
+    "test": "FRONTEND_VARIANT=legacy node --test",
+    "test:layout": "FRONTEND_VARIANT=react node --test tests/playwright.layout.test.js",
+    "test:smoke": "FRONTEND_VARIANT=legacy node --test tests/playwright.smoke.js",
     "playwright:install": "npx playwright install chromium",
     "secure-config": "node scripts/secure-config.js",
     "dev:workers": "npx wrangler dev",
@@ -29,14 +32,19 @@
     "express-rate-limit": "^8.3.1",
     "fs": "^0.0.1-security",
     "helmet": "^8.1.0",
+    "leaflet": "^1.9.4",
     "marked": "^4.3.0",
     "node-fetch": "^3.3.2",
     "path": "^0.12.7",
     "proxy-agent": "^8.0.1",
     "rate-limit-redis": "^4.3.1",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
     "redis": "^5.11.0"
   },
   "devDependencies": {
-    "playwright": "^1.59.1"
+    "@vitejs/plugin-react": "^6.0.1",
+    "playwright": "^1.59.1",
+    "vite": "^8.0.8"
   }
 }

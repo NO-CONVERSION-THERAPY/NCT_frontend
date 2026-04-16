@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <% if (typeof pageRobots !== 'undefined' && pageRobots) { %>
+    <meta name="robots" content="<%= pageRobots %>">
+    <% } %>
+    <title><%- title %></title>
+    <link rel="icon" href="/favicon.svg"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&family=Noto+Serif+SC:wght@500;700;900&display=swap" rel="stylesheet">
+    <% if (typeof reactStyleHref !== 'undefined' && reactStyleHref) { %>
+    <link rel="stylesheet" href="<%= reactStyleHref %>?v=<%= assetVersion %>">
+    <% } %>
+    <% if (typeof structuredDataJson !== 'undefined' && structuredDataJson) { %>
+    <script type="application/ld+json"><%- structuredDataJson %></script>
+    <% } %>
+    <script>
+        window.process = window.process || { env: {} };
+        window.process.env = window.process.env || {};
+        if (!window.process.env.NODE_ENV) {
+            window.process.env.NODE_ENV = 'production';
+        }
+    </script>
+    <script>
+        window.__NCT_BOOTSTRAP__ = <%- reactBootstrapJson %>;
+    </script>
+</head>
+<body>
+    <div id="root"></div>
+    <noscript>
+        <main style="padding:24px;font-family:system-ui,sans-serif;">
+            <h1><%= t('common.siteName') %></h1>
+            <p>JavaScript is required to load this experience.</p>
+        </main>
+    </noscript>
+    <% if (typeof reactScriptHref !== 'undefined' && reactScriptHref) { %>
+    <script type="module" src="<%= reactScriptHref %>?v=<%= assetVersion %>"></script>
+    <% } %>
+</body>
+</html>

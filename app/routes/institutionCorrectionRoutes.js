@@ -22,6 +22,7 @@ const {
   getSubmitTargets,
   shouldBuildGoogleFallbackUrl
 } = require('../services/submissionTargetService');
+const { renderFrontendPage } = require('../services/frontendRenderer');
 
 function normalizeInstitutionCorrectionTargetError({ error, req }) {
   if (error instanceof InstitutionCorrectionStorageUnavailableError) {
@@ -118,20 +119,40 @@ function renderInstitutionCorrectionFailurePage({
   submissionDiagnostics,
   title
 }) {
-  return res.status(statusCode).render('institution_correction_submit_error', {
-    backFormUrl: '/map/correction',
-    errorMessage,
-    fallbackUrl: shouldBuildGoogleFallbackUrl({
-      submitTarget: correctionSubmitTarget,
-      googleFormUrl: correctionGoogleFormUrl,
-      encodedPayload
-    })
-      ? buildGoogleFormPrefillUrl(correctionGoogleFormUrl, encodedPayload)
-      : '',
+  const pageTitle = req.t('pageTitles.institutionCorrectionError', { title });
+  const fallbackUrl = shouldBuildGoogleFallbackUrl({
+    submitTarget: correctionSubmitTarget,
+    googleFormUrl: correctionGoogleFormUrl,
+    encodedPayload
+  })
+    ? buildGoogleFormPrefillUrl(correctionGoogleFormUrl, encodedPayload)
+    : '';
+
+  res.status(statusCode);
+
+  return renderFrontendPage({
+    legacyData: {
+      backFormUrl: '/map/correction',
+      errorMessage,
+      fallbackUrl,
+      pageRobots: sensitiveRobotsPolicy,
+      showSubmissionDiagnostics,
+      submissionDiagnostics,
+      title: pageTitle
+    },
+    legacyView: 'institution_correction_submit_error',
+    pageProps: {
+      backFormUrl: '/map/correction',
+      errorMessage,
+      fallbackUrl,
+      showSubmissionDiagnostics,
+      submissionDiagnostics
+    },
     pageRobots: sensitiveRobotsPolicy,
-    showSubmissionDiagnostics,
-    submissionDiagnostics,
-    title: req.t('pageTitles.institutionCorrectionError', { title })
+    pageType: 'correction-error',
+    req,
+    res,
+    title: pageTitle
   });
 }
 
@@ -242,10 +263,22 @@ function createInstitutionCorrectionRoutes({
         successfulTargets: submissionDiagnostics.successfulTargets.map((target) => target.id)
       });
 
-      return res.render('institution_correction_submit', {
+      return renderFrontendPage({
+        legacyData: {
+          pageRobots: sensitiveRobotsPolicy,
+          showSubmissionDiagnostics,
+          submissionDiagnostics,
+          title: req.t('pageTitles.institutionCorrectionSuccess', { title })
+        },
+        legacyView: 'institution_correction_submit',
+        pageProps: {
+          showSubmissionDiagnostics,
+          submissionDiagnostics
+        },
         pageRobots: sensitiveRobotsPolicy,
-        showSubmissionDiagnostics,
-        submissionDiagnostics,
+        pageType: 'correction-success',
+        req,
+        res,
         title: req.t('pageTitles.institutionCorrectionSuccess', { title })
       });
     } catch (error) {

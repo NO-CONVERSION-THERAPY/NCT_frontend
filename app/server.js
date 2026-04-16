@@ -51,6 +51,13 @@ if (require.main === module) {
     } else {
       console.log('已啟用正式翻譯服務：google-cloud');
     }
+    if (app.locals.frontendVariant === 'react') {
+      console.log('前端模式：React + Vite liquid glass 版本已啟用。');
+    } else if (app.locals.frontendVariantRequested === 'react' && !app.locals.reactFrontendBuilt) {
+      console.warn('警告！FRONTEND_VARIANT=react，但缺少 public/react-app 构建产物，已自动回退到 legacy 前端。');
+    } else {
+      console.log('前端模式：legacy EJS 前端。');
+    }
     console.log(`Server is running at http://localhost:${appPort}`);
   });
 }

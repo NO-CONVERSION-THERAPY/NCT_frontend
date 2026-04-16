@@ -30,7 +30,7 @@ const messages = {
         'zh-TW': '繁中',
         en: 'English'
       },
-      footerBy: '© 2026 N·C·T Project. By: ',
+      footerBy: '© 2026 N·C·T Project.',
       loading: '加载中...',
       notFound: '未找到'
     },
@@ -60,8 +60,8 @@ const messages = {
     },
     index: {
       tagline: '凡真心所向，皆成回响；足以在偏见的荒原，震碎扭曲的枷锁',
-      fillForm: '参与填表',
-      viewMap: '查看扭转机构综合地图',
+      fillForm: '填写表单',
+      viewMap: '地图',
       blogLibrary: '文库'
     },
     blog: {
@@ -310,6 +310,7 @@ const messages = {
         loadFailed: '数据加载失败',
         translationLoading: '翻译中...',
         translationUnavailable: '翻译失败',
+        dateUnknown: '日期未标注',
         reportCounts: {
           self: '本人举报',
           agent: '代理举报'
@@ -350,7 +351,7 @@ const messages = {
       api: {
         summary: '想要调用 API？',
         privacy: '我们明确表示：我们永远不会泄露受访者的任何敏感性资料。',
-        beforeUse: '在调用 API 之前，我们要明白：HosinoNeko 站长只允许公开当前在地图上展示的资料。',
+        beforeUse: '在调用 API 之前，请注意：公开接口仅提供当前在地图页面上展示的资料。',
         implementationTitle: '我们如何实现的？',
         implementationBody: '首先你的表单会透过 Vercel 上传到 Google Forms，在那里生成一个电子表格。站长在其表格的 Apps Script 中部署了应用程序，会将地址一栏转化为经纬度并保存在表格中。然后 Google 侧会生成一个原始 JSON API。因为那个 API 包含全部资讯，所以不会公开。本站再从中取出需要的讯息，生成当前对外开放的 API。',
         opinionTitle: '我们的看法：',
@@ -365,10 +366,9 @@ const messages = {
       title: '关于我们',
       friendLinks: '致谢',
       ownership: '本项目由 TRANS UNION 维护、开发，透过Apachi-2.0 License开源。',
-      origin: '本网站建站于 2026 年 2 月 21 日，由 HosinoNeko 站长在逃到上海后建立。',
+      origin: '本网站建站于 2026 年 2 月 21 日，最初由幸存者社群协作建立。',
       thanks: '在这里衷心感谢以下项目、企业和个人为本项目提供了免费的援助，没有他们就没有这个网站的诞生：',
       friendDescriptions: {
-        hosinoneko: '站长、策划执行与社群建立',
         nanmuxue: '代码重构',
         hermaphroditus: '域名贡献者',
         muyuan: '社群传播、资料提供',
@@ -690,7 +690,7 @@ const messages = {
         'zh-TW': '繁中',
         en: 'English'
       },
-      footerBy: '© 2026 N·C·T Project. By: ',
+      footerBy: '© 2026 N·C·T Project.',
       loading: '載入中...',
       notFound: '未找到'
     },
@@ -720,8 +720,8 @@ const messages = {
     },
     index: {
       tagline: '凡真心所向，皆成迴響；足以在偏見的荒原，震碎扭曲的枷鎖',
-      fillForm: '參與填表',
-      viewMap: '查看扭轉機構綜合地圖',
+      fillForm: '填寫表單',
+      viewMap: '地圖',
       blogLibrary: '文庫'
     },
     blog: {
@@ -970,6 +970,7 @@ const messages = {
         loadFailed: '數據加載失敗',
         translationLoading: '翻譯中...',
         translationUnavailable: '翻譯失敗',
+        dateUnknown: '日期未標註',
         reportCounts: {
           self: '本人舉報',
           agent: '代理舉報'
@@ -1010,7 +1011,7 @@ const messages = {
       api: {
         summary: '想要調用 API？',
         privacy: '我們明確表示：我們永遠不會洩露受訪者的任何敏感性資料。',
-        beforeUse: '在調用 API 之前，我們要明白：HosinoNeko 站長只允許公開當前在地圖上展示的資料。',
+        beforeUse: '在調用 API 之前，請注意：公開介面僅提供目前在地圖頁面上展示的資料。',
         implementationTitle: '我們如何實現的？',
         implementationBody: '首先你的表單會透過 Vercel 上傳到 Google Forms，在那裡生成一個電子表格。站長在其表格的 Apps Script 中部署了應用程式，會將地址一欄轉化為經緯度並保存在表格中。然後 Google 側會生成一個原始 JSON API。因為那個 API 包含全部資訊，所以不會公開。本站再從中取出需要的訊息，生成當前對外開放的 API。',
         opinionTitle: '我們的看法：',
@@ -1025,10 +1026,9 @@ const messages = {
       title: '關於我們',
       friendLinks: '致謝',
       ownership: '本項目由 TRANS UNION 維護與開發 ，透過Apachi-2.0 License開源',
-      origin: '本網站建站於 2026 年 2 月 21 日，由 HosinoNeko 站長在逃到上海後建立。',
+      origin: '本網站建站於 2026 年 2 月 21 日，最初由倖存者社群協作建立。',
       thanks: '在這裡衷心感謝以下項目、企業和個人為本項目提供了免費的援助，沒有他們就沒有這個網站的誕生：',
       friendDescriptions: {
-        hosinoneko: '站長、策劃執行與社群建立',
         nanmuxue: '程式碼重構',
         hermaphroditus: '域名貢獻者',
         muyuan: '社群傳播、資料提供',
@@ -1350,7 +1350,7 @@ const messages = {
         'zh-TW': '繁中',
         en: 'English'
       },
-      footerBy: '© 2026 N·C·T Project. By: ',
+      footerBy: '© 2026 N·C·T Project.',
       loading: 'Loading...',
       notFound: 'Not Found'
     },
@@ -1380,8 +1380,8 @@ const messages = {
     },
     index: {
       tagline: 'Every sincere voice finds its resonance, enough to rend the warped fetters within the wilderness of bigotry.',
-      fillForm: 'Fill Out the Form',
-      viewMap: 'View the Conversion Institution Map',
+      fillForm: 'Form',
+      viewMap: 'Map',
       blogLibrary: 'Library'
     },
     blog: {
@@ -1630,6 +1630,7 @@ const messages = {
         loadFailed: 'Failed to load data',
         translationLoading: 'Translating...',
         translationUnavailable: 'Translation unavailable',
+        dateUnknown: 'Date unavailable',
         reportCounts: {
           self: 'Self reports',
           agent: 'Agent reports'
@@ -1670,7 +1671,7 @@ const messages = {
       api: {
         summary: 'Want to use the API?',
         privacy: 'We make this clear: we will never disclose any sensitive information about respondents.',
-        beforeUse: 'Before using the API, please note that HosinoNeko only allows access to the data currently shown on the public map.',
+        beforeUse: 'Before using the API, please note that the public endpoint only includes data currently shown on the map.',
         implementationTitle: 'How does it work?',
         implementationBody: 'First, your submission is sent through Vercel to Google Forms, where it is stored in a spreadsheet. An Apps Script attached to that spreadsheet converts addresses into latitude and longitude and stores the coordinates. Google then exposes a raw JSON API. Because that raw API contains all information, it is kept private. This site extracts only the required fields and exposes the public API you can use.',
         opinionTitle: 'Why we want this used:',
@@ -1685,10 +1686,9 @@ const messages = {
       title: 'About Us',
       friendLinks: 'THANKS',
       ownership: 'This project belongs to the TRANS UNION team, which holds all related intellectual property rights.',
-      origin: 'This website went online on February 21, 2026. HosinoNeko created it shortly after reaching Shanghai.',
+      origin: 'This website went online on February 21, 2026 and was originally built through survivor collaboration.',
       thanks: 'We sincerely thank the following projects, organizations, and individuals for helping make this website possible:',
       friendDescriptions: {
-        hosinoneko: 'Founder, planning/execution, and community building',
         nanmuxue: 'Code refactoring',
         hermaphroditus: 'Domain contributor',
         muyuan: 'Community outreach and source material support',

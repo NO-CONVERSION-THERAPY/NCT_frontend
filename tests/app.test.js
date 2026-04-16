@@ -562,7 +562,7 @@ test('map record page renders the standalone submission detail shell', async () 
 test('shared head pages render a single html and head root', async () => {
   const app = loadApp({ DEBUG_MOD: 'false' });
   const articleId = encodeURIComponent('關於心種子教育違法辦學的控告');
-  const routes = ['/aboutus', '/blog', '/map', '/map/record/test-record-token', `/port/${articleId}`];
+  const routes = ['/privacy', '/blog', '/map', '/map/record/test-record-token', `/port/${articleId}`];
 
   for (const route of routes) {
     const response = await requestPath(app, route);
@@ -1038,14 +1038,12 @@ test('standalone submit error preview respects explicit language selection', asy
   assert.match(String(traditionalChineseResponse.headers['set-cookie']), /lang=zh-TW/);
 });
 
-test('about page renders localized friend descriptions in english mode', async () => {
+test('about page route redirects back to the localized home page', async () => {
   const app = loadApp({ DEBUG_MOD: 'false' });
   const response = await requestPath(app, '/aboutus?lang=en');
 
-  assert.equal(response.statusCode, 200);
-  assert.match(response.body, /Founder, planning\/execution, and community building/);
-  assert.match(response.body, /Community outreach and source material support/);
-  assert.match(response.body, /Domain contributor/);
+  assert.equal(response.statusCode, 302);
+  assert.equal(response.headers.location, '/?lang=en');
 });
 
 test('privacy page documents the language cookie, form-disclosure flow, and footer exposes the link', async () => {

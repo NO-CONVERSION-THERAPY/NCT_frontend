@@ -8,6 +8,7 @@ const {
   correctionGoogleFormUrl,
   correctionSubmitTarget,
   debugMod,
+  frontendVariant,
   formDryRun,
   formSubmitTarget,
   formProtectionMaxAgeMs,
@@ -46,6 +47,12 @@ const configuredAssetVersion = String(process.env.ASSET_VERSION || '').trim();
 const assetVersion = configuredAssetVersion && configuredAssetVersion !== '0'
   ? configuredAssetVersion
   : String(Date.now());
+const reactScriptPath = nodePath.join(paths.reactBuild, 'app.js');
+const reactStylePath = nodePath.join(paths.reactBuild, 'app.css');
+const reactFrontendBuilt = fs.existsSync(reactScriptPath);
+const activeFrontendVariant = frontendVariant === 'react' && reactFrontendBuilt
+  ? 'react'
+  : 'legacy';
 // GeoJSON 在 Node / Workers 两侧都会频繁读取，启动时预读可以避免每次请求重复走磁盘。
 const chinaGeoJsonPayload = fs.readFileSync(nodePath.join(paths.public, 'cn.json'), 'utf8');
 
@@ -82,6 +89,13 @@ const app = express();
 
 app.disable('x-powered-by');
 app.locals.assetVersion = assetVersion;
+app.locals.frontendVariant = activeFrontendVariant;
+app.locals.frontendVariantRequested = frontendVariant;
+app.locals.reactFrontendBuilt = reactFrontendBuilt;
+app.locals.reactFrontendAssets = {
+  scriptHref: '/react-app/app.js',
+  styleHref: fs.existsSync(reactStylePath) ? '/react-app/app.css' : ''
+};
 app.set('trust proxy', trustProxy);
 app.use(helmet(helmetConfig));
 app.use(createI18nMiddleware());

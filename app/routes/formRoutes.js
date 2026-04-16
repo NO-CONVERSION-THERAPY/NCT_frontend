@@ -20,6 +20,7 @@ const {
 } = require('../services/formConfirmationService');
 const { validateFormProtection } = require('../services/formProtectionService');
 const { logAuditEvent } = require('../services/auditLogService');
+const { renderFrontendPage } = require('../services/frontendRenderer');
 const {
   buildSubmissionDiagnostics,
   getSubmitTargets,
@@ -117,14 +118,33 @@ function renderSubmitFailurePage({
   submissionDiagnostics,
   title
 }) {
-  return res.status(500).render('submit_error', {
-    fallbackUrl: shouldBuildGoogleFallbackUrl({ submitTarget: formSubmitTarget, googleFormUrl, encodedPayload })
-      ? buildGoogleFormPrefillUrl(googleFormUrl, encodedPayload)
-      : '',
+  const pageTitle = req.t('pageTitles.submitError', { title });
+  const fallbackUrl = shouldBuildGoogleFallbackUrl({ submitTarget: formSubmitTarget, googleFormUrl, encodedPayload })
+    ? buildGoogleFormPrefillUrl(googleFormUrl, encodedPayload)
+    : '';
+
+  res.status(500);
+
+  return renderFrontendPage({
+    legacyData: {
+      fallbackUrl,
+      pageRobots: sensitiveRobotsPolicy,
+      showSubmissionDiagnostics,
+      submissionDiagnostics,
+      title: pageTitle
+    },
+    legacyView: 'submit_error',
+    pageProps: {
+      backFormUrl: '/form',
+      fallbackUrl,
+      showSubmissionDiagnostics,
+      submissionDiagnostics
+    },
     pageRobots: sensitiveRobotsPolicy,
-    showSubmissionDiagnostics,
-    submissionDiagnostics,
-    title: req.t('pageTitles.submitError', { title })
+    pageType: 'submit-error',
+    req,
+    res,
+    title: pageTitle
   });
 }
 
@@ -207,16 +227,33 @@ function createFormRoutes({
 
       // 干跑模式下直接渲染预览页，不真正请求 Google。
       if (formDryRun) {
+        const pageTitle = req.t('pageTitles.submitPreview', { title });
+
         logAuditEvent(req, 'submit_preview_rendered', {
           fieldCount: fields.length,
           status: 200
         });
-        return res.render('submit_preview', {
-          title: req.t('pageTitles.submitPreview', { title }),
-          googleFormUrl: redactGoogleFormUrl(googleFormUrl),
-          fields,
-          encodedPayload,
-          pageRobots: sensitiveRobotsPolicy
+
+        return renderFrontendPage({
+          legacyData: {
+            title: pageTitle,
+            googleFormUrl: redactGoogleFormUrl(googleFormUrl),
+            fields,
+            encodedPayload,
+            pageRobots: sensitiveRobotsPolicy
+          },
+          legacyView: 'submit_preview',
+          pageProps: {
+            backFormUrl: '/form',
+            encodedPayload,
+            fields,
+            googleFormUrl: redactGoogleFormUrl(googleFormUrl)
+          },
+          pageRobots: sensitiveRobotsPolicy,
+          pageType: 'submit-preview',
+          req,
+          res,
+          title: pageTitle
         });
       }
 
@@ -233,12 +270,26 @@ function createFormRoutes({
         fieldCount: fields.length,
         status: 200
       });
-      return res.render('submit_confirm', {
+      return renderFrontendPage({
+        legacyData: {
+          pageRobots: sensitiveRobotsPolicy,
+          title: req.t('pageTitles.submitConfirm', { title }),
+          confirmationPayload,
+          confirmationToken,
+          fields: confirmationFields
+        },
+        legacyView: 'submit_confirm',
+        pageProps: {
+          backFormUrl: '/form',
+          confirmationPayload,
+          confirmationToken,
+          fields: confirmationFields
+        },
         pageRobots: sensitiveRobotsPolicy,
-        title: req.t('pageTitles.submitConfirm', { title }),
-        confirmationPayload,
-        confirmationToken,
-        fields: confirmationFields
+        pageType: 'submit-confirm',
+        req,
+        res,
+        title: req.t('pageTitles.submitConfirm', { title })
       });
     } catch (error) {
       logAuditEvent(req, 'submit_failed', {
@@ -335,10 +386,22 @@ function createFormRoutes({
         status: 200,
         successfulTargets: submissionDiagnostics.successfulTargets.map((target) => target.id)
       });
-      return res.render('submit', {
+      return renderFrontendPage({
+        legacyData: {
+          pageRobots: sensitiveRobotsPolicy,
+          showSubmissionDiagnostics,
+          submissionDiagnostics,
+          title
+        },
+        legacyView: 'submit',
+        pageProps: {
+          showSubmissionDiagnostics,
+          submissionDiagnostics
+        },
         pageRobots: sensitiveRobotsPolicy,
-        showSubmissionDiagnostics,
-        submissionDiagnostics,
+        pageType: 'submit-success',
+        req,
+        res,
         title
       });
     } catch (error) {

@@ -28,7 +28,9 @@
                             </h2>
                         </div>
                         <div class="blog-list-card__meta">
-                            <p><%= t('blog.author') %><%= Prot.author %></p>
+                            <% if (Prot.author) { %>
+                                <p><%= t('blog.author') %><%= Prot.author %></p>
+                            <% } %>
                             <p><%= t('blog.creationDate') %><%= Prot.localizedCreationDate || Prot.CreationDate %></p>
                             <p><%= t('blog.language') %><%= Prot.localizedLanguage || Prot.Language %></p>
                             <p class="blog-list-card__tags">

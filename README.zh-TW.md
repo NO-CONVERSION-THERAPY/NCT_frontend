@@ -161,7 +161,7 @@ flowchart TD
 ├── scripts/               # 運維腳本，例如 secure-config
 ├── tests/                 # 自動化測試
 ├── data.json              # 部落格索引等站點資料
-├── friends.json           # 關於頁友鏈 / 致謝資料
+├── friends.json           # 歷史致謝資料備份，供相容 / 回滾時參考
 ├── server.js              # Vercel / Node 相容入口
 ├── vercel.json            # Vercel 部署配置
 └── worker.mjs             # Cloudflare Workers 入口
@@ -556,7 +556,7 @@ A: 因為它會呼叫 `npx wrangler deploy`，並且與本倉庫的 `package.jso
 | `/map/correction` | 機構資訊補充 / 修正頁 | 提交到 `POST /map/correction/submit`；實際寫入時需要可用 D1 綁定 |
 | `/map` | 地圖總覽頁，展示機構分布、統計與公開資料列表 | 支援 `?inputType=` 預設篩選 |
 | `/map/record/:recordSlug` | 地圖提交詳情頁，獨立展示單筆提交內容並支援同機構記錄上下翻頁 | 從 `/map` 的「查看詳情頁」進入，對應 `views/map_record.ejs` |
-| `/aboutus` | 關於頁，展示專案說明與友鏈／致謝資訊 | 會讀取 `friends.json` |
+| `/aboutus` | 舊關於頁相容入口 | 現在會 `302` 重新導向到 `/?lang=目前語言`，用於相容歷史連結 |
 | `/privacy` | 隱私政策與 Cookie 說明頁 | 用於公開說明資料使用邊界 |
 | `/blog` | 文庫列表頁，展示部落格文章與標籤篩選 | 支援 `?tag=<tagId>` |
 | `/port/:id` | 單篇文章詳情頁 | `:id` 會嚴格限制在 `blog/` 目錄內解析，防止路徑穿越 |

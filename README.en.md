@@ -161,7 +161,7 @@ Notes:
 ├── scripts/               # utility scripts such as secure-config
 ├── tests/                 # automated tests
 ├── data.json              # blog index and other site data
-├── friends.json           # about page links / acknowledgements
+├── friends.json           # archived acknowledgement data kept for compatibility / rollback
 ├── server.js              # Vercel / Node compatible entry
 ├── vercel.json            # Vercel deployment config
 └── worker.mjs             # Cloudflare Workers entry
@@ -561,7 +561,7 @@ By default, every page route passes through the i18n middleware, so the UI langu
 | `/map/correction` | Institution information supplement / correction page | Submits to `POST /map/correction/submit`; the write step requires a working D1 binding |
 | `/map` | Map overview page showing institution distribution, statistics, and the public data list | Supports `?inputType=` preset filtering |
 | `/map/record/:recordSlug` | Map submission detail page that renders a standalone submission view and supports previous / next navigation within the same institution | Entered from the `/map` "View detail page" action and renders `views/map_record.ejs` |
-| `/aboutus` | About page with project information and acknowledgements / friend links | Reads `friends.json` |
+| `/aboutus` | Legacy about-page compatibility entry | Now returns a `302` redirect to `/?lang=<current language>` for old links |
 | `/privacy` | Privacy and Cookie Notice page | Explains public-facing data handling boundaries |
 | `/blog` | Library index page with blog entries and tag filtering | Supports `?tag=<tagId>` |
 | `/port/:id` | Single article detail page | `:id` is strictly resolved inside the `blog/` directory to prevent path traversal |

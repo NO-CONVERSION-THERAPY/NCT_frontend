@@ -11,7 +11,6 @@ const {
   getLocalizedSexOptions
 } = require('../../config/formConfig');
 const { renderBlogArticleHtml, translateBlogListEntries } = require('../services/blogTranslationService');
-const { loadFriends } = require('../services/friendsService');
 const { issueFormProtectionToken } = require('../services/formProtectionService');
 const { generateRobotsTxt } = require('../services/robotsService');
 const { generateSitemapXml } = require('../services/sitemapService');
@@ -29,6 +28,10 @@ const {
   encodeGoogleFormFields
 } = require('../services/formService');
 const { issueFormConfirmationToken } = require('../services/formConfirmationService');
+const {
+  renderFrontendPage,
+  shouldUseReactFrontend
+} = require('../services/frontendRenderer');
 const { buildInstitutionCorrectionGoogleFormFields } = require('../services/institutionCorrectionService');
 
 function translateWithFallback(t, key, fallbackValue = '') {
@@ -92,6 +95,78 @@ function localizeBlogTagMap(tagMap, t) {
   );
 }
 
+function buildHomeStructuredData() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    description: 'Victims Union 是由扭转治疗幸存者组成的独立组织，致力于曝光戒网瘾学校及扭转机构的身心折磨。',
+    headline: '终结扭转治疗：NCT 揭露戒网瘾学校真相',
+    image: 'https://www.victimsunion.org/favicon.svg',
+    keywords: 'CONVERSION THERAPY, 戒网瘾学校, 扭转机构, LGBTQIA',
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': 'https://www.victimsunion.org'
+    },
+    name: 'Victims Union',
+    publisher: {
+      '@type': 'Organization',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://www.victimsunion.org/favicon.svg'
+      },
+      name: 'Victims Union',
+      url: 'https://victimsunion.org'
+    }
+  };
+}
+
+async function loadLocalizedBlogListing({ language, t }) {
+  const savedTags = JSON.parse(fs.readFileSync(paths.blogData, 'utf-8'));
+  const localizedEntries = await translateBlogListEntries(savedTags.Data, {
+    targetLanguage: language
+  });
+
+  return {
+    entries: localizedEntries.map((entry) => ({
+      ...entry,
+      localizedCreationDate: localizeBlogCreationDate(entry.CreationDate, language),
+      localizedLanguage: localizeBlogLanguageLabel(entry.Language, t)
+    })),
+    tags: localizeBlogTagMap(savedTags.TagList, t)
+  };
+}
+
+async function buildPortalPageProps({ apiUrl, formProtectionSecret, initialSection, req }) {
+  const t = req.t;
+  const { provinces } = getAreaOptions(req.lang);
+  const localizedBlogListing = await loadLocalizedBlogListing({
+    language: req.lang,
+    t
+  });
+
+  return {
+    apiUrl,
+    blog: {
+      activeTag: typeof req.query.tag === 'string' ? req.query.tag : '',
+      entries: localizedBlogListing.entries,
+      tags: localizedBlogListing.tags
+    },
+    form: {
+      areaOptions: { provinces },
+      formProtectionToken: issueFormProtectionToken({ secret: formProtectionSecret }),
+      formRules: getLocalizedFormRules(t),
+      identityOptions: getLocalizedIdentityOptions(t),
+      otherSexTypeOptions: getLocalizedOtherSexTypeOptions(t),
+      sexOptions: getLocalizedSexOptions(t)
+    },
+    initialSection,
+    mapQuery: {
+      inputType: typeof req.query.inputType === 'string' ? req.query.inputType : '',
+      search: typeof req.query.search === 'string' ? req.query.search : ''
+    }
+  };
+}
+
 function resolveMarkdownPath(blogDirectory, articleId) {
   if (
     typeof articleId !== 'string'
@@ -135,6 +210,12 @@ function buildDebugSubmitErrorPreviewUrl(googleFormUrl) {
 
 function encodeDebugConfirmationPayload(confirmationState) {
   return Buffer.from(JSON.stringify(confirmationState || {}), 'utf8').toString('base64url');
+}
+
+function buildLocalizedRedirectPath(pathname, language) {
+  const query = new URLSearchParams();
+  query.set('lang', language || 'zh-CN');
+  return `${pathname}?${query.toString()}`;
 }
 
 function buildDebugSampleSubmissionValues(t) {
@@ -468,6 +549,13 @@ function buildDebugSections({
   ];
 }
 
+function buildDebugPageProps({ debugSections, debugTools }) {
+  return {
+    debugSections,
+    debugTools
+  };
+}
+
 // 页面路由只负责渲染模板，不承载表单提交或 API 逻辑。
 function createPageRoutes({
   apiUrl,
@@ -534,19 +622,32 @@ function createPageRoutes({
 
   // 首頁：项目导航入口。
   router.get('/', pageReadLimiter, (req, res) => {
-    res.render('index', {
-      title: req.t('pageTitles.home', { title }),
-      apiUrl
+    const pageTitle = req.t('pageTitles.home', { title });
+
+    return renderFrontendPage({
+      legacyData: {
+        apiUrl,
+        title: pageTitle
+      },
+      legacyView: 'index',
+      pageProps: {
+        apiUrl
+      },
+      pageType: 'home',
+      req,
+      res,
+      structuredData: buildHomeStructuredData(),
+      title: pageTitle
     });
   });
 
   // 表單頁：把地区联动数据和前端校验规则一并下发到模板。
-  router.get('/form', pageReadLimiter, (req, res) => {
+  router.get('/form', pageReadLimiter, async (req, res) => {
     const t = req.t;
     const { provinces } = getAreaOptions(req.lang);
-    applySensitivePageHeaders(res);
-    res.render('form', {
-      title: t('pageTitles.form', { title }),
+    const pageTitle = t('pageTitles.form', { title });
+    const legacyData = {
+      title: pageTitle,
       apiUrl,
       areaOptions: { provinces },
       formProtectionToken: issueFormProtectionToken({ secret: formProtectionSecret }),
@@ -555,7 +656,31 @@ function createPageRoutes({
       otherSexTypeOptions: getLocalizedOtherSexTypeOptions(t),
       pageRobots: sensitiveRobotsPolicy,
       sexOptions: getLocalizedSexOptions(t)
-    });
+    };
+
+    applySensitivePageHeaders(res);
+
+    if (shouldUseReactFrontend(req)) {
+      const portalPageProps = await buildPortalPageProps({
+        apiUrl,
+        formProtectionSecret,
+        initialSection: 'form',
+        req
+      });
+
+      return renderFrontendPage({
+        legacyData,
+        legacyView: 'form',
+        pageProps: portalPageProps,
+        pageRobots: sensitiveRobotsPolicy,
+        pageType: 'portal',
+        req,
+        res,
+        title: pageTitle
+      });
+    }
+
+    return res.render('form', legacyData);
   });
 
   router.get(['/map/correction', '/correction'], pageReadLimiter, (req, res) => {
@@ -568,53 +693,109 @@ function createPageRoutes({
     const correctionBasePath = req.path.startsWith('/correction') ? '/correction' : '/map/correction';
 
     applySensitivePageHeaders(res);
-    res.render('institution_correction', {
-      title: t('pageTitles.institutionCorrection', { title }),
-      apiUrl,
-      areaOptions: { provinces },
-      correctionFormAction: `${correctionBasePath}/submit`,
-      formProtectionToken: issueFormProtectionToken({ secret: formProtectionSecret }),
-      initialSchoolName,
-      institutionCorrectionRules,
-      pageRobots: sensitiveRobotsPolicy
+    return renderFrontendPage({
+      legacyData: {
+        title: t('pageTitles.institutionCorrection', { title }),
+        apiUrl,
+        areaOptions: { provinces },
+        correctionFormAction: `${correctionBasePath}/submit`,
+        formProtectionToken: issueFormProtectionToken({ secret: formProtectionSecret }),
+        initialSchoolName,
+        institutionCorrectionRules,
+        pageRobots: sensitiveRobotsPolicy
+      },
+      legacyView: 'institution_correction',
+      pageProps: {
+        apiUrl,
+        areaOptions: { provinces },
+        correctionFormAction: `${correctionBasePath}/submit`,
+        formProtectionToken: issueFormProtectionToken({ secret: formProtectionSecret }),
+        initialSchoolName,
+        institutionCorrectionRules
+      },
+      pageRobots: sensitiveRobotsPolicy,
+      pageType: 'correction',
+      req,
+      res,
+      title: t('pageTitles.institutionCorrection', { title })
     });
   });
 
   // 地圖頁：展示汇总后的机构数据。
-  router.get('/map', pageReadLimiter, (req, res) => {
-    res.render('map', {
-      title: req.t('pageTitles.map', { title }),
+  router.get('/map', pageReadLimiter, async (req, res) => {
+    const pageTitle = req.t('pageTitles.map', { title });
+    const legacyData = {
+      title: pageTitle,
       apiUrl,
       QTag: req.query.inputType || '',
       provinceMetadata: getClientProvinceMetadata()
-    });
+    };
+
+    if (shouldUseReactFrontend(req)) {
+      const portalPageProps = await buildPortalPageProps({
+        apiUrl,
+        formProtectionSecret,
+        initialSection: 'map',
+        req
+      });
+
+      return renderFrontendPage({
+        legacyData,
+        legacyView: 'map',
+        pageProps: portalPageProps,
+        pageType: 'portal',
+        req,
+        res,
+        title: pageTitle
+      });
+    }
+
+    return res.render('map', legacyData);
   });
 
   router.get('/map/record/:recordSlug', pageReadLimiter, (req, res) => {
-    res.render('map_record', {
-      title: req.t('pageTitles.mapRecord', { title }),
-      apiUrl,
-      recordSlug: req.params.recordSlug || ''
+    const pageTitle = req.t('pageTitles.mapRecord', { title });
+
+    return renderFrontendPage({
+      legacyData: {
+        title: pageTitle,
+        apiUrl,
+        recordSlug: req.params.recordSlug || ''
+      },
+      legacyView: 'map_record',
+      pageProps: {
+        apiUrl,
+        inputType: typeof req.query.inputType === 'string' ? req.query.inputType : '',
+        recordSlug: req.params.recordSlug || '',
+        search: typeof req.query.search === 'string' ? req.query.search : ''
+      },
+      pageType: 'record',
+      req,
+      res,
+      title: pageTitle
     });
   });
 
-  // 關於頁：这里额外读取 friends.json 作为友链数据源。
-  router.get('/aboutus', pageReadLimiter, async (req, res) => {
-    const friendsData = await loadFriends({
-      language: req.lang,
-      t: req.t
-    });
-    res.render('about', {
-      title: req.t('pageTitles.about', { title }),
-      friends: friendsData,
-      apiUrl
-    });
+  router.get('/aboutus', pageReadLimiter, (req, res) => {
+    return res.redirect(302, buildLocalizedRedirectPath('/', req.lang));
   });
 
   router.get('/privacy', pageReadLimiter, (req, res) => {
-    res.render('privacy', {
-      title: req.t('pageTitles.privacy', { title }),
-      apiUrl
+    const pageTitle = req.t('pageTitles.privacy', { title });
+
+    return renderFrontendPage({
+      legacyData: {
+        title: pageTitle,
+        apiUrl
+      },
+      legacyView: 'privacy',
+      pageProps: {
+        apiUrl
+      },
+      pageType: 'privacy',
+      req,
+      res,
+      title: pageTitle
     });
   });
 
@@ -624,66 +805,81 @@ function createPageRoutes({
       return res.status(404).send(req.t('common.notFound'));
     }
 
-    res.render('debug', {
+    const debugSections = buildDebugSections({
       apiUrl,
-      debugSections: buildDebugSections({
+      assetVersion: req.app.locals.assetVersion,
+      correctionGoogleFormUrl,
+      correctionSubmitTarget,
+      debugMod,
+      formDryRun,
+      formSubmitTarget,
+      formProtectionMaxAgeMs,
+      formProtectionMinFillMs,
+      formProtectionSecretConfigured,
+      googleFormUrl,
+      googleScriptUrl,
+      isWorkersRuntime,
+      maintenanceMode,
+      maintenanceRetryAfterSeconds,
+      mapDataNodeTransportOverrides,
+      mapDataUpstreamTimeoutMs,
+      mapReadRateLimitMax,
+      pageReadRateLimitMax,
+      publicMapDataUrl,
+      rateLimitRedisUrl,
+      requestPath: {
+        language: req.lang,
+        path: req.originalUrl
+      },
+      siteUrl,
+      submitRateLimitMax,
+      t: req.t,
+      title,
+      translationProviderConfigured,
+      translationProviderTimeoutMs,
+      trustProxy
+    });
+    const debugTools = [
+      {
+        href: '/debug/submit-error',
+        label: req.t('debug.links.submitErrorPreview')
+      },
+      {
+        href: '/debug/submit-preview',
+        label: req.t('debug.links.submitPreview')
+      },
+      {
+        href: '/debug/submit-confirm',
+        label: req.t('debug.links.submitConfirm')
+      },
+      {
+        href: '/debug/correction-submit-success',
+        label: req.t('debug.links.correctionSubmitSuccessPreview')
+      },
+      {
+        href: '/debug/correction-submit-error',
+        label: req.t('debug.links.correctionSubmitErrorPreview')
+      }
+    ];
+    const pageTitle = req.t('pageTitles.debug', { title });
+
+    return renderFrontendPage({
+      legacyData: {
         apiUrl,
-        assetVersion: req.app.locals.assetVersion,
-        correctionGoogleFormUrl,
-        correctionSubmitTarget,
-        debugMod,
-        formDryRun,
-        formSubmitTarget,
-        formProtectionMaxAgeMs,
-        formProtectionMinFillMs,
-        formProtectionSecretConfigured,
-        googleFormUrl,
-        googleScriptUrl,
-        isWorkersRuntime,
-        maintenanceMode,
-        maintenanceRetryAfterSeconds,
-        mapDataNodeTransportOverrides,
-        mapDataUpstreamTimeoutMs,
-        mapReadRateLimitMax,
-        pageReadRateLimitMax,
-        publicMapDataUrl,
-        rateLimitRedisUrl,
-        requestPath: {
-          language: req.lang,
-          path: req.originalUrl
-        },
-        siteUrl,
-        submitRateLimitMax,
-        t: req.t,
-        title,
-        translationProviderConfigured,
-        translationProviderTimeoutMs,
-        trustProxy
+        debugMode: debugMod,
+        debugSections,
+        debugTools,
+        title: pageTitle
+      },
+      legacyView: 'debug',
+      pageProps: buildDebugPageProps({
+        debugSections,
+        debugTools
       }),
-      debugTools: [
-        {
-          href: '/debug/submit-error',
-          label: req.t('debug.links.submitErrorPreview')
-        },
-        {
-          href: '/debug/submit-preview',
-          label: req.t('debug.links.submitPreview')
-        },
-        {
-          href: '/debug/submit-confirm',
-          label: req.t('debug.links.submitConfirm')
-        },
-        {
-          href: '/debug/correction-submit-success',
-          label: req.t('debug.links.correctionSubmitSuccessPreview')
-        },
-        {
-          href: '/debug/correction-submit-error',
-          label: req.t('debug.links.correctionSubmitErrorPreview')
-        }
-      ],
-      debugMode: debugMod,
-      title: req.t('pageTitles.debug', { title })
+      pageType: 'debug',
+      req,
+      res,
+      title: pageTitle
     });
   });
 
@@ -693,12 +889,26 @@ function createPageRoutes({
     }
 
     applySensitivePageHeaders(res);
-    res.render('submit_error', {
-      backFormUrl: '/debug',
-      fallbackUrl: buildDebugSubmitErrorPreviewUrl(googleFormUrl),
+    return renderFrontendPage({
+      legacyData: {
+        backFormUrl: '/debug',
+        fallbackUrl: buildDebugSubmitErrorPreviewUrl(googleFormUrl),
+        pageRobots: sensitiveRobotsPolicy,
+        showSubmissionDiagnostics: false,
+        submissionDiagnostics: null,
+        title: req.t('pageTitles.submitError', { title })
+      },
+      legacyView: 'submit_error',
+      pageProps: {
+        backFormUrl: '/debug',
+        fallbackUrl: buildDebugSubmitErrorPreviewUrl(googleFormUrl),
+        showSubmissionDiagnostics: false,
+        submissionDiagnostics: null
+      },
       pageRobots: sensitiveRobotsPolicy,
-      showSubmissionDiagnostics: false,
-      submissionDiagnostics: null,
+      pageType: 'submit-error',
+      req,
+      res,
       title: req.t('pageTitles.submitError', { title })
     });
   });
@@ -709,12 +919,24 @@ function createPageRoutes({
     }
 
     applySensitivePageHeaders(res);
-    res.render('submit_preview', {
+    return renderFrontendPage({
+      legacyData: {
       ...buildDebugSubmitPreviewModel({
         googleFormUrl,
         t: req.t
       }),
       pageRobots: sensitiveRobotsPolicy,
+      title: req.t('pageTitles.submitPreview', { title })
+      },
+      legacyView: 'submit_preview',
+      pageProps: buildDebugSubmitPreviewModel({
+        googleFormUrl,
+        t: req.t
+      }),
+      pageRobots: sensitiveRobotsPolicy,
+      pageType: 'submit-preview',
+      req,
+      res,
       title: req.t('pageTitles.submitPreview', { title })
     });
   });
@@ -725,12 +947,24 @@ function createPageRoutes({
     }
 
     applySensitivePageHeaders(res);
-    res.render('submit_confirm', {
+    return renderFrontendPage({
+      legacyData: {
       ...buildDebugSubmitConfirmModel({
         formProtectionSecret,
         t: req.t
       }),
       pageRobots: sensitiveRobotsPolicy,
+      title: req.t('pageTitles.submitConfirm', { title })
+      },
+      legacyView: 'submit_confirm',
+      pageProps: buildDebugSubmitConfirmModel({
+        formProtectionSecret,
+        t: req.t
+      }),
+      pageRobots: sensitiveRobotsPolicy,
+      pageType: 'submit-confirm',
+      req,
+      res,
       title: req.t('pageTitles.submitConfirm', { title })
     });
   });
@@ -741,10 +975,22 @@ function createPageRoutes({
     }
 
     applySensitivePageHeaders(res);
-    res.render('submit', {
+    return renderFrontendPage({
+      legacyData: {
+        pageRobots: sensitiveRobotsPolicy,
+        showSubmissionDiagnostics: true,
+        submissionDiagnostics: buildDebugSubmissionDiagnostics(req.t),
+        title: req.t('common.siteName')
+      },
+      legacyView: 'submit',
+      pageProps: {
+        showSubmissionDiagnostics: true,
+        submissionDiagnostics: buildDebugSubmissionDiagnostics(req.t)
+      },
       pageRobots: sensitiveRobotsPolicy,
-      showSubmissionDiagnostics: true,
-      submissionDiagnostics: buildDebugSubmissionDiagnostics(req.t),
+      pageType: 'submit-success',
+      req,
+      res,
       title: req.t('common.siteName')
     });
   });
@@ -755,10 +1001,22 @@ function createPageRoutes({
     }
 
     applySensitivePageHeaders(res);
-    res.render('institution_correction_submit', {
+    return renderFrontendPage({
+      legacyData: {
+        pageRobots: sensitiveRobotsPolicy,
+        showSubmissionDiagnostics: true,
+        submissionDiagnostics: buildDebugSubmissionDiagnostics(req.t),
+        title: req.t('pageTitles.institutionCorrectionSuccess', { title })
+      },
+      legacyView: 'institution_correction_submit',
+      pageProps: {
+        showSubmissionDiagnostics: true,
+        submissionDiagnostics: buildDebugSubmissionDiagnostics(req.t)
+      },
       pageRobots: sensitiveRobotsPolicy,
-      showSubmissionDiagnostics: true,
-      submissionDiagnostics: buildDebugSubmissionDiagnostics(req.t),
+      pageType: 'correction-success',
+      req,
+      res,
       title: req.t('pageTitles.institutionCorrectionSuccess', { title })
     });
   });
@@ -769,21 +1027,61 @@ function createPageRoutes({
     }
 
     applySensitivePageHeaders(res);
-    res.render('institution_correction_submit_error', {
-      backFormUrl: '/debug',
-      errorMessage: req.t('institutionCorrection.errors.submitFailed'),
-      fallbackUrl: buildDebugCorrectionSubmitErrorPreviewUrl({
-        correctionGoogleFormUrl,
-        t: req.t
-      }),
+    const fallbackUrl = buildDebugCorrectionSubmitErrorPreviewUrl({
+      correctionGoogleFormUrl,
+      t: req.t
+    });
+    return renderFrontendPage({
+      legacyData: {
+        backFormUrl: '/debug',
+        errorMessage: req.t('institutionCorrection.errors.submitFailed'),
+        fallbackUrl,
+        pageRobots: sensitiveRobotsPolicy,
+        showSubmissionDiagnostics: true,
+        submissionDiagnostics: buildDebugSubmissionDiagnostics(req.t),
+        title: req.t('pageTitles.institutionCorrectionError', { title })
+      },
+      legacyView: 'institution_correction_submit_error',
+      pageProps: {
+        backFormUrl: '/debug',
+        errorMessage: req.t('institutionCorrection.errors.submitFailed'),
+        fallbackUrl,
+        showSubmissionDiagnostics: true,
+        submissionDiagnostics: buildDebugSubmissionDiagnostics(req.t)
+      },
       pageRobots: sensitiveRobotsPolicy,
-      showSubmissionDiagnostics: true,
-      submissionDiagnostics: buildDebugSubmissionDiagnostics(req.t),
+      pageType: 'correction-error',
+      req,
+      res,
       title: req.t('pageTitles.institutionCorrectionError', { title })
     });
   });
 
   router.get('/blog', pageReadLimiter, async (req,res) => {
+    const pageTitle = req.t('pageTitles.blog', { title });
+
+    if (shouldUseReactFrontend(req)) {
+      const portalPageProps = await buildPortalPageProps({
+        apiUrl,
+        formProtectionSecret,
+        initialSection: 'blog',
+        req
+      });
+
+      return renderFrontendPage({
+        legacyData: {
+          title: pageTitle,
+          apiUrl
+        },
+        legacyView: 'blog',
+        pageProps: portalPageProps,
+        pageType: 'portal',
+        req,
+        res,
+        title: pageTitle
+      });
+    }
+
     const SavedTags = JSON.parse(fs.readFileSync(paths.blogData, 'utf-8'));
     
     const QTag = req.query.tag;//現在頁面的query tag是什麽
@@ -803,11 +1101,11 @@ function createPageRoutes({
       localizedLanguage: localizeBlogLanguageLabel(entry.Language, req.t)
     }));
 
-    res.render('blog', {
+    return res.render('blog', {
       SavedTags: localizedEntriesWithMeta,//數據（已篩選）
       AllTags: localizedTags,//所有tag的數據
       apiUrl,
-      title: req.t('pageTitles.blog', { title })
+      title: pageTitle
     })
   })
 
@@ -825,13 +1123,27 @@ function createPageRoutes({
       targetLanguage: req.lang
     });
     
-    res.render('blogs', {
-      apiUrl,
-      reports: [{ html: rawHtml }],
-      title: req.t('pageTitles.article', {
-        articleTitle: mdName,
-        title
-      })
+    const pageTitle = req.t('pageTitles.article', {
+      articleTitle: mdName,
+      title
+    });
+
+    return renderFrontendPage({
+      legacyData: {
+        apiUrl,
+        reports: [{ html: rawHtml }],
+        title: pageTitle
+      },
+      legacyView: 'blogs',
+      pageProps: {
+        apiUrl,
+        articleHtml: rawHtml,
+        articleId: mdName
+      },
+      pageType: 'article',
+      req,
+      res,
+      title: pageTitle
     });
   });
 

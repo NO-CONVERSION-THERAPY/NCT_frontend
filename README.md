@@ -26,6 +26,7 @@
 - [技术架构图](#技术架构图)
 - [仓库结构](#仓库结构)
 - [快速开始](#快速开始)
+- [前端切换](#前端切换)
 - [常用命令](#常用命令)
 - [Playwright 页面冒烟截图巡检](#playwright-页面冒烟截图巡检)
 - [关键配置](#关键配置)
@@ -53,6 +54,24 @@ N·C·T 是一个用来记录、整理、公开展示“扭转治疗”相关机
 - https://nct.hosinoneko.me
 
 > 我们承诺不以任何理由主动收集不必要的个人信息。
+
+## 前端切换
+
+仓库现在同时保留两套前端：
+
+- 新版：`Vite + React`，默认使用 liquid glass 风格，并将 `/map`、`/form`、`/blog` 三个主模板整合为纵向长页，通过横向标签在页面内纵向跳转。
+- 旧版：原有 `EJS + public/css + public/js` 前端，已原样备份到 [`old/frontend-legacy`](./old/frontend-legacy)。
+
+切换方式：
+
+1. 先构建新版前端：`npm run frontend:build`
+2. 在 `.env` 里设置 `FRONTEND_VARIANT="react"` 启用新版，或设为 `FRONTEND_VARIANT="legacy"` 切回旧版
+3. 重启服务
+
+说明：
+
+- 如果设置了 `FRONTEND_VARIANT="react"`，但缺少 `public/react-app` 构建产物，服务会自动回退到旧版前端，并在启动日志中提示。
+- 示例环境变量已经写在 [`.env.example`](./.env.example)。
 
 ## 线上入口
 
@@ -161,7 +180,7 @@ flowchart TD
 ├── scripts/               # 运维脚本，例如 secure-config
 ├── tests/                 # 自动化测试
 ├── data.json              # 博客索引等站点数据
-├── friends.json           # 关于页友链 / 致谢数据
+├── friends.json           # 历史致谢数据备份，供兼容 / 回滚时参考
 ├── server.js              # Vercel / Node 兼容入口
 ├── vercel.json            # Vercel 部署配置
 └── worker.mjs             # Cloudflare Workers 入口
@@ -528,7 +547,7 @@ A: 因为它会调用 `npx wrangler deploy`，并且与本仓库的 `package.jso
 | `/map/correction` / `/correction` | 机构信息补充 / 修正页 | 提交到对应的 `POST .../submit`；按 `CORRECTION_SUBMIT_TARGET` 写入 Google Form、D1，或同时写入两者 |
 | `/map` | 地图总览页，展示机构分布、统计与公开数据列表 | 支持 `?inputType=` 预设筛选 |
 | `/map/record/:recordSlug` | 地图提交详情页，独立展示单条提交内容并支持同机构记录上下翻页 | 从 `/map` 的“查看详情页”进入，对应 `views/map_record.ejs` |
-| `/aboutus` | 关于页，展示项目说明与友链 / 致谢信息 | 会读取 `friends.json` |
+| `/aboutus` | 旧关于页兼容入口 | 现已 302 重定向到 `/?lang=当前语言`，用于兼容历史链接 |
 | `/privacy` | 隐私政策与 Cookie 说明页 | 用于公开说明数据使用边界 |
 | `/blog` | 文库列表页，展示博客文章与标签筛选 | 支持 `?tag=<tagId>` |
 | `/port/:id` | 单篇文章详情页 | `:id` 会严格限制在 `blog/` 目录内解析，防止路径穿越 |

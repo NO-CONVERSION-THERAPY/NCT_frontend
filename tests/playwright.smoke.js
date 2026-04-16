@@ -391,17 +391,6 @@ test('playwright smoke screenshots cover page routes and submission flows', asyn
         await capturePageScreenshot({
           baseUrl,
           browser,
-          fileName: 'about',
-          pathName: '/aboutus',
-          ready: async (page) => {
-            await page.waitForSelector('.friend-card', { timeout: NAVIGATION_TIMEOUT_MS });
-          },
-          manifestEntries
-        });
-
-        await capturePageScreenshot({
-          baseUrl,
-          browser,
           fileName: 'privacy',
           pathName: '/privacy',
           ready: async (page) => {

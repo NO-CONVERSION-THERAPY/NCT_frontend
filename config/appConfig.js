@@ -76,6 +76,16 @@ function resolveSubmitTarget(value, fallback = 'both') {
   return fallback;
 }
 
+function resolveFrontendVariant(value, fallback = 'react') {
+  const normalizedValue = readTrimmedEnvValue(value).toLowerCase();
+
+  if (normalizedValue === 'legacy' || normalizedValue === 'react') {
+    return normalizedValue;
+  }
+
+  return fallback;
+}
+
 function normalizeGoogleFormSubmitUrl(url) {
   const normalizedUrl = readTrimmedEnvValue(url);
 
@@ -250,6 +260,7 @@ const appPort = parsePositiveInteger(process.env.PORT, 3000);
 const publicMapDataUrl = process.env.PUBLIC_MAP_DATA_URL || 'https://nct.hosinoeiji.workers.dev/api/map-data';
 const mapDataNodeTransportOverrides = parseBooleanEnv(process.env.MAP_DATA_NODE_TRANSPORT_OVERRIDES, false);
 const mapDataUpstreamTimeoutMs = parsePositiveInteger(process.env.MAP_DATA_UPSTREAM_TIMEOUT_MS, 25000);
+const frontendVariant = resolveFrontendVariant(process.env.FRONTEND_VARIANT, 'react');
 const siteUrl = String(process.env.SITE_URL || 'https://www.victimsunion.org/').replace(/\/+$/, '');
 const apiUrl = '/api/map-data';
 const trustProxy = resolveTrustProxy(process.env.TRUST_PROXY || '1');
@@ -274,6 +285,7 @@ module.exports = {
   correctionGoogleFormViewUrl,
   correctionSubmitTarget,
   debugMod,
+  frontendVariant,
   formDryRun,
   formSubmitTarget,
   formId,
