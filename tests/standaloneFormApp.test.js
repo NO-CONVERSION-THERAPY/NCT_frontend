@@ -107,6 +107,42 @@ test('standalone form app keeps /form/standalone as a compatibility alias', asyn
   assert.match(response.body, /action="\/submit"/);
 });
 
+test('standalone form debug routes stay hidden when debug mode is disabled', async () => {
+  const app = loadStandaloneFormApp({ DEBUG_MOD: 'false' });
+  const debugResponse = await requestPath(app, '/debug');
+  const successResponse = await requestPath(app, '/debug/submit-success');
+  const errorResponse = await requestPath(app, '/debug/submit-error');
+
+  assert.equal(debugResponse.statusCode, 404);
+  assert.equal(successResponse.statusCode, 404);
+  assert.equal(errorResponse.statusCode, 404);
+});
+
+test('standalone form debug page renders success and error preview links when debug mode is enabled', async () => {
+  const app = loadStandaloneFormApp({ DEBUG_MOD: 'true' });
+  const response = await requestPath(app, '/debug');
+
+  assert.equal(response.statusCode, 200);
+  assert.match(response.body, /调试|Debug|調試/);
+  assert.match(response.body, /href="\/debug\/submit-success"/);
+  assert.match(response.body, /href="\/debug\/submit-error"/);
+});
+
+test('standalone form debug preview routes render the standalone success and error pages', async () => {
+  const app = loadStandaloneFormApp({ DEBUG_MOD: 'true' });
+  const successResponse = await requestPath(app, '/debug/submit-success');
+  const errorResponse = await requestPath(app, '/debug/submit-error');
+
+  assert.equal(successResponse.statusCode, 200);
+  assert.match(successResponse.body, /standalone-state-card--success/);
+  assert.match(successResponse.body, /href="\/debug"/);
+
+  assert.equal(errorResponse.statusCode, 200);
+  assert.match(errorResponse.body, /standalone-state-card--error/);
+  assert.match(errorResponse.body, /href="\/debug"/);
+  assert.match(errorResponse.body, /viewform\?usp=pp_url/);
+});
+
 test('standalone form app renders the dry run preview at /submit', async () => {
   clearProjectModules();
   const { issueFormProtectionToken } = require(path.join(projectRoot, 'app/services/formProtectionService'));

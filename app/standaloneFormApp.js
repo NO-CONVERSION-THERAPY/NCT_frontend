@@ -80,7 +80,9 @@ app.use(express.json({ limit: requestBodyLimits.json }));
 
 app.use(createStandaloneFormPageRoutes({
   apiUrl,
+  debugMod,
   formProtectionSecret,
+  googleFormUrl,
   pageReadRateLimitMax,
   rateLimitRedisUrl,
   title

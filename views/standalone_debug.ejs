@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<%- include('partials/standalone_head') %>
+<body class="standalone-liquid-page">
+    <main class="standalone-shell standalone-shell--narrow standalone-stack">
+        <a href="/" class="standalone-back-link">← <%= t('navigation.home') %></a>
+
+        <section class="glass-panel standalone-card standalone-debug-hero">
+            <p class="glass-eyebrow"><%= t('debug.title') %></p>
+            <h1><%= t('debug.title') %></h1>
+            <p class="standalone-state-card__intro"><%= t('debug.intro') %></p>
+        </section>
+
+        <section class="standalone-debug-grid" aria-label="<%= t('debug.title') %>">
+            <% debugTools.forEach((tool) => { %>
+                <article class="glass-panel standalone-card standalone-debug-card">
+                    <p class="glass-eyebrow"><%= tool.pathLabel %></p>
+                    <a class="standalone-debug-card__link" href="<%= tool.href %>"><%= tool.title %></a>
+                    <p class="standalone-debug-card__description"><%= tool.description %></p>
+                    <p class="standalone-debug-card__hint"><%= tool.href %></p>
+                </article>
+            <% }) %>
+        </section>
+
+        <%- include('partials/standalone_foot') %>
+    </main>
+</body>
+</html>

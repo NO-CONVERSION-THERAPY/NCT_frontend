@@ -273,6 +273,7 @@ button {
 .form-grid {
     display: grid;
     gap: 18px;
+    align-items: start;
 }
 
 .form-grid--two {
@@ -375,6 +376,7 @@ select {
 
 .birth-date-group {
     display: grid;
+    align-items: start;
 }
 
 .form-privacy-note {
@@ -421,11 +423,17 @@ select {
     display: grid;
     gap: 10px;
     padding: 10px;
+    max-height: 280px;
+    overflow-y: auto;
     border: 1px solid var(--glass-border);
     border-radius: 20px;
     background: var(--glass-strong);
     box-shadow: var(--glass-shadow-soft);
     backdrop-filter: blur(24px);
+}
+
+.autocomplete-results[hidden] {
+    display: none;
 }
 
 .result-item {
@@ -535,6 +543,46 @@ select {
 
 .standalone-state-card--error {
     border-color: rgba(208, 95, 114, 0.24);
+}
+
+.standalone-debug-grid {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.standalone-debug-card {
+    display: grid;
+    gap: 12px;
+    align-content: start;
+}
+
+.standalone-debug-card__link {
+    color: var(--text);
+    font-size: 1.28rem;
+    font-weight: 800;
+    line-height: 1.35;
+}
+
+.standalone-debug-card__link:hover {
+    color: var(--accent-strong);
+}
+
+.standalone-debug-card__description,
+.standalone-debug-card__hint {
+    margin: 0;
+}
+
+.standalone-debug-card__description {
+    color: var(--text-muted);
+    line-height: 1.7;
+}
+
+.standalone-debug-card__hint {
+    color: var(--text-soft);
+    font-family: "SFMono-Regular", "Menlo", "Monaco", "Courier New", monospace;
+    font-size: 0.86rem;
+    overflow-wrap: anywhere;
 }
 
 .standalone-summary {

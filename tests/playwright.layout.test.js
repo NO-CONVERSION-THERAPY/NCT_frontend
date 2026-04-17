@@ -837,3 +837,199 @@ test('form map picker shows a marker and writes coordinates after clicking the m
     await server.close();
   }
 });
+
+test('standalone form autocomplete panels stay hidden until suggestions are rendered', async () => {
+  const app = loadApp({
+    DEBUG_MOD: 'true',
+    FRONTEND_VARIANT: 'react'
+  });
+  const server = await startServer(app);
+  const browser = await chromium.launch({
+    headless: true
+  });
+
+  try {
+    const context = await createContext(browser, server.baseUrl, VIEWPORTS[0], 'light');
+    const page = await context.newPage();
+    const diagnostics = attachPageDiagnostics(page, server.baseUrl);
+
+    try {
+      const response = await page.goto(`${server.baseUrl}/form/standalone?lang=zh-CN`, {
+        timeout: NAVIGATION_TIMEOUT_MS,
+        waitUntil: 'domcontentloaded'
+      });
+
+      assert.ok(response, 'Expected navigation response for standalone autocomplete visibility test');
+      assert.equal(response.status(), 200, 'Expected standalone form page to return HTTP 200');
+
+      await waitForLegacyPage(page, '.standalone-report-form .form-section');
+      await disableAnimations(page);
+
+      const initialVisibility = await page.evaluate(() => {
+        const schoolResults = document.getElementById('school_results_list');
+        const addressResults = document.getElementById('address_results_list');
+
+        function describe(element) {
+          if (!(element instanceof HTMLElement)) {
+            return null;
+          }
+
+          return {
+            display: window.getComputedStyle(element).display,
+            hidden: element.hidden,
+            offsetHeight: element.offsetHeight,
+            offsetWidth: element.offsetWidth
+          };
+        }
+
+        return {
+          address: describe(addressResults),
+          school: describe(schoolResults)
+        };
+      });
+
+      assert.deepEqual(initialVisibility.school, {
+        display: 'none',
+        hidden: true,
+        offsetHeight: 0,
+        offsetWidth: 0
+      }, `Expected school autocomplete panel to stay hidden before input, received ${JSON.stringify(initialVisibility.school)}`);
+      assert.deepEqual(initialVisibility.address, {
+        display: 'none',
+        hidden: true,
+        offsetHeight: 0,
+        offsetWidth: 0
+      }, `Expected address autocomplete panel to stay hidden before input, received ${JSON.stringify(initialVisibility.address)}`);
+
+      await page.fill('#school_input', 'Playwright');
+      await page.waitForSelector('#school_results_list .result-item', {
+        timeout: NAVIGATION_TIMEOUT_MS
+      });
+
+      const suggestionState = await page.evaluate(() => {
+        const schoolResults = document.getElementById('school_results_list');
+        const addressResults = document.getElementById('address_results_list');
+
+        return {
+          addressHidden: addressResults ? addressResults.hidden : null,
+          schoolDisplay: schoolResults ? window.getComputedStyle(schoolResults).display : '',
+          schoolHidden: schoolResults ? schoolResults.hidden : null,
+          schoolItems: schoolResults ? schoolResults.querySelectorAll('.result-item').length : 0
+        };
+      });
+
+      assert.equal(suggestionState.schoolHidden, false, 'Expected school autocomplete panel to become visible after input');
+      assert.notEqual(suggestionState.schoolDisplay, 'none', 'Expected school autocomplete panel to render after input');
+      assert.ok(suggestionState.schoolItems >= 1, `Expected at least one school suggestion, received ${suggestionState.schoolItems}`);
+      assert.equal(suggestionState.addressHidden, true, 'Expected address autocomplete panel to remain hidden while school suggestions are open');
+
+      await page.locator('body').click({
+        position: { x: 16, y: 16 }
+      });
+      await page.waitForFunction(() => {
+        const schoolResults = document.getElementById('school_results_list');
+        const addressResults = document.getElementById('address_results_list');
+        return Boolean(
+          schoolResults
+          && addressResults
+          && schoolResults.hidden
+          && addressResults.hidden
+        );
+      }, null, {
+        timeout: NAVIGATION_TIMEOUT_MS
+      });
+
+      diagnostics.assertClean('standalone form autocomplete visibility');
+    } finally {
+      await context.close();
+    }
+  } finally {
+    await browser.close();
+    await server.close();
+  }
+});
+
+test('standalone form birth year field does not stretch when other sex options expand', async () => {
+  const app = loadApp({
+    DEBUG_MOD: 'true',
+    FRONTEND_VARIANT: 'react'
+  });
+  const server = await startServer(app);
+  const browser = await chromium.launch({
+    headless: true
+  });
+
+  try {
+    const context = await createContext(browser, server.baseUrl, VIEWPORTS[0], 'light');
+    const page = await context.newPage();
+    const diagnostics = attachPageDiagnostics(page, server.baseUrl);
+
+    try {
+      const response = await page.goto(`${server.baseUrl}/form/standalone?lang=zh-CN`, {
+        timeout: NAVIGATION_TIMEOUT_MS,
+        waitUntil: 'domcontentloaded'
+      });
+
+      assert.ok(response, 'Expected navigation response for standalone birth year field stretch test');
+      assert.equal(response.status(), 200, 'Expected standalone form page to return HTTP 200');
+
+      await waitForLegacyPage(page, '.standalone-report-form .form-section');
+      await disableAnimations(page);
+
+      await page.selectOption('#sexSelect', '__other_option__');
+      await page.waitForFunction(() => {
+        const otherSexFields = document.getElementById('otherSexFields');
+        return Boolean(otherSexFields && !otherSexFields.hidden);
+      }, null, {
+        timeout: NAVIGATION_TIMEOUT_MS
+      });
+
+      const fieldMetrics = await page.evaluate(() => {
+        const birthYearSelect = document.getElementById('birthYearSelect');
+        const birthYearWrap = document.getElementById('birthYearSelectWrap');
+        const sexSelect = document.getElementById('sexSelect');
+
+        function rectOf(element) {
+          if (!(element instanceof HTMLElement)) {
+            return null;
+          }
+
+          const rect = element.getBoundingClientRect();
+          return {
+            height: Math.round(rect.height),
+            width: Math.round(rect.width)
+          };
+        }
+
+        return {
+          birthYearSelect: rectOf(birthYearSelect),
+          birthYearWrap: rectOf(birthYearWrap),
+          sexSelect: rectOf(sexSelect)
+        };
+      });
+
+      assert.ok(fieldMetrics.birthYearSelect, 'Expected the birth year select to exist');
+      assert.ok(fieldMetrics.birthYearWrap, 'Expected the birth year wrapper to exist');
+      assert.ok(fieldMetrics.sexSelect, 'Expected the sex select to exist');
+      assert.ok(
+        fieldMetrics.birthYearSelect.height <= 72,
+        `Expected birth year select height to stay compact after expanding other sex options, received ${fieldMetrics.birthYearSelect.height}px`
+      );
+      assert.ok(
+        fieldMetrics.birthYearWrap.height <= 80,
+        `Expected birth year field wrapper height to stay compact after expanding other sex options, received ${fieldMetrics.birthYearWrap.height}px`
+      );
+      assert.ok(
+        Math.abs(fieldMetrics.birthYearSelect.height - fieldMetrics.sexSelect.height) <= 8,
+        `Expected birth year and sex selects to stay visually aligned, received ${JSON.stringify(fieldMetrics)}`
+      );
+
+      diagnostics.assertClean('standalone form birth year field stretch');
+    } finally {
+      await context.close();
+    }
+  } finally {
+    await browser.close();
+    await server.close();
+  }
+});
