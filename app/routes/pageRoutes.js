@@ -4,12 +4,6 @@ const path = require('path');
 const { getAreaOptions } = require('../../config/areaSelector');
 const { getLocalizedInstitutionCorrectionRules } = require('../../config/institutionCorrectionConfig');
 const { getClientProvinceMetadata } = require('../../config/provinceMetadata');
-const {
-  getLocalizedFormRules,
-  getLocalizedIdentityOptions,
-  getLocalizedOtherSexTypeOptions,
-  getLocalizedSexOptions
-} = require('../../config/formConfig');
 const { renderBlogArticleHtml, translateBlogListEntries } = require('../services/blogTranslationService');
 const { buildFormPageViewModel } = require('../services/formPageViewModel');
 const { issueFormProtectionToken } = require('../services/formProtectionService');
@@ -139,10 +133,14 @@ async function loadLocalizedBlogListing({ language, t }) {
 
 async function buildPortalPageProps({ apiUrl, formProtectionSecret, initialSection, req }) {
   const t = req.t;
-  const { provinces } = getAreaOptions(req.lang);
   const localizedBlogListing = await loadLocalizedBlogListing({
     language: req.lang,
     t
+  });
+  const portalFormViewModel = buildFormPageViewModel({
+    apiUrl,
+    formProtectionSecret,
+    req
   });
 
   return {
@@ -153,12 +151,17 @@ async function buildPortalPageProps({ apiUrl, formProtectionSecret, initialSecti
       tags: localizedBlogListing.tags
     },
     form: {
-      areaOptions: { provinces },
-      formProtectionToken: issueFormProtectionToken({ secret: formProtectionSecret }),
-      formRules: getLocalizedFormRules(t),
-      identityOptions: getLocalizedIdentityOptions(t),
-      otherSexTypeOptions: getLocalizedOtherSexTypeOptions(t),
-      sexOptions: getLocalizedSexOptions(t)
+      agentRelationshipOptions: portalFormViewModel.agentRelationshipOptions,
+      areaOptions: portalFormViewModel.areaOptions,
+      exitMethodOptions: portalFormViewModel.exitMethodOptions,
+      formProtectionToken: portalFormViewModel.formProtectionToken,
+      formRules: portalFormViewModel.formRules,
+      identityOptions: portalFormViewModel.identityOptions,
+      legalAidOptions: portalFormViewModel.legalAidOptions,
+      otherSexTypeOptions: portalFormViewModel.otherSexTypeOptions,
+      parentMotivationOptions: portalFormViewModel.parentMotivationOptions,
+      sexOptions: portalFormViewModel.sexOptions,
+      violenceCategoryOptions: portalFormViewModel.violenceCategoryOptions
     },
     initialSection,
     mapQuery: {

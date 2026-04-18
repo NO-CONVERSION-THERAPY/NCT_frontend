@@ -13,6 +13,12 @@ const SELF_IDENTITY = '受害者本人';
 const AGENT_IDENTITY = '受害者的代理人';
 const OTHER_SEX_OPTION = '__other_option__';
 const CUSTOM_OTHER_SEX_OPTION = '__custom_other_sex__';
+const CUSTOM_AGENT_RELATIONSHIP_OPTION = '__custom_agent_relationship__';
+const CUSTOM_PARENT_MOTIVATION_OPTION = '__custom_parent_motivation__';
+const CUSTOM_VIOLENCE_CATEGORY_OPTION = '__custom_violence_category__';
+const CUSTOM_EXIT_METHOD_OPTION = '__custom_exit_method__';
+const CUSTOM_LEGAL_AID_OPTION = '__custom_legal_aid__';
+const REACT_PORTAL_ENHANCED_FORM_VARIANT = 'react_portal_enhanced';
 const EASTER_EGG_CLICK_TARGET = 6;
 const EASTER_EGG_CLICK_WINDOW_MS = 2400;
 const EASTER_EGG_TRIGGER_EVENT = 'nct:easter-egg-activate';
@@ -2310,6 +2316,54 @@ const CoordinatePicker = memo(function CoordinatePicker({ visible, onPick }) {
   return <div className="picker-map" ref={mapElementRef} />;
 }, (previousProps, nextProps) => previousProps.visible === nextProps.visible);
 
+function CheckboxChoiceGrid({
+  customInputName,
+  customInputPlaceholder,
+  customInputRef,
+  customInputValue,
+  customValue,
+  name,
+  onCustomInputChange,
+  onToggle,
+  options,
+  selectedValues
+}) {
+  return (
+    <div className="choice-grid">
+      {options.map((option) => {
+        const checked = selectedValues.includes(option.value);
+        const isCustomOption = option.value === customValue;
+
+        return (
+          <label className={`choice-card${checked ? ' is-selected' : ''}${isCustomOption ? ' choice-card--custom' : ''}`} key={option.value}>
+            <span className="choice-card__toggle">
+              <input
+                checked={checked}
+                name={name}
+                onChange={(event) => onToggle(option.value, event.target.checked)}
+                type="checkbox"
+                value={option.value}
+              />
+              <span>{option.label}</span>
+            </span>
+            {isCustomOption ? (
+              <input
+                disabled={!checked}
+                name={customInputName}
+                onChange={(event) => onCustomInputChange(event.target.value)}
+                placeholder={customInputPlaceholder}
+                ref={customInputRef}
+                type="text"
+                value={customInputValue}
+              />
+            ) : null}
+          </label>
+        );
+      })}
+    </div>
+  );
+}
+
 function MainReportForm({ apiUrl, formConfig, i18n, lang }) {
   const autocompleteRecords = useAutocompleteRecords(apiUrl);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -2318,34 +2372,60 @@ function MainReportForm({ apiUrl, formConfig, i18n, lang }) {
   const [showMapPicker, setShowMapPicker] = useState(false);
   const [locationStatus, setLocationStatus] = useState('');
   const [values, setValues] = useState({
+    abuser_info: '',
+    agent_relationship: '',
+    agent_relationship_other: '',
     birth_year: '',
     cityCode: '',
     contact_information: '',
     countyCode: '',
     date_end: '',
     date_start: '',
+    exit_method: '',
+    exit_method_other: '',
     experience: '',
     headmaster_name: '',
     identity: formConfig.identityOptions[0] ? formConfig.identityOptions[0].value : SELF_IDENTITY,
+    legal_aid_other: '',
+    legal_aid_status: '',
     other: '',
+    parent_motivation_other: '',
+    parent_motivations: [],
+    pre_institution_city_code: '',
+    pre_institution_province_code: '',
     provinceCode: '',
     scandal: '',
     school_address: '',
     school_name: '',
     sex: '',
     sex_other: '',
-    sex_other_type: ''
+    sex_other_type: '',
+    violence_categories: [],
+    violence_category_other: ''
   });
 
   const areaSelector = useAreaSelector({
     initialProvinces: formConfig.areaOptions.provinces || [],
     lang
   });
-  const formRef = useRef(null);
+  const preInstitutionAreaSelector = useAreaSelector({
+    initialProvinces: formConfig.areaOptions.provinces || [],
+    lang
+  });
   const otherSexInputRef = useRef(null);
+  const agentRelationshipOtherInputRef = useRef(null);
+  const parentMotivationOtherInputRef = useRef(null);
+  const exitMethodOtherInputRef = useRef(null);
+  const legalAidOtherInputRef = useRef(null);
+  const violenceCategoryOtherInputRef = useRef(null);
   const handleCoordinatePick = useEffectEvent((lat, lng) => {
     applyCoordinates(lat, lng);
   });
+  const formMessages = i18n.form || {};
+  const isAgentMode = values.identity === AGENT_IDENTITY;
+  const hasCustomParentMotivation = values.parent_motivations.includes(CUSTOM_PARENT_MOTIVATION_OPTION);
+  const hasCustomViolenceCategory = values.violence_categories.includes(CUSTOM_VIOLENCE_CATEGORY_OPTION);
+  const showExitMethod = Boolean(values.date_end);
 
   useEffect(() => {
     areaSelector.setProvinceCode(values.provinceCode);
@@ -2354,6 +2434,14 @@ function MainReportForm({ apiUrl, formConfig, i18n, lang }) {
   useEffect(() => {
     areaSelector.setCityCode(values.cityCode);
   }, [values.cityCode]);
+
+  useEffect(() => {
+    preInstitutionAreaSelector.setProvinceCode(values.pre_institution_province_code);
+  }, [values.pre_institution_province_code]);
+
+  useEffect(() => {
+    preInstitutionAreaSelector.setCityCode(values.pre_institution_city_code);
+  }, [values.pre_institution_city_code]);
 
   useEffect(() => {
     setSchoolSuggestions(getAutocompleteSuggestions(autocompleteRecords, values.school_name, 'school'));
@@ -2373,14 +2461,99 @@ function MainReportForm({ apiUrl, formConfig, i18n, lang }) {
     }
   }, [values.sex]);
 
-  const isAgentMode = values.identity === AGENT_IDENTITY;
-  const formMessages = i18n.form || {};
+  useEffect(() => {
+    if (!isAgentMode && (values.agent_relationship || values.agent_relationship_other)) {
+      setValues((current) => ({
+        ...current,
+        agent_relationship: '',
+        agent_relationship_other: ''
+      }));
+    }
+  }, [isAgentMode, values.agent_relationship, values.agent_relationship_other]);
+
+  useEffect(() => {
+    if (values.agent_relationship !== CUSTOM_AGENT_RELATIONSHIP_OPTION && values.agent_relationship_other) {
+      setValues((current) => ({
+        ...current,
+        agent_relationship_other: ''
+      }));
+    }
+  }, [values.agent_relationship, values.agent_relationship_other]);
+
+  useEffect(() => {
+    if (!values.pre_institution_province_code && values.pre_institution_city_code) {
+      setValues((current) => ({
+        ...current,
+        pre_institution_city_code: ''
+      }));
+    }
+  }, [values.pre_institution_city_code, values.pre_institution_province_code]);
+
+  useEffect(() => {
+    if (!hasCustomParentMotivation && values.parent_motivation_other) {
+      setValues((current) => ({
+        ...current,
+        parent_motivation_other: ''
+      }));
+    }
+  }, [hasCustomParentMotivation, values.parent_motivation_other]);
+
+  useEffect(() => {
+    if (!showExitMethod && (values.exit_method || values.exit_method_other)) {
+      setValues((current) => ({
+        ...current,
+        exit_method: '',
+        exit_method_other: ''
+      }));
+    }
+  }, [showExitMethod, values.exit_method, values.exit_method_other]);
+
+  useEffect(() => {
+    if (values.exit_method !== CUSTOM_EXIT_METHOD_OPTION && values.exit_method_other) {
+      setValues((current) => ({
+        ...current,
+        exit_method_other: ''
+      }));
+    }
+  }, [values.exit_method, values.exit_method_other]);
+
+  useEffect(() => {
+    if (values.legal_aid_status !== CUSTOM_LEGAL_AID_OPTION && values.legal_aid_other) {
+      setValues((current) => ({
+        ...current,
+        legal_aid_other: ''
+      }));
+    }
+  }, [values.legal_aid_other, values.legal_aid_status]);
+
+  useEffect(() => {
+    if (!hasCustomViolenceCategory && values.violence_category_other) {
+      setValues((current) => ({
+        ...current,
+        violence_category_other: ''
+      }));
+    }
+  }, [hasCustomViolenceCategory, values.violence_category_other]);
 
   function updateValue(key, nextValue) {
     setValues((current) => ({
       ...current,
       [key]: nextValue
     }));
+  }
+
+  function toggleChoiceValue(key, optionValue, checked) {
+    setValues((current) => {
+      const currentValues = Array.isArray(current[key]) ? current[key] : [];
+      const nextValues = checked
+        ? [...currentValues.filter((value) => value !== optionValue), optionValue]
+        : currentValues.filter((value) => value !== optionValue);
+
+      return {
+        ...current,
+        [key]: nextValues
+      };
+    });
   }
 
   function applyCoordinates(latitude, longitude) {
@@ -2394,24 +2567,96 @@ function MainReportForm({ apiUrl, formConfig, i18n, lang }) {
     }));
   }
 
+  function showValidationMessage(message, inputRef) {
+    window.alert(message);
+
+    if (inputRef && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }
+
   function handleSubmit(event) {
     const form = event.currentTarget;
 
     if (values.sex === OTHER_SEX_OPTION && !values.sex_other_type) {
       event.preventDefault();
-      if (otherSexInputRef.current) {
-        otherSexInputRef.current.setCustomValidity(readPath(formMessages, ['validation', 'specifyOtherSex'], 'Please choose an option'));
-        otherSexInputRef.current.reportValidity();
-      }
+      showValidationMessage(
+        readPath(formMessages, ['validation', 'specifyOtherSex'], 'Please choose an option'),
+        otherSexInputRef
+      );
       return;
     }
 
     if (values.sex === OTHER_SEX_OPTION && values.sex_other_type === CUSTOM_OTHER_SEX_OPTION && !values.sex_other.trim()) {
       event.preventDefault();
-      if (otherSexInputRef.current) {
-        otherSexInputRef.current.setCustomValidity(readPath(formMessages, ['validation', 'fillOtherSex'], 'Please enter the custom value'));
-        otherSexInputRef.current.reportValidity();
-      }
+      showValidationMessage(
+        readPath(formMessages, ['validation', 'fillOtherSex'], 'Please enter the custom value'),
+        otherSexInputRef
+      );
+      return;
+    }
+
+    if (
+      isAgentMode
+      && values.agent_relationship === CUSTOM_AGENT_RELATIONSHIP_OPTION
+      && !values.agent_relationship_other.trim()
+    ) {
+      event.preventDefault();
+      showValidationMessage(
+        readPath(formMessages, ['validation', 'fillAgentRelationshipOther'], 'Please describe the relationship'),
+        agentRelationshipOtherInputRef
+      );
+      return;
+    }
+
+    if (values.parent_motivations.length === 0) {
+      event.preventDefault();
+      showValidationMessage(
+        readPath(formMessages, ['validation', 'fillParentMotivations'], 'Please choose at least one reason')
+      );
+      return;
+    }
+
+    if (hasCustomParentMotivation && !values.parent_motivation_other.trim()) {
+      event.preventDefault();
+      showValidationMessage(
+        readPath(formMessages, ['validation', 'fillParentMotivationOther'], 'Please enter the other reason'),
+        parentMotivationOtherInputRef
+      );
+      return;
+    }
+
+    if (hasCustomViolenceCategory && !values.violence_category_other.trim()) {
+      event.preventDefault();
+      showValidationMessage(
+        readPath(formMessages, ['validation', 'fillViolenceCategoryOther'], 'Please describe the other violent behavior'),
+        violenceCategoryOtherInputRef
+      );
+      return;
+    }
+
+    if (
+      showExitMethod
+      && values.exit_method === CUSTOM_EXIT_METHOD_OPTION
+      && !values.exit_method_other.trim()
+    ) {
+      event.preventDefault();
+      showValidationMessage(
+        readPath(formMessages, ['validation', 'fillExitMethodOther'], 'Please describe the other departure method'),
+        exitMethodOtherInputRef
+      );
+      return;
+    }
+
+    if (
+      values.legal_aid_status === CUSTOM_LEGAL_AID_OPTION
+      && !values.legal_aid_other.trim()
+    ) {
+      event.preventDefault();
+      showValidationMessage(
+        readPath(formMessages, ['validation', 'fillLegalAidOther'], 'Please enter the additional note'),
+        legalAidOtherInputRef
+      );
       return;
     }
 
@@ -2431,14 +2676,20 @@ function MainReportForm({ apiUrl, formConfig, i18n, lang }) {
   }
 
   return (
-    <form action="/submit" className="report-form" method="POST" onSubmit={handleSubmit} ref={formRef}>
+    <form action="/submit" className="report-form" method="POST" onSubmit={handleSubmit}>
       <div className="form-honeypot" aria-hidden="true">
         <label htmlFor="website">Website</label>
         <input autoComplete="off" id="website" name="website" spellCheck="false" tabIndex="-1" type="text" />
       </div>
       <input name="form_token" type="hidden" value={formConfig.formProtectionToken} />
+      <input name="form_variant" type="hidden" value={REACT_PORTAL_ENHANCED_FORM_VARIANT} />
 
-      <p className="form-privacy-note">{readPath(formMessages, ['privacyNotice'], '')}</p>
+      <p className="form-privacy-note">
+        <span>{readPath(formMessages, ['privacyNotice'], '')}</span>
+        {readPath(formMessages, ['standalone', 'safetyNotice'], '') ? (
+          <strong>{readPath(formMessages, ['standalone', 'safetyNotice'], '')}</strong>
+        ) : null}
+      </p>
 
       <div className="form-grid">
         <label className="field">
@@ -2449,6 +2700,33 @@ function MainReportForm({ apiUrl, formConfig, i18n, lang }) {
             ))}
           </select>
         </label>
+
+        {isAgentMode ? (
+          <div className="field">
+            <span>{readPath(formMessages, ['fields', 'agentRelationship'], 'Relationship to the survivor')}</span>
+            <select
+              name="agent_relationship"
+              onChange={(event) => updateValue('agent_relationship', event.target.value)}
+              value={values.agent_relationship}
+            >
+              <option value="">{readPath(formMessages, ['placeholders', 'agentRelationship'], 'Select the relationship')}</option>
+              {(formConfig.agentRelationshipOptions || []).map((option) => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+            {values.agent_relationship === CUSTOM_AGENT_RELATIONSHIP_OPTION ? (
+              <input
+                maxLength={formConfig.formRules.agentRelationship.maxLength}
+                name="agent_relationship_other"
+                onChange={(event) => updateValue('agent_relationship_other', event.target.value)}
+                placeholder={readPath(formMessages, ['placeholders', 'agentRelationshipOther'], 'Other: describe the relationship')}
+                ref={agentRelationshipOtherInputRef}
+                type="text"
+                value={values.agent_relationship_other}
+              />
+            ) : null}
+          </div>
+        ) : null}
 
         <label className="field">
           <span>{isAgentMode ? readPath(formMessages, ['fields', 'victimBirthYear'], 'Victim birth year') : readPath(formMessages, ['fields', 'birthYear'], 'Birth year')}</span>
@@ -2519,12 +2797,93 @@ function MainReportForm({ apiUrl, formConfig, i18n, lang }) {
         <label className="field">
           <span>{readPath(formMessages, ['fields', 'dateStart'], 'Start date')}</span>
           <input name="date_start" onChange={(event) => updateValue('date_start', event.target.value)} required type="date" value={values.date_start} />
+          <p className="field-note">{readPath(formMessages, ['hints', 'dateStart'], '')}</p>
         </label>
 
         <label className="field">
           <span>{readPath(formMessages, ['fields', 'dateEnd'], 'End date')}</span>
           <input name="date_end" onChange={(event) => updateValue('date_end', event.target.value)} type="date" value={values.date_end} />
+          <p className="field-note">{readPath(formMessages, ['hints', 'dateEnd'], '')}</p>
         </label>
+
+        <label className="field">
+          <span>{readPath(formMessages, ['fields', 'preInstitutionProvinceCode'], 'Province before entering the institution')}</span>
+          <select
+            name="pre_institution_province_code"
+            onChange={(event) => {
+              updateValue('pre_institution_province_code', event.target.value);
+              updateValue('pre_institution_city_code', '');
+            }}
+            value={values.pre_institution_province_code}
+          >
+            <option value="">{readPath(formMessages, ['placeholders', 'preInstitutionProvinceCode'], 'Optional: select the province before entering the institution')}</option>
+            {preInstitutionAreaSelector.initialProvinces.map((province) => (
+              <option key={province.code} value={province.code}>{province.name}</option>
+            ))}
+          </select>
+        </label>
+
+        <label className="field">
+          <span>{readPath(formMessages, ['fields', 'preInstitutionCityCode'], 'City before entering the institution')}</span>
+          <select
+            disabled={!values.pre_institution_province_code}
+            name="pre_institution_city_code"
+            onChange={(event) => updateValue('pre_institution_city_code', event.target.value)}
+            value={values.pre_institution_city_code}
+          >
+            <option value="">
+              {preInstitutionAreaSelector.loadingCityOptions
+                ? readPath(i18n, ['common', 'loading'], 'Loading')
+                : readPath(formMessages, ['placeholders', 'preInstitutionCityCode'], 'Optional: select the city before entering the institution')}
+            </option>
+            {preInstitutionAreaSelector.cityOptions.map((city) => (
+              <option key={city.code} value={city.code}>{city.name}</option>
+            ))}
+          </select>
+        </label>
+
+        <div className="field field--full">
+          <span>{readPath(formMessages, ['fields', 'parentMotivations'], 'Why did the parent(s) choose the institution?')}</span>
+          <CheckboxChoiceGrid
+            customInputName="parent_motivation_other"
+            customInputPlaceholder={readPath(formMessages, ['placeholders', 'parentMotivationOther'], 'Other reason: describe the reason')}
+            customInputRef={parentMotivationOtherInputRef}
+            customInputValue={values.parent_motivation_other}
+            customValue={CUSTOM_PARENT_MOTIVATION_OPTION}
+            name="parent_motivations"
+            onCustomInputChange={(nextValue) => updateValue('parent_motivation_other', nextValue)}
+            onToggle={(optionValue, checked) => toggleChoiceValue('parent_motivations', optionValue, checked)}
+            options={formConfig.parentMotivationOptions || []}
+            selectedValues={values.parent_motivations}
+          />
+        </div>
+
+        {showExitMethod ? (
+          <div className="field field--full">
+            <span>{readPath(formMessages, ['fields', 'exitMethod'], 'How did the survivor leave the institution?')}</span>
+            <select
+              name="exit_method"
+              onChange={(event) => updateValue('exit_method', event.target.value)}
+              value={values.exit_method}
+            >
+              <option value="">{readPath(formMessages, ['placeholders', 'exitMethod'], 'Optional: select how the survivor left the institution')}</option>
+              {(formConfig.exitMethodOptions || []).map((option) => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+            {values.exit_method === CUSTOM_EXIT_METHOD_OPTION ? (
+              <input
+                maxLength={formConfig.formRules.exitMethodOther.maxLength}
+                name="exit_method_other"
+                onChange={(event) => updateValue('exit_method_other', event.target.value)}
+                placeholder={readPath(formMessages, ['placeholders', 'exitMethodOther'], 'Other method: describe how they left')}
+                ref={exitMethodOtherInputRef}
+                type="text"
+                value={values.exit_method_other}
+              />
+            ) : null}
+          </div>
+        ) : null}
 
         <label className="field field--full">
           <span>{readPath(formMessages, ['fields', 'experience'], 'Experience')}</span>
@@ -2536,7 +2895,33 @@ function MainReportForm({ apiUrl, formConfig, i18n, lang }) {
             rows="5"
             value={values.experience}
           />
+          <p className="field-note">{readPath(formMessages, ['hints', 'experience'], '')}</p>
         </label>
+
+        <div className="field field--full">
+          <span>{readPath(formMessages, ['fields', 'legalAidStatus'], 'Was this experience reported or taken to legal aid?')}</span>
+          <select
+            name="legal_aid_status"
+            onChange={(event) => updateValue('legal_aid_status', event.target.value)}
+            value={values.legal_aid_status}
+          >
+            <option value="">{readPath(formMessages, ['placeholders', 'legalAidStatus'], 'Optional: select the current situation')}</option>
+            {(formConfig.legalAidOptions || []).map((option) => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+          </select>
+          {values.legal_aid_status === CUSTOM_LEGAL_AID_OPTION ? (
+            <input
+              maxLength={formConfig.formRules.legalAidOther.maxLength}
+              name="legal_aid_other"
+              onChange={(event) => updateValue('legal_aid_other', event.target.value)}
+              placeholder={readPath(formMessages, ['placeholders', 'legalAidOther'], 'Other: add a short note')}
+              ref={legalAidOtherInputRef}
+              type="text"
+              value={values.legal_aid_other}
+            />
+          ) : null}
+        </div>
 
         <div className="field field--full">
           <span>{readPath(formMessages, ['fields', 'schoolName'], 'Institution')}</span>
@@ -2677,6 +3062,18 @@ function MainReportForm({ apiUrl, formConfig, i18n, lang }) {
         </div>
 
         <label className="field">
+          <span>{readPath(formMessages, ['fields', 'headmasterName'], 'Headmaster')}</span>
+          <input
+            maxLength={formConfig.formRules.headmasterName.maxLength}
+            name="headmaster_name"
+            onChange={(event) => updateValue('headmaster_name', event.target.value)}
+            placeholder={readPath(formMessages, ['placeholders', 'headmasterName'], 'Headmaster')}
+            type="text"
+            value={values.headmaster_name}
+          />
+        </label>
+
+        <label className="field">
           <span>{readPath(formMessages, ['fields', 'contactInformation'], 'Contact')}</span>
           <input
             maxLength={formConfig.formRules.contactInformation.maxLength}
@@ -2689,17 +3086,33 @@ function MainReportForm({ apiUrl, formConfig, i18n, lang }) {
           />
         </label>
 
-        <label className="field">
-          <span>{readPath(formMessages, ['fields', 'headmasterName'], 'Headmaster')}</span>
-          <input
-            maxLength={formConfig.formRules.headmasterName.maxLength}
-            name="headmaster_name"
-            onChange={(event) => updateValue('headmaster_name', event.target.value)}
-            placeholder={readPath(formMessages, ['placeholders', 'headmasterName'], 'Headmaster')}
-            type="text"
-            value={values.headmaster_name}
+        <label className="field field--full">
+          <span>{readPath(formMessages, ['fields', 'abuserInfo'], 'Known information and description of abusers / drill instructors')}</span>
+          <textarea
+            maxLength={formConfig.formRules.abuserInfo.maxLength}
+            name="abuser_info"
+            onChange={(event) => updateValue('abuser_info', event.target.value)}
+            placeholder={readPath(formMessages, ['placeholders', 'abuserInfo'], 'You can add names, contact details, violent acts, and other known information.')}
+            rows="3"
+            value={values.abuser_info}
           />
         </label>
+
+        <div className="field field--full">
+          <span>{readPath(formMessages, ['fields', 'violenceCategories'], 'Institution scandals and violent behavior')}</span>
+          <CheckboxChoiceGrid
+            customInputName="violence_category_other"
+            customInputPlaceholder={readPath(formMessages, ['placeholders', 'violenceCategoryOther'], 'Other violent behavior: describe it briefly')}
+            customInputRef={violenceCategoryOtherInputRef}
+            customInputValue={values.violence_category_other}
+            customValue={CUSTOM_VIOLENCE_CATEGORY_OPTION}
+            name="violence_categories"
+            onCustomInputChange={(nextValue) => updateValue('violence_category_other', nextValue)}
+            onToggle={(optionValue, checked) => toggleChoiceValue('violence_categories', optionValue, checked)}
+            options={formConfig.violenceCategoryOptions || []}
+            selectedValues={values.violence_categories}
+          />
+        </div>
 
         <label className="field field--full">
           <span>{readPath(formMessages, ['fields', 'scandal'], 'Scandal')}</span>
@@ -2906,7 +3319,7 @@ function PortalPage({ bootstrap }) {
           <HeroBlock
             description={readPath(i18n, ['form', 'subtitle'], '')}
             eyebrow="Form / Liquid Glass"
-            title={readPath(i18n, ['form', 'title'], 'Form')}
+            title={readPath(i18n, ['form', 'standalone', 'title'], readPath(i18n, ['form', 'title'], 'Form'))}
           />
           <section className="glass-panel">
             <MainReportForm apiUrl={apiUrl} formConfig={pageProps.form} i18n={i18n} lang={lang} />

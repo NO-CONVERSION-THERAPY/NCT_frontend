@@ -160,6 +160,13 @@ function resolveFlowTitle(req, flow, fallbackTitle = '') {
     : fallbackTitle;
 }
 
+function shouldUseEnhancedQuestionnaire(flow, body) {
+  return Boolean(
+    flow
+    && (flow.standaloneEnhancements || String(body && body.form_variant || '').trim() === 'react_portal_enhanced')
+  );
+}
+
 function renderSubmitFailurePage({
   encodedPayload,
   flow,
@@ -313,7 +320,7 @@ function registerSubmissionFlowRoutes({
     try {
       // 先把请求体校验并规范化成 Google Form 需要的值。
       const { errors, values } = validateSubmission(req.body, req.t, {
-        standaloneEnhancements: Boolean(flow.standaloneEnhancements)
+        standaloneEnhancements: shouldUseEnhancedQuestionnaire(flow, req.body)
       });
       if (errors.length > 0) {
         logAuditEvent(req, 'submit_validation_failed', {

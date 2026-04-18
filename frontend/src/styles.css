@@ -835,6 +835,18 @@ pre {
   gap: 18px;
 }
 
+.form-privacy-note {
+  margin: 0 0 18px;
+  display: grid;
+  gap: 8px;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.form-privacy-note strong {
+  color: var(--text);
+}
+
 .field {
   position: relative;
   display: grid;
@@ -879,6 +891,74 @@ pre {
   margin: 0;
   text-transform: none;
   letter-spacing: 0;
+}
+
+.field-note:empty {
+  display: none;
+}
+
+.choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.choice-card {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  min-height: 72px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.choice-card.is-selected {
+  border-color: rgba(130, 222, 255, 0.4);
+  background: rgba(130, 222, 255, 0.12);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.choice-card--custom {
+  grid-column: 1 / -1;
+}
+
+.choice-card__toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  line-height: 1.55;
+}
+
+.choice-card__toggle input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  margin: 2px 0 0;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  flex-shrink: 0;
+}
+
+.choice-card input[type='text'] {
+  width: 100%;
+  min-height: 46px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  background: rgba(6, 14, 25, 0.42);
+  color: var(--text);
+}
+
+.choice-card input[type='text']:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.choice-card input[type='text']::placeholder {
+  color: var(--text-faint);
 }
 
 .choice-row {
@@ -1481,5 +1561,9 @@ pre {
 
   .choice-pill--input input[type='text'] {
     width: 100%;
+  }
+
+  .choice-grid {
+    grid-template-columns: 1fr;
   }
 }
