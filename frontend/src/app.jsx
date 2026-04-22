@@ -8,16 +8,25 @@ import {
   useState
 } from 'react';
 import L from 'leaflet';
+import {
+  AGENT_IDENTITY,
+  buildLocalizedFormConfig,
+  buildLocalizedInstitutionCorrectionRules,
+  CUSTOM_AGENT_RELATIONSHIP_OPTION,
+  CUSTOM_EXIT_METHOD_OPTION,
+  CUSTOM_LEGAL_AID_OPTION,
+  CUSTOM_OTHER_SEX_OPTION,
+  CUSTOM_PARENT_MOTIVATION_OPTION,
+  CUSTOM_VIOLENCE_CATEGORY_OPTION,
+  OTHER_SEX_OPTION,
+  SELF_IDENTITY
+} from './formRuntimeConfig';
+import {
+  loadAreaSelectorPayload,
+  loadBlogArticlePayload,
+  loadBlogIndexPayload
+} from './staticContent';
 
-const SELF_IDENTITY = '受害者本人';
-const AGENT_IDENTITY = '受害者的代理人';
-const OTHER_SEX_OPTION = '__other_option__';
-const CUSTOM_OTHER_SEX_OPTION = '__custom_other_sex__';
-const CUSTOM_AGENT_RELATIONSHIP_OPTION = '__custom_agent_relationship__';
-const CUSTOM_PARENT_MOTIVATION_OPTION = '__custom_parent_motivation__';
-const CUSTOM_VIOLENCE_CATEGORY_OPTION = '__custom_violence_category__';
-const CUSTOM_EXIT_METHOD_OPTION = '__custom_exit_method__';
-const CUSTOM_LEGAL_AID_OPTION = '__custom_legal_aid__';
 const REACT_PORTAL_ENHANCED_FORM_VARIANT = 'react_portal_enhanced';
 const EASTER_EGG_CLICK_TARGET = 6;
 const EASTER_EGG_CLICK_WINDOW_MS = 2400;
@@ -870,10 +879,131 @@ function appendLangToUrl(href, lang) {
   return `${url.pathname}${url.search}${url.hash}`;
 }
 
+function appendLangToHref(href, lang) {
+  const url = new URL(href, window.location.origin);
+  url.searchParams.set('lang', lang);
+
+  return url.origin === window.location.origin
+    ? `${url.pathname}${url.search}${url.hash}`
+    : url.toString();
+}
+
+function getLinkNavigationProps(href) {
+  const url = new URL(href, window.location.origin);
+
+  return url.origin === window.location.origin
+    ? {}
+    : {
+        rel: 'noreferrer',
+        target: '_blank'
+      };
+}
+
+function resolveFrontendDeploymentMode(bootstrap) {
+  return bootstrap && bootstrap.deploymentMode === 'hono'
+    ? 'hono'
+    : 'api-only';
+}
+
+function resolveFrontendFormHref(bootstrap) {
+  const lang = bootstrap && bootstrap.lang ? bootstrap.lang : 'zh-CN';
+  const deploymentMode = resolveFrontendDeploymentMode(bootstrap);
+  const formPageUrl = String(bootstrap && bootstrap.formPageUrl || '').trim();
+
+  if (deploymentMode === 'hono' && formPageUrl) {
+    return appendLangToHref(formPageUrl, lang);
+  }
+
+  return appendLangToUrl('/form', lang);
+}
+
 function updatePathWithLang(currentPath, lang) {
   const url = new URL(currentPath || '/', window.location.origin);
   url.searchParams.set('lang', lang);
   return `${url.pathname}${url.search}${url.hash}`;
+}
+
+function readCurrentUrl() {
+  return new URL(window.location.href);
+}
+
+function getSearchParamValue(searchParams, key) {
+  const value = searchParams.get(key);
+  return value == null ? '' : value;
+}
+
+function resolveInitialPortalSection(pathname) {
+  if (pathname === '/form') {
+    return 'form';
+  }
+
+  if (pathname === '/blog') {
+    return 'blog';
+  }
+
+  return 'map';
+}
+
+function resolveCorrectionFormAction(pathname) {
+  return pathname.startsWith('/correction')
+    ? '/correction/submit'
+    : '/map/correction/submit';
+}
+
+function resolveFrontendRoute(currentPath) {
+  const url = new URL(currentPath || window.location.href, window.location.origin);
+  const pathname = url.pathname || '/';
+  const query = {
+    inputType: getSearchParamValue(url.searchParams, 'inputType'),
+    schoolName: getSearchParamValue(url.searchParams, 'school_name'),
+    search: getSearchParamValue(url.searchParams, 'search'),
+    tag: getSearchParamValue(url.searchParams, 'tag')
+  };
+
+  if (pathname === '/' || pathname === '/map' || pathname === '/form' || pathname === '/blog') {
+    return {
+      pathname,
+      query,
+      routeType: pathname === '/' ? 'home' : 'portal'
+    };
+  }
+
+  if (pathname === '/privacy') {
+    return {
+      pathname,
+      query,
+      routeType: 'privacy'
+    };
+  }
+
+  if (pathname.startsWith('/map/record/')) {
+    return {
+      pathname,
+      query,
+      recordSlug: decodeURIComponent(pathname.slice('/map/record/'.length)),
+      routeType: 'record'
+    };
+  }
+
+  if (pathname.startsWith('/port/')) {
+    return {
+      articleId: decodeURIComponent(pathname.slice('/port/'.length)),
+      pathname,
+      query,
+      routeType: 'article'
+    };
+  }
+
+  return {
+    pathname,
+    query,
+    routeType: 'not-found'
+  };
+}
+
+function replaceCurrentUrl(nextPath) {
+  window.history.replaceState({}, '', nextPath);
+  window.dispatchEvent(new PopStateEvent('popstate'));
 }
 
 function formatAbsoluteDate(value, lang) {
@@ -882,6 +1012,10 @@ function formatAbsoluteDate(value, lang) {
   }
 
   if (typeof value === 'number') {
+    if (value < 100000000000) {
+      return `v${value}`;
+    }
+
     return new Intl.DateTimeFormat(lang, {
       dateStyle: 'medium',
       timeStyle: 'short'
@@ -893,7 +1027,11 @@ function formatAbsoluteDate(value, lang) {
 
 function formatRelativeTimestamp(timestamp, lang) {
   const numericTimestamp = Number(timestamp);
-  if (!Number.isFinite(numericTimestamp) || numericTimestamp <= 0) {
+  if (
+    !Number.isFinite(numericTimestamp)
+    || numericTimestamp <= 0
+    || numericTimestamp < 100000000000
+  ) {
     return '';
   }
 
@@ -1186,23 +1324,64 @@ async function fetchSharedMapData(apiUrl) {
   return sharedMapRequest;
 }
 
-async function requestAreaOptions(queryKey, queryValue, lang) {
-  const url = new URL('/api/area-options', window.location.origin);
-  url.searchParams.set(queryKey, queryValue);
-  url.searchParams.set('lang', lang);
+function getStaticAreaOptions(areaSelectorPayload, lang) {
+  const payload = areaSelectorPayload && typeof areaSelectorPayload === 'object'
+    ? areaSelectorPayload
+    : {};
 
-  const response = await window.fetch(url.toString(), {
-    headers: {
-      Accept: 'application/json'
-    }
-  });
-  const payload = await response.json();
+  return {
+    citiesByProvinceCode: payload.citiesByProvinceCode && typeof payload.citiesByProvinceCode === 'object'
+      ? payload.citiesByProvinceCode
+      : {},
+    countiesByCityCode: payload.countiesByCityCode && typeof payload.countiesByCityCode === 'object'
+      ? payload.countiesByCityCode
+      : {},
+    provinces: Array.isArray(payload.provincesByLanguage && payload.provincesByLanguage[lang])
+      ? payload.provincesByLanguage[lang]
+      : (Array.isArray(payload.provincesByLanguage && payload.provincesByLanguage['zh-CN'])
+        ? payload.provincesByLanguage['zh-CN']
+        : [])
+  };
+}
 
-  if (!response.ok) {
-    throw new Error(payload && payload.error ? payload.error : 'Failed to load area options');
+function localizeBlogLanguageLabel(value, i18n) {
+  const normalizedValue = String(value || '').trim();
+  const languageLabelByValue = {
+    English: readPath(i18n, ['blog', 'articleLanguages', 'en'], 'English'),
+    en: readPath(i18n, ['blog', 'articleLanguages', 'en'], 'English'),
+    'zh-CN': readPath(i18n, ['blog', 'articleLanguages', 'zhCN'], 'Simplified Chinese'),
+    'zh-TW': readPath(i18n, ['blog', 'articleLanguages', 'zhTW'], 'Traditional Chinese'),
+    '简体中文': readPath(i18n, ['blog', 'articleLanguages', 'zhCN'], 'Simplified Chinese'),
+    '簡體中文': readPath(i18n, ['blog', 'articleLanguages', 'zhCN'], 'Simplified Chinese'),
+    '繁體中文': readPath(i18n, ['blog', 'articleLanguages', 'zhTW'], 'Traditional Chinese'),
+    '正體中文': readPath(i18n, ['blog', 'articleLanguages', 'zhTW'], 'Traditional Chinese'),
+    '英文': readPath(i18n, ['blog', 'articleLanguages', 'en'], 'English')
+  };
+
+  return languageLabelByValue[normalizedValue] || normalizedValue;
+}
+
+function localizeBlogCreationDate(value, lang) {
+  const rawValue = String(value || '').trim();
+
+  if (lang !== 'en') {
+    return rawValue;
   }
 
-  return Array.isArray(payload.options) ? payload.options : [];
+  const dateMatch = rawValue.match(/^(\d{4})年(\d{1,2})月(\d{1,2})日$/);
+  if (!dateMatch) {
+    return rawValue;
+  }
+
+  const [, year, month, day] = dateMatch;
+  const date = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
+
+  return new Intl.DateTimeFormat('en', {
+    day: 'numeric',
+    month: 'long',
+    timeZone: 'UTC',
+    year: 'numeric'
+  }).format(date);
 }
 
 function buildAutocompleteRecords(records) {
@@ -1301,7 +1480,41 @@ function useMapPayload(apiUrl) {
   };
 }
 
-function useAreaSelector({ initialProvinces, lang }) {
+function useAreaSelectorPayload(lang) {
+  const [payload, setPayload] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let disposed = false;
+
+    setLoading(true);
+    loadAreaSelectorPayload()
+      .then((nextPayload) => {
+        if (!disposed) {
+          setPayload(nextPayload);
+          setLoading(false);
+        }
+      })
+      .catch(() => {
+        if (!disposed) {
+          setPayload(null);
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      disposed = true;
+    };
+  }, []);
+
+  return {
+    ...getStaticAreaOptions(payload, lang),
+    loading
+  };
+}
+
+function useAreaSelector({ lang }) {
+  const areaSelectorPayload = useAreaSelectorPayload(lang);
   const [provinceCode, setProvinceCode] = useState('');
   const [cityCode, setCityCode] = useState('');
   const [countyCode, setCountyCode] = useState('');
@@ -1311,93 +1524,50 @@ function useAreaSelector({ initialProvinces, lang }) {
   const [loadingCountyOptions, setLoadingCountyOptions] = useState(false);
 
   useEffect(() => {
-    let disposed = false;
-
     if (!provinceCode) {
       setCityOptions([]);
       setCountyOptions([]);
       setCityCode('');
       setCountyCode('');
-      return undefined;
+      return;
     }
 
     setLoadingCityOptions(true);
-    requestAreaOptions('provinceCode', provinceCode, lang)
-      .then((options) => {
-        if (disposed) {
-          return;
-        }
+    const nextCityOptions = Array.isArray(areaSelectorPayload.citiesByProvinceCode[provinceCode])
+      ? areaSelectorPayload.citiesByProvinceCode[provinceCode]
+      : [];
 
-        setCityOptions(options);
-        setCityCode('');
-        setCountyCode('');
-        setCountyOptions([]);
-      })
-      .catch(() => {
-        if (disposed) {
-          return;
-        }
-
-        setCityOptions([]);
-        setCityCode('');
-        setCountyOptions([]);
-        setCountyCode('');
-      })
-      .finally(() => {
-        if (!disposed) {
-          setLoadingCityOptions(false);
-        }
-      });
-
-    return () => {
-      disposed = true;
-    };
-  }, [provinceCode, lang]);
+    setCityOptions(nextCityOptions);
+    setCityCode('');
+    setCountyCode('');
+    setCountyOptions([]);
+    setLoadingCityOptions(false);
+  }, [areaSelectorPayload.citiesByProvinceCode, provinceCode]);
 
   useEffect(() => {
-    let disposed = false;
-
     if (!cityCode) {
       setCountyOptions([]);
       setCountyCode('');
-      return undefined;
+      return;
     }
 
     setLoadingCountyOptions(true);
-    requestAreaOptions('cityCode', cityCode, lang)
-      .then((options) => {
-        if (disposed) {
-          return;
-        }
+    const nextCountyOptions = Array.isArray(areaSelectorPayload.countiesByCityCode[cityCode])
+      ? areaSelectorPayload.countiesByCityCode[cityCode]
+      : [];
 
-        setCountyOptions(options);
-        setCountyCode('');
-      })
-      .catch(() => {
-        if (disposed) {
-          return;
-        }
-
-        setCountyOptions([]);
-        setCountyCode('');
-      })
-      .finally(() => {
-        if (!disposed) {
-          setLoadingCountyOptions(false);
-        }
-      });
-
-    return () => {
-      disposed = true;
-    };
-  }, [cityCode, lang]);
+    setCountyOptions(nextCountyOptions);
+    setCountyCode('');
+    setLoadingCountyOptions(false);
+  }, [areaSelectorPayload.countiesByCityCode, cityCode]);
 
   return {
     cityCode,
     cityOptions,
     countyCode,
     countyOptions,
-    initialProvinces,
+    initialProvinces: areaSelectorPayload.provinces,
+    loadingInitialOptions: areaSelectorPayload.loading,
     loadingCityOptions,
     loadingCountyOptions,
     provinceCode,
@@ -1431,6 +1601,156 @@ function useAutocompleteRecords(apiUrl) {
   }, [apiUrl]);
 
   return records;
+}
+
+function useFrontendRuntime(scope) {
+  const [payload, setPayload] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let disposed = false;
+    const requestUrl = new URL('/api/frontend-runtime', window.location.origin);
+
+    requestUrl.searchParams.set('scope', scope);
+
+    setLoading(true);
+    window.fetch(requestUrl.toString(), {
+      headers: {
+        Accept: 'application/json'
+      }
+    })
+      .then(async (response) => {
+        const nextPayload = await response.json();
+
+        if (!response.ok) {
+          throw new Error(nextPayload && nextPayload.error ? nextPayload.error : 'Frontend runtime unavailable');
+        }
+
+        if (!disposed) {
+          setPayload(nextPayload);
+          setError('');
+          setLoading(false);
+        }
+      })
+      .catch((nextError) => {
+        if (!disposed) {
+          setPayload(null);
+          setError(nextError.message || 'Frontend runtime unavailable');
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      disposed = true;
+    };
+  }, [scope]);
+
+  return {
+    error,
+    loading,
+    payload
+  };
+}
+
+function useBlogIndex(i18n, lang) {
+  const [payload, setPayload] = useState({ entries: [], tags: {} });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let disposed = false;
+
+    setLoading(true);
+    loadBlogIndexPayload()
+      .then((nextPayload) => {
+        if (disposed) {
+          return;
+        }
+
+        const tags = Object.fromEntries(
+          Object.entries(nextPayload && nextPayload.tags || {}).map(([tagId, tagLabel]) => ([
+            tagId,
+            readPath(i18n, ['blog', 'tags', tagId], tagLabel)
+          ]))
+        );
+        const entries = Array.isArray(nextPayload && nextPayload.entries)
+          ? nextPayload.entries.map((entry) => ({
+            ...entry,
+            localizedCreationDate: localizeBlogCreationDate(entry.CreationDate, lang),
+            localizedLanguage: localizeBlogLanguageLabel(entry.Language, i18n)
+          }))
+          : [];
+
+        setPayload({
+          entries,
+          tags
+        });
+        setError('');
+        setLoading(false);
+      })
+      .catch((nextError) => {
+        if (!disposed) {
+          setPayload({ entries: [], tags: {} });
+          setError(nextError.message || 'Blog content unavailable');
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      disposed = true;
+    };
+  }, [i18n, lang]);
+
+  return {
+    error,
+    loading,
+    payload
+  };
+}
+
+function useBlogArticle(articleId) {
+  const [payload, setPayload] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let disposed = false;
+
+    if (!articleId) {
+      setPayload(null);
+      setError('Missing article id');
+      setLoading(false);
+      return undefined;
+    }
+
+    setLoading(true);
+    loadBlogArticlePayload(articleId)
+      .then((nextPayload) => {
+        if (!disposed) {
+          setPayload(nextPayload);
+          setError('');
+          setLoading(false);
+        }
+      })
+      .catch((nextError) => {
+        if (!disposed) {
+          setPayload(null);
+          setError(nextError.message || 'Article unavailable');
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      disposed = true;
+    };
+  }, [articleId]);
+
+  return {
+    error,
+    loading,
+    payload
+  };
 }
 
 function LanguageSwitcher({ currentPath, lang, options }) {
@@ -1559,9 +1879,105 @@ function HeroBlock({ eyebrow, title, description, children, onTitleClick, titleC
   );
 }
 
+function getFormAccessModeCopy(lang, formEnabled) {
+  if (formEnabled) {
+    if (lang === 'en') {
+      return {
+        body: 'Form submission is now handled by the Hono backend in nct-api-sql-sub. The button below opens the standalone submission page hosted there.',
+        ctaLabel: 'Open standalone form',
+        secondary: 'Validation, confirmation, and the final delivery step all happen on the backend page.'
+      };
+    }
+
+    if (lang === 'zh-TW') {
+      return {
+        body: '表單提交流程已移交給 nct-api-sql-sub 的 Hono 後端。下方按鈕會打開由後端託管的獨立填寫頁。',
+        ctaLabel: '前往獨立填寫頁',
+        secondary: '校驗、確認與最終投遞都會在後端頁面完成。'
+      };
+    }
+
+    return {
+      body: '表单提交流程已移交给 nct-api-sql-sub 的 Hono 后端。下方按钮会打开由后端托管的独立填写页。',
+      ctaLabel: '前往独立填写页',
+      secondary: '校验、确认与最终投递都会在后端页面完成。'
+    };
+  }
+
+  if (lang === 'en') {
+    return {
+      body: 'This deployment is running in api-only mode. It only connects to the public JSON dataset for browsing the map, records, and blog.',
+      ctaLabel: '',
+      secondary: 'Form submission is intentionally unavailable here. Use the hono-backed deployment if you need the reporting workflow.'
+    };
+  }
+
+  if (lang === 'zh-TW') {
+    return {
+      body: '當前部署運行在 api-only 模式，只接入公開 JSON 數據，用於瀏覽地圖、記錄與文庫。',
+      ctaLabel: '',
+      secondary: '這個模式不包含表單提交流程。如需填寫，請使用接入 Hono 後端的部署。'
+    };
+  }
+
+  return {
+    body: '当前部署运行在 api-only 模式，只接入公开 JSON 数据，用于浏览地图、记录与文库。',
+    ctaLabel: '',
+    secondary: '这个模式不包含表单提交流程。如需填写，请使用接入 Hono 后端的部署。'
+  };
+}
+
+function FormAccessSection({ bootstrap }) {
+  const { i18n, lang } = bootstrap;
+  const deploymentMode = resolveFrontendDeploymentMode(bootstrap);
+  const formEnabled = deploymentMode === 'hono' && String(bootstrap.formPageUrl || '').trim();
+  const accessCopy = getFormAccessModeCopy(lang, Boolean(formEnabled));
+  const formHref = resolveFrontendFormHref(bootstrap);
+  const formLinkProps = getLinkNavigationProps(formHref);
+
+  return (
+    <div className="section-stack">
+      <HeroBlock
+        description={readPath(i18n, ['form', 'subtitle'], '')}
+        eyebrow="Form Gateway"
+        title={readPath(i18n, ['form', 'standalone', 'title'], readPath(i18n, ['form', 'title'], 'Form'))}
+      />
+
+      <section className="glass-panel">
+        <div className="section-heading">
+          <h2>{readPath(i18n, ['index', 'fillForm'], 'Form')}</h2>
+        </div>
+
+        <p>{accessCopy.body}</p>
+        <p>{accessCopy.secondary}</p>
+        <p className="field-note">{readPath(i18n, ['form', 'standalone', 'safetyNotice'], '')}</p>
+        {readPath(i18n, ['form', 'standalone', 'footerMeta'], '')
+          ? <p className="field-note">{readPath(i18n, ['form', 'standalone', 'footerMeta'], '')}</p>
+          : null}
+
+        <div className="panel-actions">
+          {formEnabled ? (
+            <a className="glass-button glass-button--primary" href={formHref} {...formLinkProps}>
+              {accessCopy.ctaLabel}
+            </a>
+          ) : null}
+          <a className="glass-button" href={appendLangToUrl('/map', lang)}>
+            {readPath(i18n, ['index', 'viewMap'], 'Map')}
+          </a>
+          <a className="glass-button" href={appendLangToUrl('/blog', lang)}>
+            {readPath(i18n, ['index', 'blogLibrary'], 'Blog')}
+          </a>
+        </div>
+      </section>
+    </div>
+  );
+}
+
 function HomePage({ bootstrap }) {
   const { i18n, lang } = bootstrap;
   const clickTimestampsRef = useRef([]);
+  const formHref = resolveFrontendFormHref(bootstrap);
+  const formLinkProps = getLinkNavigationProps(formHref);
 
   function handleTitleClick() {
     const currentTimestamp = Date.now();
@@ -1588,7 +2004,7 @@ function HomePage({ bootstrap }) {
         titleClassName="hero-block__title--home"
       >
         <div className="hero-actions">
-          <a className="glass-button glass-button--primary" href={appendLangToUrl('/form', lang)}>
+          <a className="glass-button glass-button--primary" href={formHref} {...formLinkProps}>
             {readPath(i18n, ['index', 'fillForm'], 'Form')}
           </a>
           <a className="glass-button" href={appendLangToUrl('/map', lang)}>
@@ -1611,7 +2027,7 @@ function HomePage({ bootstrap }) {
           <span className="glass-card__badge">02</span>
           <h2>{readPath(i18n, ['form', 'title'], 'Form')}</h2>
           <p>{readPath(i18n, ['form', 'subtitle'], 'Documenting harm helps make resistance visible.')}</p>
-          <a href={appendLangToUrl('/form', lang)}>{readPath(i18n, ['form', 'buttons', 'submit'], 'Open form')}</a>
+          <a href={formHref} {...formLinkProps}>{readPath(i18n, ['index', 'fillForm'], 'Open form')}</a>
         </article>
         <article className="glass-card">
           <span className="glass-card__badge">03</span>
@@ -2032,6 +2448,11 @@ function MapSection({ apiUrl, i18n, initialQuery, lang }) {
   const [search, setSearch] = useState(initialQuery.search || '');
   const deferredSearch = useDeferredValue(search);
 
+  useEffect(() => {
+    setInputType(initialQuery.inputType || '');
+    setSearch(initialQuery.search || '');
+  }, [initialQuery.inputType, initialQuery.search]);
+
   const rawRecords = payload && Array.isArray(payload.data) ? payload.data : [];
   const filteredRecords = rawRecords.filter((record) => {
     const matchesInputType = !inputType
@@ -2174,10 +2595,7 @@ function MapSection({ apiUrl, i18n, initialQuery, lang }) {
         <p>{readPath(i18n, ['map', 'api', 'privacy'], '')}</p>
         <p>{readPath(i18n, ['map', 'api', 'implementationBody'], '')}</p>
         <div className="panel-actions">
-          <a className="glass-button" href={appendLangToUrl('/map/correction', lang)}>
-            {readPath(i18n, ['map', 'api', 'correctionButton'], 'Correction')}
-          </a>
-          <a className="glass-button" href="/api/map-data" rel="noreferrer" target="_blank">
+          <a className="glass-button" href={apiUrl} rel="noreferrer" target="_blank">
             {readPath(i18n, ['map', 'api', 'link'], 'Open API')}
           </a>
         </div>
@@ -2404,14 +2822,8 @@ function MainReportForm({ apiUrl, formConfig, i18n, lang }) {
     violence_category_other: ''
   });
 
-  const areaSelector = useAreaSelector({
-    initialProvinces: formConfig.areaOptions.provinces || [],
-    lang
-  });
-  const preInstitutionAreaSelector = useAreaSelector({
-    initialProvinces: formConfig.areaOptions.provinces || [],
-    lang
-  });
+  const areaSelector = useAreaSelector({ lang });
+  const preInstitutionAreaSelector = useAreaSelector({ lang });
   const otherSexInputRef = useRef(null);
   const agentRelationshipOtherInputRef = useRef(null);
   const parentMotivationOtherInputRef = useRef(null);
@@ -2426,6 +2838,7 @@ function MainReportForm({ apiUrl, formConfig, i18n, lang }) {
   const hasCustomParentMotivation = values.parent_motivations.includes(CUSTOM_PARENT_MOTIVATION_OPTION);
   const hasCustomViolenceCategory = values.violence_categories.includes(CUSTOM_VIOLENCE_CATEGORY_OPTION);
   const showExitMethod = Boolean(values.date_end);
+  const submitDisabled = isSubmitting || !formConfig.formProtectionToken;
 
   useEffect(() => {
     areaSelector.setProvinceCode(values.provinceCode);
@@ -2690,6 +3103,9 @@ function MainReportForm({ apiUrl, formConfig, i18n, lang }) {
           <strong>{readPath(formMessages, ['standalone', 'safetyNotice'], '')}</strong>
         ) : null}
       </p>
+      {!formConfig.formProtectionToken ? (
+        <p className="field-note">{readPath(i18n, ['common', 'loading'], 'Loading')}</p>
+      ) : null}
 
       <div className="form-grid">
         <label className="field">
@@ -3139,20 +3555,30 @@ function MainReportForm({ apiUrl, formConfig, i18n, lang }) {
         </label>
       </div>
 
-      <button className="glass-submit" disabled={isSubmitting} type="submit">
+      <button className="glass-submit" disabled={submitDisabled} type="submit">
         {isSubmitting
           ? readPath(formMessages, ['buttons', 'submitting'], 'Submitting...')
+          : !formConfig.formProtectionToken
+            ? readPath(i18n, ['common', 'loading'], 'Loading')
           : readPath(formMessages, ['buttons', 'submit'], 'Submit')}
       </button>
     </form>
   );
 }
 
-function BlogSection({ blog, i18n, lang }) {
-  const [activeTag, setActiveTag] = useState(blog.activeTag || '');
+function BlogSection({
+  activeTag,
+  blogEntries,
+  blogError,
+  blogLoading,
+  blogTags,
+  i18n,
+  lang,
+  onTagChange
+}) {
   const filteredEntries = activeTag
-    ? blog.entries.filter((entry) => Array.isArray(entry.tagid) && entry.tagid.includes(activeTag))
-    : blog.entries;
+    ? blogEntries.filter((entry) => Array.isArray(entry.tagid) && entry.tagid.includes(activeTag))
+    : blogEntries;
 
   return (
     <div className="section-stack">
@@ -3164,14 +3590,14 @@ function BlogSection({ blog, i18n, lang }) {
 
       <section className="glass-panel">
         <div className="chip-row">
-          <button className={`filter-chip${activeTag === '' ? ' is-active' : ''}`} onClick={() => setActiveTag('')} type="button">
+          <button className={`filter-chip${activeTag === '' ? ' is-active' : ''}`} onClick={() => onTagChange('')} type="button">
             {readPath(i18n, ['blog', 'all'], 'All')}
           </button>
-          {Object.entries(blog.tags).map(([tagId, tagLabel]) => (
+          {Object.entries(blogTags).map(([tagId, tagLabel]) => (
             <button
               className={`filter-chip${activeTag === tagId ? ' is-active' : ''}`}
               key={tagId}
-              onClick={() => setActiveTag(tagId)}
+              onClick={() => onTagChange(tagId)}
               type="button"
             >
               #{tagLabel}
@@ -3181,7 +3607,16 @@ function BlogSection({ blog, i18n, lang }) {
       </section>
 
       <section className="blog-grid">
-        {filteredEntries.length === 0 ? (
+        {blogLoading ? (
+          <article className="glass-card">
+            <h2>{readPath(i18n, ['common', 'loading'], 'Loading')}</h2>
+          </article>
+        ) : blogError ? (
+          <article className="glass-card">
+            <h2>{readPath(i18n, ['blog', 'title'], 'Blog')}</h2>
+            <p>{blogError}</p>
+          </article>
+        ) : filteredEntries.length === 0 ? (
           <article className="glass-card">
             <h2>{readPath(i18n, ['blog', 'empty'], 'No articles yet')}</h2>
           </article>
@@ -3200,7 +3635,7 @@ function BlogSection({ blog, i18n, lang }) {
               <div className="chip-row chip-row--compact">
                 {Array.isArray(entry.tagid) && entry.tagid.length > 0
                   ? entry.tagid.map((tagId) => (
-                    <span className="inline-tag" key={tagId}>#{blog.tags[tagId] || tagId}</span>
+                    <span className="inline-tag" key={tagId}>#{blogTags[tagId] || tagId}</span>
                   ))
                   : <span className="inline-tag">{readPath(i18n, ['blog', 'noTag'], '#No tag')}</span>}
               </div>
@@ -3213,8 +3648,11 @@ function BlogSection({ blog, i18n, lang }) {
 }
 
 function PortalPage({ bootstrap }) {
-  const { apiUrl, i18n, lang, pageProps } = bootstrap;
-  const [activeSection, setActiveSection] = useState(pageProps.initialSection || 'map');
+  const { apiUrl, currentPath, i18n, lang } = bootstrap;
+  const route = resolveFrontendRoute(currentPath);
+  const blog = useBlogIndex(i18n, lang);
+  const [activeSection, setActiveSection] = useState(resolveInitialPortalSection(route.pathname));
+  const [activeTag, setActiveTag] = useState(route.query.tag || '');
   const mapSectionRef = useRef(null);
   const formSectionRef = useRef(null);
   const blogSectionRef = useRef(null);
@@ -3227,9 +3665,10 @@ function PortalPage({ bootstrap }) {
 
   useEffect(() => {
     let cancelled = false;
+    const initialSection = resolveInitialPortalSection(route.pathname);
 
     async function scrollToInitialSection() {
-      const targetRef = sectionRefs[pageProps.initialSection || 'map'];
+      const targetRef = sectionRefs[initialSection];
 
       if (document.fonts && document.fonts.ready) {
         try {
@@ -3255,7 +3694,12 @@ function PortalPage({ bootstrap }) {
       cancelled = true;
       window.clearTimeout(timer);
     };
-  }, [pageProps.initialSection]);
+  }, [route.pathname]);
+
+  useEffect(() => {
+    setActiveSection(resolveInitialPortalSection(route.pathname));
+    setActiveTag(route.query.tag || '');
+  }, [route.pathname, route.query.tag]);
 
   useEffect(() => {
     const sections = Object.entries(sectionRefs)
@@ -3289,7 +3733,7 @@ function PortalPage({ bootstrap }) {
 
   function navigateToSection(sectionId, href) {
     setActiveSection(sectionId);
-    window.history.replaceState({}, '', appendLangToUrl(href, lang));
+    replaceCurrentUrl(appendLangToUrl(href, lang));
 
     const targetRef = sectionRefs[sectionId];
     if (targetRef && targetRef.current) {
@@ -3298,6 +3742,18 @@ function PortalPage({ bootstrap }) {
         block: 'start'
       });
     }
+  }
+
+  function navigateToBlogTag(tagId) {
+    const nextUrl = new URL('/blog', window.location.origin);
+
+    if (tagId) {
+      nextUrl.searchParams.set('tag', tagId);
+    }
+
+    nextUrl.searchParams.set('lang', lang);
+    setActiveTag(tagId);
+    replaceCurrentUrl(`${nextUrl.pathname}${nextUrl.search}`);
   }
 
   return (
@@ -3311,31 +3767,34 @@ function PortalPage({ bootstrap }) {
       <PortalTabs activeSection={activeSection} i18n={i18n} lang={lang} onNavigate={navigateToSection} />
 
       <section className="portal-section" data-section-id="map" ref={mapSectionRef}>
-        <MapSection apiUrl={apiUrl} i18n={i18n} initialQuery={pageProps.mapQuery} lang={lang} />
+        <MapSection apiUrl={apiUrl} i18n={i18n} initialQuery={route.query} lang={lang} />
       </section>
 
       <section className="portal-section" data-section-id="form" ref={formSectionRef}>
-        <div className="section-stack">
-          <HeroBlock
-            description={readPath(i18n, ['form', 'subtitle'], '')}
-            eyebrow="Form / Liquid Glass"
-            title={readPath(i18n, ['form', 'standalone', 'title'], readPath(i18n, ['form', 'title'], 'Form'))}
-          />
-          <section className="glass-panel">
-            <MainReportForm apiUrl={apiUrl} formConfig={pageProps.form} i18n={i18n} lang={lang} />
-          </section>
-        </div>
+        <FormAccessSection bootstrap={bootstrap} />
       </section>
 
       <section className="portal-section" data-section-id="blog" ref={blogSectionRef}>
-        <BlogSection blog={pageProps.blog} i18n={i18n} lang={lang} />
+        <BlogSection
+          activeTag={activeTag}
+          blogEntries={blog.payload.entries}
+          blogError={blog.error}
+          blogLoading={blog.loading}
+          blogTags={blog.payload.tags}
+          i18n={i18n}
+          lang={lang}
+          onTagChange={navigateToBlogTag}
+        />
       </section>
     </PageChrome>
   );
 }
 
 function CorrectionPage({ bootstrap }) {
-  const { apiUrl, i18n, lang, pageProps } = bootstrap;
+  const { apiUrl, currentPath, i18n, lang } = bootstrap;
+  const route = resolveFrontendRoute(currentPath);
+  const correctionRules = buildLocalizedInstitutionCorrectionRules(i18n);
+  const correctionRuntime = useFrontendRuntime('correction');
   const autocompleteRecords = useAutocompleteRecords(apiUrl);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [schoolSuggestions, setSchoolSuggestions] = useState([]);
@@ -3350,13 +3809,13 @@ function CorrectionPage({ bootstrap }) {
     headmaster_name: '',
     provinceCode: '',
     school_address: '',
-    school_name: pageProps.initialSchoolName || ''
+    school_name: route.query.schoolName || ''
   });
-  const areaSelector = useAreaSelector({
-    initialProvinces: pageProps.areaOptions.provinces || [],
-    lang
-  });
+  const areaSelector = useAreaSelector({ lang });
   const correctionMessages = i18n.institutionCorrection || {};
+  const correctionFormAction = resolveCorrectionFormAction(route.pathname);
+  const correctionToken = readPath(correctionRuntime, ['payload', 'formProtectionToken'], '');
+  const submitDisabled = isSubmitting || !correctionToken;
   const handleCoordinatePick = useEffectEvent((lat, lng) => {
     applyCoordinates(lat, lng);
   });
@@ -3411,7 +3870,7 @@ function CorrectionPage({ bootstrap }) {
 
       <section className="glass-panel">
         <form
-          action={pageProps.correctionFormAction}
+          action={correctionFormAction}
           className="report-form"
           method="POST"
           onSubmit={(event) => {
@@ -3428,15 +3887,18 @@ function CorrectionPage({ bootstrap }) {
             <label htmlFor="website-correction">Website</label>
             <input autoComplete="off" id="website-correction" name="website" spellCheck="false" tabIndex="-1" type="text" />
           </div>
-          <input name="form_token" type="hidden" value={pageProps.formProtectionToken} />
+          <input name="form_token" type="hidden" value={correctionToken} />
 
           <p className="form-privacy-note">{readPath(correctionMessages, ['privacyNotice'], '')}</p>
+          {!correctionToken ? (
+            <p className="field-note">{readPath(i18n, ['common', 'loading'], 'Loading')}</p>
+          ) : null}
 
           <div className="form-grid">
             <div className="field field--full">
               <span>{readPath(correctionMessages, ['fields', 'schoolName'], 'Institution')}</span>
               <input
-                maxLength={pageProps.institutionCorrectionRules.schoolName.maxLength}
+                maxLength={correctionRules.schoolName.maxLength}
                 name="school_name"
                 onChange={(event) => updateValue('school_name', event.target.value)}
                 placeholder={readPath(correctionMessages, ['placeholders', 'schoolName'], 'Institution name')}
@@ -3508,7 +3970,7 @@ function CorrectionPage({ bootstrap }) {
             <div className="field field--full">
               <span>{readPath(correctionMessages, ['fields', 'schoolAddress'], 'Address')}</span>
               <input
-                maxLength={pageProps.institutionCorrectionRules.schoolAddress.maxLength}
+                maxLength={correctionRules.schoolAddress.maxLength}
                 name="school_address"
                 onChange={(event) => updateValue('school_address', event.target.value)}
                 placeholder={readPath(correctionMessages, ['placeholders', 'schoolAddress'], 'Address')}
@@ -3564,7 +4026,7 @@ function CorrectionPage({ bootstrap }) {
             <label className="field">
               <span>{readPath(correctionMessages, ['fields', 'contactInformation'], 'Contact')}</span>
               <input
-                maxLength={pageProps.institutionCorrectionRules.contactInformation.maxLength}
+                maxLength={correctionRules.contactInformation.maxLength}
                 name="contact_information"
                 onChange={(event) => updateValue('contact_information', event.target.value)}
                 placeholder={readPath(correctionMessages, ['placeholders', 'contactInformation'], 'Contact')}
@@ -3576,7 +4038,7 @@ function CorrectionPage({ bootstrap }) {
             <label className="field">
               <span>{readPath(correctionMessages, ['fields', 'headmasterName'], 'Headmaster')}</span>
               <input
-                maxLength={pageProps.institutionCorrectionRules.headmasterName.maxLength}
+                maxLength={correctionRules.headmasterName.maxLength}
                 name="headmaster_name"
                 onChange={(event) => updateValue('headmaster_name', event.target.value)}
                 placeholder={readPath(correctionMessages, ['placeholders', 'headmasterName'], 'Headmaster')}
@@ -3588,7 +4050,7 @@ function CorrectionPage({ bootstrap }) {
             <label className="field field--full">
               <span>{readPath(correctionMessages, ['fields', 'correctionContent'], 'Correction')}</span>
               <textarea
-                maxLength={pageProps.institutionCorrectionRules.correctionContent.maxLength}
+                maxLength={correctionRules.correctionContent.maxLength}
                 name="correction_content"
                 onChange={(event) => updateValue('correction_content', event.target.value)}
                 placeholder={readPath(correctionMessages, ['placeholders', 'correctionContent'], 'Correction content')}
@@ -3598,9 +4060,11 @@ function CorrectionPage({ bootstrap }) {
             </label>
           </div>
 
-          <button className="glass-submit" disabled={isSubmitting} type="submit">
+          <button className="glass-submit" disabled={submitDisabled} type="submit">
             {isSubmitting
               ? readPath(correctionMessages, ['buttons', 'submitting'], 'Submitting...')
+              : !correctionToken
+                ? readPath(i18n, ['common', 'loading'], 'Loading')
               : readPath(correctionMessages, ['buttons', 'submit'], 'Submit')}
           </button>
         </form>
@@ -4020,14 +4484,46 @@ function CorrectionErrorPage({ bootstrap }) {
 }
 
 function ArticlePage({ bootstrap }) {
-  const { i18n, lang, pageProps } = bootstrap;
+  const { currentPath, i18n, lang } = bootstrap;
+  const route = resolveFrontendRoute(currentPath);
+  const article = useBlogArticle(route.articleId);
+
+  if (article.loading) {
+    return (
+      <PageChrome bootstrap={bootstrap}>
+        <HeroBlock
+          description={readPath(i18n, ['blog', 'subtitle'], '')}
+          eyebrow="Blog Article"
+          title={readPath(i18n, ['common', 'loading'], 'Loading')}
+        />
+      </PageChrome>
+    );
+  }
+
+  if (article.error || !article.payload) {
+    return (
+      <PageChrome bootstrap={bootstrap}>
+        <HeroBlock
+          description={article.error || readPath(i18n, ['blog', 'articleNotFound'], 'Article unavailable')}
+          eyebrow="Blog Article"
+          title={readPath(i18n, ['blog', 'title'], 'Article')}
+        >
+          <div className="panel-actions">
+            <a className="glass-button" href={appendLangToUrl('/blog', lang)}>
+              {readPath(i18n, ['navigation', 'allArticles'], 'All articles')}
+            </a>
+          </div>
+        </HeroBlock>
+      </PageChrome>
+    );
+  }
 
   return (
     <PageChrome bootstrap={bootstrap}>
       <HeroBlock
         description={readPath(i18n, ['blog', 'subtitle'], '')}
         eyebrow="Blog Article"
-        title={pageProps.articleId || readPath(i18n, ['blog', 'title'], 'Article')}
+        title={article.payload.articleId || readPath(i18n, ['blog', 'title'], 'Article')}
       >
         <div className="panel-actions">
           <a className="glass-button" href={appendLangToUrl('/blog', lang)}>
@@ -4037,18 +4533,20 @@ function ArticlePage({ bootstrap }) {
       </HeroBlock>
 
       <section className="glass-panel blog-article-shell">
-        <div dangerouslySetInnerHTML={{ __html: pageProps.articleHtml || '' }} />
+        <div dangerouslySetInnerHTML={{ __html: article.payload.articleHtml || '' }} />
       </section>
     </PageChrome>
   );
 }
 
 function RecordPage({ bootstrap }) {
-  const { apiUrl, i18n, lang, pageProps } = bootstrap;
+  const { apiUrl, currentPath, i18n, lang, pageProps } = bootstrap;
+  const route = resolveFrontendRoute(currentPath);
   const { error, loading, payload } = useMapPayload(apiUrl);
+  const recordSlug = pageProps.recordSlug || route.recordSlug || '';
 
   const groups = groupSchoolRecords(payload && payload.data || []);
-  const location = findRecordLocation(groups, pageProps.recordSlug);
+  const location = findRecordLocation(groups, recordSlug);
 
   if (loading) {
     return (
@@ -4082,8 +4580,8 @@ function RecordPage({ bootstrap }) {
   const statsBySchool = buildSchoolReportStats(payload && payload.data || []);
   const schoolStats = statsBySchool.get(location.group.schoolKey) || { selfCount: 0, agentCount: 0 };
   const query = {
-    inputType: pageProps.inputType || '',
-    search: pageProps.search || ''
+    inputType: pageProps.inputType || route.query.inputType || '',
+    search: pageProps.search || route.query.search || ''
   };
 
   return (
@@ -4161,7 +4659,7 @@ function NotFoundPage({ bootstrap }) {
   return (
     <PageChrome bootstrap={bootstrap}>
       <HeroBlock
-        description="This page type is not configured in the React frontend."
+        description="This route is not configured in the frontend router."
         eyebrow="Frontend"
         title="Page unavailable"
       />
@@ -4169,16 +4667,88 @@ function NotFoundPage({ bootstrap }) {
   );
 }
 
+function resolveFrontendDocumentTitle(route, i18n, siteName) {
+  const pageTitles = i18n && i18n.pageTitles ? i18n.pageTitles : {};
+  const resolvedSiteName = siteName || readPath(i18n, ['common', 'siteName'], 'NO CONVERSION THERAPY');
+
+  switch (route.routeType) {
+    case 'article':
+      return formatMessage(pageTitles.article || '{articleTitle}|{title}', {
+        articleTitle: route.articleId || readPath(i18n, ['blog', 'title'], 'Article'),
+        title: resolvedSiteName
+      });
+    case 'correction':
+      return formatMessage(pageTitles.institutionCorrection || '{title}', {
+        title: resolvedSiteName
+      });
+    case 'home':
+      return formatMessage(pageTitles.home || '{title}', {
+        title: resolvedSiteName
+      });
+    case 'portal':
+      return formatMessage(
+        route.pathname === '/blog'
+          ? pageTitles.blog || '{title}'
+          : route.pathname === '/form'
+            ? pageTitles.form || '{title}'
+            : pageTitles.map || '{title}',
+        { title: resolvedSiteName }
+      );
+    case 'privacy':
+      return formatMessage(pageTitles.privacy || '{title}', {
+        title: resolvedSiteName
+      });
+    case 'record':
+      return formatMessage(pageTitles.mapRecord || '{title}', {
+        title: resolvedSiteName
+      });
+    default:
+      return resolvedSiteName;
+  }
+}
+
 export function App({ bootstrap }) {
+  const [currentPath, setCurrentPath] = useState(
+    bootstrap.currentPath || `${window.location.pathname}${window.location.search}${window.location.hash}`
+  );
+
+  useEffect(() => {
+    function handleLocationChange() {
+      setCurrentPath(`${window.location.pathname}${window.location.search}${window.location.hash}`);
+    }
+
+    window.addEventListener('popstate', handleLocationChange);
+    return () => {
+      window.removeEventListener('popstate', handleLocationChange);
+    };
+  }, []);
+
   const normalizedBootstrap = {
     ...bootstrap,
-    apiUrl: bootstrap.apiUrl || '/api/map-data',
-    currentPath: bootstrap.currentPath || window.location.pathname,
+    apiUrl: bootstrap.apiUrl || '',
+    currentPath,
+    deploymentMode: resolveFrontendDeploymentMode(bootstrap),
+    formPageUrl: bootstrap.formPageUrl || '',
     i18n: bootstrap.i18n || {},
     lang: bootstrap.lang || 'zh-CN',
     languageOptions: Array.isArray(bootstrap.languageOptions) ? bootstrap.languageOptions : [],
-    pageProps: bootstrap.pageProps || {}
+    pageProps: bootstrap.pageProps || {},
+    pageType: bootstrap.pageType || 'frontend-router'
   };
+
+  const frontendRoute = resolveFrontendRoute(normalizedBootstrap.currentPath);
+
+  useEffect(() => {
+    if (normalizedBootstrap.pageType !== 'frontend-router') {
+      return;
+    }
+
+    document.title = resolveFrontendDocumentTitle(
+      frontendRoute,
+      normalizedBootstrap.i18n,
+      normalizedBootstrap.siteName
+    );
+  }, [frontendRoute, normalizedBootstrap.i18n, normalizedBootstrap.pageType, normalizedBootstrap.siteName]);
 
   const pageByType = {
     about: <AboutPage bootstrap={normalizedBootstrap} />,
@@ -4196,6 +4766,19 @@ export function App({ bootstrap }) {
     'submit-preview': <SubmitPreviewPage bootstrap={normalizedBootstrap} />,
     'submit-success': <SubmitSuccessPage bootstrap={normalizedBootstrap} />
   };
+
+  if (normalizedBootstrap.pageType === 'frontend-router') {
+    const pageByRoute = {
+      article: <ArticlePage bootstrap={normalizedBootstrap} />,
+      home: <HomePage bootstrap={normalizedBootstrap} />,
+      'not-found': <NotFoundPage bootstrap={normalizedBootstrap} />,
+      portal: <PortalPage bootstrap={normalizedBootstrap} />,
+      privacy: <PrivacyPage bootstrap={normalizedBootstrap} />,
+      record: <RecordPage bootstrap={normalizedBootstrap} />
+    };
+
+    return pageByRoute[frontendRoute.routeType] || <NotFoundPage bootstrap={normalizedBootstrap} />;
+  }
 
   return pageByType[normalizedBootstrap.pageType] || <NotFoundPage bootstrap={normalizedBootstrap} />;
 }

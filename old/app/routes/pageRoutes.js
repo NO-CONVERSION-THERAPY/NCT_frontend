@@ -1,0 +1,1220 @@
+const express = require('express');
+const fs = require('fs');
+const path = require('path');
+const { getAreaOptions } = require('../../config/areaSelector');
+const { getLocalizedInstitutionCorrectionRules } = require('../../config/institutionCorrectionConfig');
+const { getClientProvinceMetadata } = require('../../config/provinceMetadata');
+const { renderBlogArticleHtml, translateBlogListEntries } = require('../services/blogTranslationService');
+const { buildFormPageViewModel } = require('../services/formPageViewModel');
+const { issueFormProtectionToken } = require('../services/formProtectionService');
+const { generateRobotsTxt } = require('../services/robotsService');
+const { generateSitemapXml } = require('../services/sitemapService');
+const { logAuditEvent } = require('../services/auditLogService');
+const { paths } = require('../../config/fileConfig');
+const {
+  applySensitivePageHeaders,
+  createRateLimiter,
+  sensitiveRobotsPolicy
+} = require('../../config/security');
+const {
+  buildConfirmationFields,
+  buildGoogleFormFields,
+  buildGoogleFormPrefillUrl,
+  encodeGoogleFormFields
+} = require('../services/formService');
+const { issueFormConfirmationToken } = require('../services/formConfirmationService');
+const {
+  renderFrontendPage,
+  shouldUseReactFrontend
+} = require('../services/frontendRenderer');
+const { buildInstitutionCorrectionGoogleFormFields } = require('../services/institutionCorrectionService');
+
+function translateWithFallback(t, key, fallbackValue = '') {
+  if (typeof t !== 'function') {
+    return fallbackValue;
+  }
+
+  const translatedValue = t(key);
+  return translatedValue && translatedValue !== key ? translatedValue : fallbackValue;
+}
+
+function localizeBlogLanguageLabel(value, t) {
+  const normalizedValue = String(value || '').trim();
+  const languageKeyByLabel = {
+    English: 'blog.articleLanguages.en',
+    'zh-CN': 'blog.articleLanguages.zhCN',
+    'zh-TW': 'blog.articleLanguages.zhTW',
+    '简体中文': 'blog.articleLanguages.zhCN',
+    '簡體中文': 'blog.articleLanguages.zhCN',
+    '正體中文': 'blog.articleLanguages.zhTW',
+    '繁體中文': 'blog.articleLanguages.zhTW',
+    '英文': 'blog.articleLanguages.en'
+  };
+  const languageKey = languageKeyByLabel[normalizedValue];
+
+  if (!languageKey) {
+    return normalizedValue;
+  }
+
+  return translateWithFallback(t, languageKey, normalizedValue);
+}
+
+function localizeBlogCreationDate(value, language) {
+  const rawValue = String(value || '').trim();
+  if (language !== 'en') {
+    return rawValue;
+  }
+
+  const dateMatch = rawValue.match(/^(\d{4})年(\d{1,2})月(\d{1,2})日$/);
+  if (!dateMatch) {
+    return rawValue;
+  }
+
+  const [, year, month, day] = dateMatch;
+  const date = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
+
+  return new Intl.DateTimeFormat('en', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'UTC'
+  }).format(date);
+}
+
+function localizeBlogTagMap(tagMap, t) {
+  return Object.fromEntries(
+    Object.entries(tagMap || {}).map(([id, label]) => [
+      id,
+      translateWithFallback(t, `blog.tags.${id}`, label)
+    ])
+  );
+}
+
+function buildHomeStructuredData() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    description: 'Victims Union 是由扭转治疗幸存者组成的独立组织，致力于曝光戒网瘾学校及扭转机构的身心折磨。',
+    headline: '终结扭转治疗：NCT 揭露戒网瘾学校真相',
+    image: 'https://www.victimsunion.org/favicon.svg',
+    keywords: 'CONVERSION THERAPY, 戒网瘾学校, 扭转机构, LGBTQIA',
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': 'https://www.victimsunion.org'
+    },
+    name: 'Victims Union',
+    publisher: {
+      '@type': 'Organization',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://www.victimsunion.org/favicon.svg'
+      },
+      name: 'Victims Union',
+      url: 'https://victimsunion.org'
+    }
+  };
+}
+
+async function loadLocalizedBlogListing({ language, t }) {
+  const savedTags = JSON.parse(fs.readFileSync(paths.blogData, 'utf-8'));
+  const localizedEntries = await translateBlogListEntries(savedTags.Data, {
+    targetLanguage: language
+  });
+
+  return {
+    entries: localizedEntries.map((entry) => ({
+      ...entry,
+      localizedCreationDate: localizeBlogCreationDate(entry.CreationDate, language),
+      localizedLanguage: localizeBlogLanguageLabel(entry.Language, t)
+    })),
+    tags: localizeBlogTagMap(savedTags.TagList, t)
+  };
+}
+
+async function buildPortalPageProps({ apiUrl, formProtectionSecret, initialSection, req }) {
+  const t = req.t;
+  const localizedBlogListing = await loadLocalizedBlogListing({
+    language: req.lang,
+    t
+  });
+  const portalFormViewModel = buildFormPageViewModel({
+    apiUrl,
+    formProtectionSecret,
+    req
+  });
+
+  return {
+    apiUrl,
+    blog: {
+      activeTag: typeof req.query.tag === 'string' ? req.query.tag : '',
+      entries: localizedBlogListing.entries,
+      tags: localizedBlogListing.tags
+    },
+    form: {
+      agentRelationshipOptions: portalFormViewModel.agentRelationshipOptions,
+      areaOptions: portalFormViewModel.areaOptions,
+      exitMethodOptions: portalFormViewModel.exitMethodOptions,
+      formProtectionToken: portalFormViewModel.formProtectionToken,
+      formRules: portalFormViewModel.formRules,
+      identityOptions: portalFormViewModel.identityOptions,
+      legalAidOptions: portalFormViewModel.legalAidOptions,
+      otherSexTypeOptions: portalFormViewModel.otherSexTypeOptions,
+      parentMotivationOptions: portalFormViewModel.parentMotivationOptions,
+      sexOptions: portalFormViewModel.sexOptions,
+      violenceCategoryOptions: portalFormViewModel.violenceCategoryOptions
+    },
+    initialSection,
+    mapQuery: {
+      inputType: typeof req.query.inputType === 'string' ? req.query.inputType : '',
+      search: typeof req.query.search === 'string' ? req.query.search : ''
+    }
+  };
+}
+
+function resolveMarkdownPath(blogDirectory, articleId) {
+  if (
+    typeof articleId !== 'string'
+    || articleId.includes('\0')
+    || articleId.includes('/')
+    || articleId.includes('\\')
+  ) {
+    return null;
+  }
+
+  const normalizedBlogDirectory = path.resolve(blogDirectory);
+  const markdownPath = path.resolve(normalizedBlogDirectory, `${articleId}.md`);
+
+  if (!markdownPath.startsWith(`${normalizedBlogDirectory}${path.sep}`)) {
+    return null;
+  }
+
+  return markdownPath;
+}
+
+function buildDebugSubmitErrorPreviewUrl(googleFormUrl) {
+  const samplePayload = new URLSearchParams({
+    'entry.842223433': '11',
+    'entry.1422578992': '男',
+    'entry.1766160152': '福建',
+    'entry.402227428': '區，縣',
+    'entry.5034928': '學校',
+    'entry.1390240202': '地址',
+    'entry.1344969670': '2026-04-21',
+    'entry.129670533': '2026-04-25',
+    'entry.578287646': '經歷',
+    'entry.1533497153': '校長',
+    'entry.883193772': '聯繫方式',
+    'entry.1400127416': '醜聞',
+    'entry.2022959936': '其他',
+    'entry.500021634': '受害者本人'
+  }).toString();
+
+  return buildGoogleFormPrefillUrl(googleFormUrl, samplePayload);
+}
+
+function encodeDebugConfirmationPayload(confirmationState) {
+  return Buffer.from(JSON.stringify(confirmationState || {}), 'utf8').toString('base64url');
+}
+
+function buildLocalizedRedirectPath(pathname, language) {
+  const query = new URLSearchParams();
+  query.set('lang', language || 'zh-CN');
+  return `${pathname}?${query.toString()}`;
+}
+
+function buildDebugSampleSubmissionValues(t) {
+  return {
+    birthDate: '2008-01-01',
+    googleFormAge: 17,
+    birthYear: '2008',
+    birthMonth: '1',
+    birthDay: '1',
+    provinceCode: '350000',
+    province: translateWithFallback(t, 'data.provinceNames.350000', '福建'),
+    cityCode: '350500',
+    city: '泉州市',
+    countyCode: '350504',
+    county: '洛江区',
+    schoolName: t('debug.samples.form.schoolName'),
+    identity: translateWithFallback(t, 'form.identityOptions.self', 'Survivor'),
+    sex: translateWithFallback(t, 'form.sexOptions.male', 'Male'),
+    schoolAddress: t('debug.samples.form.schoolAddress'),
+    experience: t('debug.samples.form.experience'),
+    dateStart: '2026-04-21',
+    dateEnd: '2026-04-25',
+    headmasterName: t('debug.samples.form.headmasterName'),
+    contactInformation: t('debug.samples.form.contactInformation'),
+    scandal: t('debug.samples.form.scandal'),
+    other: t('debug.samples.form.other')
+  };
+}
+
+function buildDebugSubmitPreviewModel({ googleFormUrl, t }) {
+  const values = buildDebugSampleSubmissionValues(t);
+  const fields = buildGoogleFormFields(values, t);
+
+  return {
+    backFormUrl: '/debug',
+    encodedPayload: encodeGoogleFormFields(fields),
+    fields,
+    googleFormUrl: redactGoogleFormUrlForDebug(googleFormUrl)
+  };
+}
+
+function buildDebugSubmitConfirmModel({ formProtectionSecret, t }) {
+  const values = buildDebugSampleSubmissionValues(t);
+  const encodedPayload = encodeGoogleFormFields(buildGoogleFormFields(values, t));
+  const confirmationPayload = encodeDebugConfirmationPayload({
+    encodedPayload,
+    submissionValues: values
+  });
+
+  return {
+    backFormUrl: '/debug',
+    confirmAction: '/debug/submit-confirm',
+    confirmationPayload,
+    confirmationToken: issueFormConfirmationToken({
+      payload: confirmationPayload,
+      secret: formProtectionSecret
+    }),
+    fields: buildConfirmationFields(values, t).filter((field) => String(field && field.value || '').trim())
+  };
+}
+
+function buildDebugSubmissionDiagnostics(t) {
+  const attemptedTargets = [
+    { id: 'google', label: t('submitStatus.targets.google') },
+    { id: 'd1', label: t('submitStatus.targets.d1') }
+  ];
+
+  return {
+    attemptedTargets,
+    successfulTargets: attemptedTargets.filter((target) => target.id === 'google'),
+    failedTargets: attemptedTargets
+      .filter((target) => target.id === 'd1')
+      .map((target) => ({
+        ...target,
+        error: t('debug.samples.d1SkippedError')
+      }))
+  };
+}
+
+function buildDebugInstitutionCorrectionSampleValues(t) {
+  return {
+    schoolName: t('debug.samples.correction.schoolName'),
+    provinceCode: '350000',
+    province: translateWithFallback(t, 'data.provinceNames.350000', '福建'),
+    cityCode: '350500',
+    city: '泉州市',
+    countyCode: '350504',
+    county: '洛江区',
+    schoolAddress: t('debug.samples.correction.schoolAddress'),
+    contactInformation: t('debug.samples.correction.contactInformation'),
+    headmasterName: t('debug.samples.correction.headmasterName'),
+    correctionContent: t('debug.samples.correction.correctionContent')
+  };
+}
+
+function buildDebugCorrectionSubmitErrorPreviewUrl({ correctionGoogleFormUrl, t }) {
+  const fields = buildInstitutionCorrectionGoogleFormFields(buildDebugInstitutionCorrectionSampleValues(t), t);
+  return buildGoogleFormPrefillUrl(correctionGoogleFormUrl, encodeGoogleFormFields(fields));
+}
+
+function redactGoogleFormUrlForDebug(googleFormUrl) {
+  const normalizedUrl = String(googleFormUrl || '').trim();
+
+  if (!normalizedUrl) {
+    return '';
+  }
+
+  return normalizedUrl.replace(/\/d\/e\/([^/]+)\//, (_match, formId) => {
+    const visiblePrefix = formId.slice(0, 4);
+    const visibleSuffix = formId.slice(-4);
+    return `/d/e/${visiblePrefix}...${visibleSuffix}/`;
+  });
+}
+
+function redactGoogleScriptUrlForDebug(googleScriptUrl) {
+  const normalizedUrl = String(googleScriptUrl || '').trim();
+
+  if (!normalizedUrl) {
+    return '';
+  }
+
+  try {
+    const parsedUrl = new URL(normalizedUrl);
+    const redactedPathname = parsedUrl.pathname.replace(/\/s\/([^/]+)\/exec/i, (_match, deploymentId) => {
+      const visiblePrefix = deploymentId.slice(0, 4);
+      const visibleSuffix = deploymentId.slice(-4);
+      return `/s/${visiblePrefix}...${visibleSuffix}/exec`;
+    });
+
+    return `${parsedUrl.origin}${redactedPathname}`;
+  } catch (_error) {
+    return normalizedUrl.replace(/\/s\/([^/]+)\/exec/i, (_match, deploymentId) => {
+      const visiblePrefix = deploymentId.slice(0, 4);
+      const visibleSuffix = deploymentId.slice(-4);
+      return `/s/${visiblePrefix}...${visibleSuffix}/exec`;
+    });
+  }
+}
+
+function redactRedisUrlForDebug(redisUrl) {
+  const normalizedUrl = String(redisUrl || '').trim();
+
+  if (!normalizedUrl) {
+    return '';
+  }
+
+  try {
+    const parsedUrl = new URL(normalizedUrl);
+    const host = parsedUrl.hostname || '';
+    const port = parsedUrl.port ? `:${parsedUrl.port}` : '';
+    const pathname = parsedUrl.pathname || '';
+    return `${parsedUrl.protocol}//${host}${port}${pathname}`;
+  } catch (_error) {
+    return normalizedUrl.replace(/\/\/[^@/]+@/, '//');
+  }
+}
+
+function buildDebugSections({
+  apiUrl,
+  assetVersion,
+  correctionGoogleFormUrl,
+  correctionSubmitTarget,
+  debugMod,
+  formDryRun,
+  formSubmitTarget,
+  formProtectionMaxAgeMs,
+  formProtectionMinFillMs,
+  formProtectionSecretConfigured,
+  googleFormUrl,
+  googleScriptUrl,
+  isWorkersRuntime,
+  maintenanceMode,
+  maintenanceRetryAfterSeconds,
+  mapDataNodeTransportOverrides,
+  mapDataUpstreamTimeoutMs,
+  mapReadRateLimitMax,
+  pageReadRateLimitMax,
+  publicMapDataUrl,
+  rateLimitRedisUrl,
+  requestPath,
+  siteUrl,
+  submitRateLimitMax,
+  t,
+  title,
+  translationProviderConfigured,
+  translationProviderTimeoutMs,
+  trustProxy
+}) {
+  const statusValue = {
+    configured: t('debug.values.configured'),
+    derived: t('debug.values.derived'),
+    disabled: t('debug.values.disabled'),
+    enabled: t('debug.values.enabled'),
+    explicit: t('debug.values.explicit'),
+    memoryOnly: t('debug.values.memoryOnly'),
+    missing: t('debug.values.missing'),
+    node: t('debug.values.node'),
+    publicFallbackOnly: t('debug.values.publicFallbackOnly'),
+    workers: t('debug.values.workers')
+  };
+
+  return [
+    {
+      title: t('debug.sections.request'),
+      items: [
+        { label: t('debug.labels.language'), value: requestPath.language },
+        { label: t('debug.labels.requestPath'), value: requestPath.path, multiline: true },
+        { label: t('debug.labels.runtime'), value: isWorkersRuntime ? statusValue.workers : statusValue.node },
+        { label: t('debug.labels.assetVersion'), value: assetVersion || t('debug.values.unknown') }
+      ]
+    },
+    {
+      title: t('debug.sections.site'),
+      items: [
+        { label: t('debug.labels.siteTitle'), value: title },
+        { label: t('debug.labels.siteUrl'), value: siteUrl, wide: true, multiline: true },
+        { label: t('debug.labels.apiUrl'), value: apiUrl },
+        { label: t('debug.labels.trustProxy'), value: String(trustProxy) },
+        {
+          label: t('debug.labels.debugMode'),
+          value: debugMod === 'true' ? statusValue.enabled : statusValue.disabled,
+          badgeTone: debugMod === 'true' ? 'positive' : 'neutral'
+        },
+        {
+          label: t('debug.labels.formDryRun'),
+          value: formDryRun ? statusValue.enabled : statusValue.disabled,
+          badgeTone: formDryRun ? 'positive' : 'neutral'
+        },
+        {
+          label: t('debug.labels.formSubmitTarget'),
+          value: t(`debug.submitTargets.${formSubmitTarget}`),
+          badgeTone: 'neutral'
+        },
+        {
+          label: t('debug.labels.correctionSubmitTarget'),
+          value: t(`debug.submitTargets.${correctionSubmitTarget}`),
+          badgeTone: 'neutral'
+        },
+        {
+          label: t('debug.labels.maintenanceMode'),
+          value: maintenanceMode ? statusValue.enabled : statusValue.disabled,
+          badgeTone: maintenanceMode ? 'caution' : 'neutral',
+          hint: t('debug.values.seconds', { count: maintenanceRetryAfterSeconds })
+        },
+        {
+          label: t('debug.labels.mapNodeTransport'),
+          value: mapDataNodeTransportOverrides ? statusValue.enabled : statusValue.disabled,
+          badgeTone: mapDataNodeTransportOverrides ? 'positive' : 'neutral'
+        }
+      ]
+    },
+    {
+      title: t('debug.sections.integrations'),
+      items: [
+        {
+          label: t('debug.labels.googleForm'),
+          value: googleFormUrl ? statusValue.configured : statusValue.missing,
+          badgeTone: googleFormUrl ? 'positive' : 'caution',
+          hint: redactGoogleFormUrlForDebug(googleFormUrl)
+        },
+        {
+          label: t('debug.labels.correctionGoogleForm'),
+          value: correctionGoogleFormUrl ? statusValue.configured : statusValue.missing,
+          badgeTone: correctionGoogleFormUrl ? 'positive' : 'caution',
+          hint: redactGoogleFormUrlForDebug(correctionGoogleFormUrl)
+        },
+        {
+          label: t('debug.labels.googleScript'),
+          value: googleScriptUrl ? statusValue.configured : statusValue.publicFallbackOnly,
+          badgeTone: googleScriptUrl ? 'positive' : 'caution',
+          hint: googleScriptUrl ? redactGoogleScriptUrlForDebug(googleScriptUrl) : ''
+        },
+        {
+          label: t('debug.labels.publicMapDataUrl'),
+          value: publicMapDataUrl,
+          wide: true,
+          multiline: true
+        },
+        {
+          label: t('debug.labels.translationProvider'),
+          value: translationProviderConfigured ? statusValue.configured : statusValue.missing,
+          badgeTone: translationProviderConfigured ? 'positive' : 'caution',
+          hint: t('debug.values.milliseconds', { count: translationProviderTimeoutMs })
+        },
+        {
+          label: t('debug.labels.redisRateLimit'),
+          value: rateLimitRedisUrl ? statusValue.configured : statusValue.memoryOnly,
+          badgeTone: rateLimitRedisUrl ? 'positive' : 'caution',
+          hint: redactRedisUrlForDebug(rateLimitRedisUrl)
+        },
+        {
+          label: t('debug.labels.formProtectionSecret'),
+          value: formProtectionSecretConfigured ? statusValue.explicit : statusValue.derived,
+          badgeTone: formProtectionSecretConfigured ? 'positive' : 'caution'
+        }
+      ]
+    },
+    {
+      title: t('debug.sections.limits'),
+      items: [
+        {
+          label: t('debug.labels.pageReadLimit'),
+          value: t('debug.values.limitWindow', { count: pageReadRateLimitMax, minutes: 5 })
+        },
+        {
+          label: t('debug.labels.mapReadLimit'),
+          value: t('debug.values.limitWindow', { count: mapReadRateLimitMax, minutes: 5 })
+        },
+        {
+          label: t('debug.labels.submitRateLimit'),
+          value: t('debug.values.limitWindow', { count: submitRateLimitMax, minutes: 15 })
+        },
+        {
+          label: t('debug.labels.mapUpstreamTimeout'),
+          value: t('debug.values.milliseconds', { count: mapDataUpstreamTimeoutMs })
+        },
+        {
+          label: t('debug.labels.translationTimeout'),
+          value: t('debug.values.milliseconds', { count: translationProviderTimeoutMs })
+        },
+        {
+          label: t('debug.labels.minFillMs'),
+          value: t('debug.values.milliseconds', { count: formProtectionMinFillMs })
+        },
+        {
+          label: t('debug.labels.maxAgeMs'),
+          value: t('debug.values.milliseconds', { count: formProtectionMaxAgeMs })
+        }
+      ]
+    }
+  ];
+}
+
+function buildDebugPageProps({ debugSections, debugTools }) {
+  return {
+    debugSections,
+    debugTools
+  };
+}
+
+function renderReactShellPage({ legacyData = {}, legacyView, pageRobots, req, res, structuredData, title }) {
+  return renderFrontendPage({
+    legacyData,
+    legacyView,
+    pageProps: {
+      apiUrl: legacyData.apiUrl || ''
+    },
+    pageRobots,
+    pageType: 'frontend-router',
+    req,
+    res,
+    structuredData,
+    title
+  });
+}
+
+// 页面路由只负责渲染模板，不承载表单提交或 API 逻辑。
+function createPageRoutes({
+  apiUrl,
+  correctionGoogleFormUrl,
+  correctionSubmitTarget,
+  debugMod,
+  formDryRun,
+  formSubmitTarget,
+  formProtectionMaxAgeMs,
+  formProtectionMinFillMs,
+  formProtectionSecret,
+  formProtectionSecretConfigured,
+  googleFormUrl,
+  googleScriptUrl,
+  isWorkersRuntime,
+  maintenanceMode,
+  maintenanceRetryAfterSeconds,
+  mapDataNodeTransportOverrides,
+  mapDataUpstreamTimeoutMs,
+  mapReadRateLimitMax,
+  pageReadRateLimitMax,
+  publicMapDataUrl,
+  rateLimitRedisUrl,
+  siteUrl,
+  submitRateLimitMax,
+  title,
+  translationProviderConfigured,
+  translationProviderTimeoutMs,
+  trustProxy
+}) {
+  const router = express.Router();
+  const pageReadLimiter = createRateLimiter({
+    windowMs: 5 * 60 * 1000,
+    max: pageReadRateLimitMax,
+    redisUrl: rateLimitRedisUrl,
+    storePrefix: 'page-read-rate-limit:',
+    getMessage(req) {
+      return req.t('server.tooManyRequests');
+    },
+    onLimit(req, status, message) {
+      logAuditEvent(req, 'page_read_rate_limited', { status, message });
+    }
+  });
+
+  router.get('/robots.txt', (_req, res) => {
+    res
+      .type('text/plain')
+      .set('Cache-Control', 'public, max-age=300')
+      .send(generateRobotsTxt(siteUrl));
+  });
+
+  router.get('/sitemap.xml', (_req, res) => {
+    const xml = generateSitemapXml({
+      blogDataPath: paths.blogData,
+      blogDirectory: paths.blog,
+      siteUrl
+    });
+
+    res
+      .type('application/xml')
+      .set('Cache-Control', 'public, max-age=300')
+      .send(xml);
+  });
+
+  // 首頁：项目导航入口。
+  router.get('/', pageReadLimiter, (req, res) => {
+    const pageTitle = req.t('pageTitles.home', { title });
+
+    if (shouldUseReactFrontend(req)) {
+      return renderReactShellPage({
+        legacyData: {
+          apiUrl,
+          title: pageTitle
+        },
+        legacyView: 'index',
+        req,
+        res,
+        structuredData: buildHomeStructuredData(),
+        title: pageTitle
+      });
+    }
+
+    return renderFrontendPage({
+      legacyData: {
+        apiUrl,
+        title: pageTitle
+      },
+      legacyView: 'index',
+      pageProps: {
+        apiUrl
+      },
+      pageType: 'home',
+      req,
+      res,
+      structuredData: buildHomeStructuredData(),
+      title: pageTitle
+    });
+  });
+
+  // 表單頁：把地区联动数据和前端校验规则一并下发到模板。
+  router.get('/form', pageReadLimiter, async (req, res) => {
+    const pageTitle = req.t('pageTitles.form', { title });
+
+    applySensitivePageHeaders(res);
+
+    if (shouldUseReactFrontend(req)) {
+      // Retired React bootstrap path:
+      // the React frontend now loads static form config and asks /api/frontend-runtime
+      // for a fresh form token instead of receiving pageProps from the backend.
+      return renderReactShellPage({
+        legacyData: {
+          apiUrl,
+          title: pageTitle
+        },
+        legacyView: 'form',
+        pageRobots: sensitiveRobotsPolicy,
+        req,
+        res,
+        title: pageTitle
+      });
+    }
+
+    const legacyData = buildFormPageViewModel({
+      apiUrl,
+      formProtectionSecret,
+      req,
+      title: pageTitle
+    });
+
+    return res.render('form', legacyData);
+  });
+
+  router.get('/form/standalone', pageReadLimiter, (req, res) => {
+    const pageTitle = req.t('pageTitles.form', { title });
+    const legacyData = buildFormPageViewModel({
+      apiUrl,
+      formProtectionSecret,
+      req,
+      title: pageTitle
+    });
+
+    applySensitivePageHeaders(res);
+
+    return res.render('standalone_form', {
+      ...legacyData,
+      submitAction: '/form/standalone/submit'
+    });
+  });
+
+  router.get(['/map/correction', '/correction'], pageReadLimiter, (req, res) => {
+    const t = req.t;
+    const pageTitle = t('pageTitles.institutionCorrection', { title });
+
+    applySensitivePageHeaders(res);
+
+    if (shouldUseReactFrontend(req)) {
+      return renderReactShellPage({
+        legacyData: {
+          apiUrl,
+          title: pageTitle
+        },
+        legacyView: 'institution_correction',
+        pageRobots: sensitiveRobotsPolicy,
+        req,
+        res,
+        title: pageTitle
+      });
+    }
+
+    const { provinces } = getAreaOptions(req.lang);
+    const institutionCorrectionRules = getLocalizedInstitutionCorrectionRules(t);
+    const initialSchoolName = typeof req.query.school_name === 'string'
+      ? req.query.school_name.trim().slice(0, institutionCorrectionRules.schoolName.maxLength)
+      : '';
+    const correctionBasePath = req.path.startsWith('/correction') ? '/correction' : '/map/correction';
+
+    return res.render('institution_correction', {
+      title: pageTitle,
+      apiUrl,
+      areaOptions: { provinces },
+      correctionFormAction: `${correctionBasePath}/submit`,
+      formProtectionToken: issueFormProtectionToken({ secret: formProtectionSecret }),
+      initialSchoolName,
+      institutionCorrectionRules,
+      pageRobots: sensitiveRobotsPolicy
+    });
+  });
+
+  // 地圖頁：展示汇总后的机构数据。
+  router.get('/map', pageReadLimiter, async (req, res) => {
+    const pageTitle = req.t('pageTitles.map', { title });
+
+    if (shouldUseReactFrontend(req)) {
+      return renderReactShellPage({
+        legacyData: {
+          title: pageTitle,
+          apiUrl
+        },
+        legacyView: 'map',
+        req,
+        res,
+        title: pageTitle
+      });
+    }
+
+    const legacyData = {
+      title: pageTitle,
+      apiUrl,
+      QTag: req.query.inputType || '',
+      provinceMetadata: getClientProvinceMetadata()
+    };
+
+    return res.render('map', legacyData);
+  });
+
+  router.get('/map/record/:recordSlug', pageReadLimiter, (req, res) => {
+    const pageTitle = req.t('pageTitles.mapRecord', { title });
+
+    if (shouldUseReactFrontend(req)) {
+      return renderReactShellPage({
+        legacyData: {
+          title: pageTitle,
+          apiUrl
+        },
+        legacyView: 'map_record',
+        req,
+        res,
+        title: pageTitle
+      });
+    }
+
+    return renderFrontendPage({
+      legacyData: {
+        title: pageTitle,
+        apiUrl,
+        recordSlug: req.params.recordSlug || ''
+      },
+      legacyView: 'map_record',
+      pageProps: {
+        apiUrl,
+        inputType: typeof req.query.inputType === 'string' ? req.query.inputType : '',
+        recordSlug: req.params.recordSlug || '',
+        search: typeof req.query.search === 'string' ? req.query.search : ''
+      },
+      pageType: 'record',
+      req,
+      res,
+      title: pageTitle
+    });
+  });
+
+  router.get('/aboutus', pageReadLimiter, (req, res) => {
+    return res.redirect(302, buildLocalizedRedirectPath('/', req.lang));
+  });
+
+  router.get('/privacy', pageReadLimiter, (req, res) => {
+    const pageTitle = req.t('pageTitles.privacy', { title });
+
+    if (shouldUseReactFrontend(req)) {
+      return renderReactShellPage({
+        legacyData: {
+          title: pageTitle,
+          apiUrl
+        },
+        legacyView: 'privacy',
+        req,
+        res,
+        title: pageTitle
+      });
+    }
+
+    return renderFrontendPage({
+      legacyData: {
+        title: pageTitle,
+        apiUrl
+      },
+      legacyView: 'privacy',
+      pageProps: {
+        apiUrl
+      },
+      pageType: 'privacy',
+      req,
+      res,
+      title: pageTitle
+    });
+  });
+
+  // 預留的調試頁面入口。
+  router.get('/debug', pageReadLimiter, (req, res) => {
+    if (debugMod !== 'true') {
+      return res.status(404).send(req.t('common.notFound'));
+    }
+
+    const debugSections = buildDebugSections({
+      apiUrl,
+      assetVersion: req.app.locals.assetVersion,
+      correctionGoogleFormUrl,
+      correctionSubmitTarget,
+      debugMod,
+      formDryRun,
+      formSubmitTarget,
+      formProtectionMaxAgeMs,
+      formProtectionMinFillMs,
+      formProtectionSecretConfigured,
+      googleFormUrl,
+      googleScriptUrl,
+      isWorkersRuntime,
+      maintenanceMode,
+      maintenanceRetryAfterSeconds,
+      mapDataNodeTransportOverrides,
+      mapDataUpstreamTimeoutMs,
+      mapReadRateLimitMax,
+      pageReadRateLimitMax,
+      publicMapDataUrl,
+      rateLimitRedisUrl,
+      requestPath: {
+        language: req.lang,
+        path: req.originalUrl
+      },
+      siteUrl,
+      submitRateLimitMax,
+      t: req.t,
+      title,
+      translationProviderConfigured,
+      translationProviderTimeoutMs,
+      trustProxy
+    });
+    const debugTools = [
+      {
+        href: '/debug/submit-error',
+        label: req.t('debug.links.submitErrorPreview')
+      },
+      {
+        href: '/debug/submit-preview',
+        label: req.t('debug.links.submitPreview')
+      },
+      {
+        href: '/debug/submit-confirm',
+        label: req.t('debug.links.submitConfirm')
+      },
+      {
+        href: '/debug/correction-submit-success',
+        label: req.t('debug.links.correctionSubmitSuccessPreview')
+      },
+      {
+        href: '/debug/correction-submit-error',
+        label: req.t('debug.links.correctionSubmitErrorPreview')
+      }
+    ];
+    const pageTitle = req.t('pageTitles.debug', { title });
+
+    return renderFrontendPage({
+      legacyData: {
+        apiUrl,
+        debugMode: debugMod,
+        debugSections,
+        debugTools,
+        title: pageTitle
+      },
+      legacyView: 'debug',
+      pageProps: buildDebugPageProps({
+        debugSections,
+        debugTools
+      }),
+      pageType: 'debug',
+      req,
+      res,
+      title: pageTitle
+    });
+  });
+
+  router.get('/debug/submit-error', pageReadLimiter, (req, res) => {
+    if (debugMod !== 'true') {
+      return res.status(404).send(req.t('common.notFound'));
+    }
+
+    applySensitivePageHeaders(res);
+    return renderFrontendPage({
+      legacyData: {
+        backFormUrl: '/debug',
+        fallbackUrl: buildDebugSubmitErrorPreviewUrl(googleFormUrl),
+        pageRobots: sensitiveRobotsPolicy,
+        showSubmissionDiagnostics: false,
+        submissionDiagnostics: null,
+        title: req.t('pageTitles.submitError', { title })
+      },
+      legacyView: 'submit_error',
+      pageProps: {
+        backFormUrl: '/debug',
+        fallbackUrl: buildDebugSubmitErrorPreviewUrl(googleFormUrl),
+        showSubmissionDiagnostics: false,
+        submissionDiagnostics: null
+      },
+      pageRobots: sensitiveRobotsPolicy,
+      pageType: 'submit-error',
+      req,
+      res,
+      title: req.t('pageTitles.submitError', { title })
+    });
+  });
+
+  router.get('/debug/submit-preview', pageReadLimiter, (req, res) => {
+    if (debugMod !== 'true') {
+      return res.status(404).send(req.t('common.notFound'));
+    }
+
+    applySensitivePageHeaders(res);
+    return renderFrontendPage({
+      legacyData: {
+      ...buildDebugSubmitPreviewModel({
+        googleFormUrl,
+        t: req.t
+      }),
+      pageRobots: sensitiveRobotsPolicy,
+      title: req.t('pageTitles.submitPreview', { title })
+      },
+      legacyView: 'submit_preview',
+      pageProps: buildDebugSubmitPreviewModel({
+        googleFormUrl,
+        t: req.t
+      }),
+      pageRobots: sensitiveRobotsPolicy,
+      pageType: 'submit-preview',
+      req,
+      res,
+      title: req.t('pageTitles.submitPreview', { title })
+    });
+  });
+
+  router.get('/debug/submit-confirm', pageReadLimiter, (req, res) => {
+    if (debugMod !== 'true') {
+      return res.status(404).send(req.t('common.notFound'));
+    }
+
+    applySensitivePageHeaders(res);
+    return renderFrontendPage({
+      legacyData: {
+      ...buildDebugSubmitConfirmModel({
+        formProtectionSecret,
+        t: req.t
+      }),
+      pageRobots: sensitiveRobotsPolicy,
+      title: req.t('pageTitles.submitConfirm', { title })
+      },
+      legacyView: 'submit_confirm',
+      pageProps: buildDebugSubmitConfirmModel({
+        formProtectionSecret,
+        t: req.t
+      }),
+      pageRobots: sensitiveRobotsPolicy,
+      pageType: 'submit-confirm',
+      req,
+      res,
+      title: req.t('pageTitles.submitConfirm', { title })
+    });
+  });
+
+  router.post('/debug/submit-confirm', (req, res) => {
+    if (debugMod !== 'true') {
+      return res.status(404).send(req.t('common.notFound'));
+    }
+
+    applySensitivePageHeaders(res);
+    return renderFrontendPage({
+      legacyData: {
+        pageRobots: sensitiveRobotsPolicy,
+        showSubmissionDiagnostics: true,
+        submissionDiagnostics: buildDebugSubmissionDiagnostics(req.t),
+        title: req.t('common.siteName')
+      },
+      legacyView: 'submit',
+      pageProps: {
+        showSubmissionDiagnostics: true,
+        submissionDiagnostics: buildDebugSubmissionDiagnostics(req.t)
+      },
+      pageRobots: sensitiveRobotsPolicy,
+      pageType: 'submit-success',
+      req,
+      res,
+      title: req.t('common.siteName')
+    });
+  });
+
+  router.get('/debug/correction-submit-success', pageReadLimiter, (req, res) => {
+    if (debugMod !== 'true') {
+      return res.status(404).send(req.t('common.notFound'));
+    }
+
+    applySensitivePageHeaders(res);
+    return renderFrontendPage({
+      legacyData: {
+        pageRobots: sensitiveRobotsPolicy,
+        showSubmissionDiagnostics: true,
+        submissionDiagnostics: buildDebugSubmissionDiagnostics(req.t),
+        title: req.t('pageTitles.institutionCorrectionSuccess', { title })
+      },
+      legacyView: 'institution_correction_submit',
+      pageProps: {
+        showSubmissionDiagnostics: true,
+        submissionDiagnostics: buildDebugSubmissionDiagnostics(req.t)
+      },
+      pageRobots: sensitiveRobotsPolicy,
+      pageType: 'correction-success',
+      req,
+      res,
+      title: req.t('pageTitles.institutionCorrectionSuccess', { title })
+    });
+  });
+
+  router.get('/debug/correction-submit-error', pageReadLimiter, (req, res) => {
+    if (debugMod !== 'true') {
+      return res.status(404).send(req.t('common.notFound'));
+    }
+
+    applySensitivePageHeaders(res);
+    const fallbackUrl = buildDebugCorrectionSubmitErrorPreviewUrl({
+      correctionGoogleFormUrl,
+      t: req.t
+    });
+    return renderFrontendPage({
+      legacyData: {
+        backFormUrl: '/debug',
+        errorMessage: req.t('institutionCorrection.errors.submitFailed'),
+        fallbackUrl,
+        pageRobots: sensitiveRobotsPolicy,
+        showSubmissionDiagnostics: true,
+        submissionDiagnostics: buildDebugSubmissionDiagnostics(req.t),
+        title: req.t('pageTitles.institutionCorrectionError', { title })
+      },
+      legacyView: 'institution_correction_submit_error',
+      pageProps: {
+        backFormUrl: '/debug',
+        errorMessage: req.t('institutionCorrection.errors.submitFailed'),
+        fallbackUrl,
+        showSubmissionDiagnostics: true,
+        submissionDiagnostics: buildDebugSubmissionDiagnostics(req.t)
+      },
+      pageRobots: sensitiveRobotsPolicy,
+      pageType: 'correction-error',
+      req,
+      res,
+      title: req.t('pageTitles.institutionCorrectionError', { title })
+    });
+  });
+
+  router.get('/blog', pageReadLimiter, async (req,res) => {
+    const pageTitle = req.t('pageTitles.blog', { title });
+
+    if (shouldUseReactFrontend(req)) {
+      return renderReactShellPage({
+        legacyData: {
+          title: pageTitle,
+          apiUrl
+        },
+        legacyView: 'blog',
+        req,
+        res,
+        title: pageTitle
+      });
+    }
+
+    const SavedTags = JSON.parse(fs.readFileSync(paths.blogData, 'utf-8'));
+    
+    const QTag = req.query.tag;//現在頁面的query tag是什麽
+    let filteredPort = SavedTags.Data;//篩選的數據
+
+    const AllTags = SavedTags.TagList;
+
+    if(QTag) filteredPort = SavedTags.Data.filter(p => p.tagid && p.tagid.includes(QTag));//篩選SavedTags裏面的tagid是Tag的
+
+    const localizedEntries = await translateBlogListEntries(filteredPort, {
+      targetLanguage: req.lang
+    });
+    const localizedTags = localizeBlogTagMap(AllTags, req.t);
+    const localizedEntriesWithMeta = localizedEntries.map((entry) => ({
+      ...entry,
+      localizedCreationDate: localizeBlogCreationDate(entry.CreationDate, req.lang),
+      localizedLanguage: localizeBlogLanguageLabel(entry.Language, req.t)
+    }));
+
+    return res.render('blog', {
+      SavedTags: localizedEntriesWithMeta,//數據（已篩選）
+      AllTags: localizedTags,//所有tag的數據
+      apiUrl,
+      title: pageTitle
+    })
+  })
+
+  router.get('/port/:id', pageReadLimiter, async (req, res) => {
+    const mdName = req.params.id;
+    const mdPath = resolveMarkdownPath(paths.blog, mdName);
+
+    if (!mdPath || !fs.existsSync(mdPath)) {
+      return res.status(404).send(req.t('blog.articleNotFound'));
+    }
+
+    const pageTitle = req.t('pageTitles.article', {
+      articleTitle: mdName,
+      title
+    });
+
+    if (shouldUseReactFrontend(req)) {
+      return renderReactShellPage({
+        legacyData: {
+          apiUrl,
+          title: pageTitle
+        },
+        legacyView: 'blogs',
+        req,
+        res,
+        title: pageTitle
+      });
+    }
+
+    const content = fs.readFileSync(mdPath, 'utf-8');
+    const rawHtml = await renderBlogArticleHtml(content, {
+      targetLanguage: req.lang
+    });
+    
+    return renderFrontendPage({
+      legacyData: {
+        apiUrl,
+        reports: [{ html: rawHtml }],
+        title: pageTitle
+      },
+      legacyView: 'blogs',
+      pageProps: {
+        apiUrl,
+        articleHtml: rawHtml,
+        articleId: mdName
+      },
+      pageType: 'article',
+      req,
+      res,
+      title: pageTitle
+    });
+  });
+
+  return router;
+}
+
+module.exports = createPageRoutes;

@@ -1,0 +1,43 @@
+{
+  "name": "no-torsion-old",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Legacy Express plus EJS frontend extracted from No-Torsion.",
+  "main": "server.js",
+  "scripts": {
+    "start": "FRONTEND_VARIANT=legacy node app/server.js",
+    "dev": "FRONTEND_VARIANT=legacy node app/server.js",
+    "test": "FRONTEND_VARIANT=legacy node --test tests/app.test.js tests/standaloneFormApp.test.js tests/workerResponse.test.mjs tests/nctBackendProxy.test.js",
+    "test:smoke": "FRONTEND_VARIANT=legacy node --test tests/playwright.smoke.js",
+    "test:standalone": "FRONTEND_VARIANT=legacy node --test tests/standaloneFormApp.test.js",
+    "secure-config": "node scripts/secure-config.js",
+    "dev:workers": "npx wrangler dev",
+    "deploy:workers": "npx wrangler deploy --keep-vars",
+    "dev:workers:standalone-form": "npx wrangler dev -c standalone/form-worker/wrangler.jsonc",
+    "deploy:workers:standalone-form": "npx wrangler deploy -c standalone/form-worker/wrangler.jsonc --keep-vars"
+  },
+  "engines": {
+    "node": "20.x"
+  },
+  "dependencies": {
+    "axios": "^1.13.5",
+    "china-area-data": "^5.0.1",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "ejs": "^4.0.1",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.3.1",
+    "fs": "^0.0.1-security",
+    "helmet": "^8.1.0",
+    "leaflet": "^1.9.4",
+    "marked": "^4.3.0",
+    "node-fetch": "^3.3.2",
+    "path": "^0.12.7",
+    "proxy-agent": "^8.0.1",
+    "rate-limit-redis": "^4.3.1",
+    "redis": "^5.11.0"
+  },
+  "devDependencies": {
+    "playwright": "^1.59.1"
+  }
+}

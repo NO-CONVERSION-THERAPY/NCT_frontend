@@ -1,26 +1,30 @@
-# Legacy Frontend Backup
+# No-Torsion Old
 
-这个目录用于保留 React 改造前的旧前端，便于随时恢复和对照。
+这个目录现在是从 `No-Torsion` 根目录拆出来的独立 legacy 项目，保留：
 
-当前备份内容：
+- `Express 5` 服务端
+- 旧版 `EJS + public/js` 前端
+- 原有 standalone / worker / 测试与配置文件
 
-- `old/frontend-legacy/views`
-- `old/frontend-legacy/public/css`
-- `old/frontend-legacy/public/js`
-- `old/frontend-legacy/public/favicon.svg`
+## 运行
 
-切换回旧前端的方法：
+```bash
+cd old
+npm install
+npm start
+```
 
-1. 在 `.env` 中设置 `FRONTEND_VARIANT="legacy"`
-2. 重启服务
+默认会以 `FRONTEND_VARIANT=legacy` 启动旧版页面。
 
-切换回新版 React 前端的方法：
+## 测试
 
-1. 运行 `npm run frontend:build`
-2. 在 `.env` 中设置 `FRONTEND_VARIANT="react"`
-3. 重启服务
+```bash
+cd old
+npm test
+```
 
-说明：
+## 说明
 
-- 旧前端是按改造前目录结构原样复制的，不建议直接在这里继续开发。
-- 正在使用的服务端会根据 `FRONTEND_VARIANT` 决定渲染 React 新版还是 legacy 旧版。
+- 根目录 `No-Torsion` 现在只负责新的静态 Vite + React 前端。
+- 新的表单提交流程已经迁到 `nct-api-sql-sub` 的 Hono 后端。
+- 如果你还需要旧版 Express 页面或旧提交流程，请在这个 `old/` 项目里维护。

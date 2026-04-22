@@ -17,6 +17,8 @@
   </p>
 </div>
 
+> Migration note (April 22, 2026): the root `No-Torsion` project is now a frontend-only static site. Use `nct-api-sql-sub` for the form backend, and use [`old/`](./old/README.md) for the extracted legacy `Express + EJS` project. Any server-side structure described below is historical context unless updated.
+
 ## Contents
 
 - [Overview](#overview)
