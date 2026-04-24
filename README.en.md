@@ -1,7 +1,8 @@
-# N·C·T
+# NCT_frontend
 
 <div align="center">
-  <p><strong>NO CONVERSION THERAPY</strong></p>
+  <p><strong>NCT_frontend</strong></p>
+  <p>NO CONVERSION THERAPY frontend</p>
   <p>Multilingual frontend for documenting, organizing, and publicly presenting information about conversion therapy institutions and lived experiences.</p>
   <p>
     <a href="./README.md">简体中文</a> ·
@@ -16,17 +17,17 @@
   </p>
 </div>
 
-> Updated on April 23, 2026: the root `No-Torsion` directory is now a standalone `Vite + React` static frontend. The legacy `Express + EJS + Workers` stack lives in the sibling project `../NCT_old`, while backend services now belong to `../nct-api-sql` and `../nct-api-sql-sub`.
+> Updated on April 25, 2026: the `NCT_frontend` project root is now a standalone `Vite + React` static frontend. The legacy `Express + EJS + Workers` stack lives in the sibling project `../NCT_old`, while backend services now belong to `../nct-api-sql` and `../nct-api-sql-sub`.
 
 ## What This Project Is
 
-`No-Torsion` is now the public-facing frontend shell, not the backend service. It is responsible for:
+`NCT_frontend` is now the public-facing frontend shell, not the backend service. It is responsible for:
 
-- rendering frontend routes such as `/`, `/map`, `/blog`, `/port/:id`, and `/privacy`
-- generating `public/content/*` static snapshots at build time
-- reading public map JSON and rendering it in the browser
+- rendering static frontend routes such as `/`, `/map`, `/blog`, `/port/:id`, `/privacy`, and `/form`
+- generating `site-bootstrap.json`, `area-selector.json`, and blog article snapshots at build time
+- reusing the checked-in `public/content/map-data.json` snapshot while reading public map data at runtime
 - redirecting `/form` to the standalone `nct-api-sql-sub` form page when `VITE_NCT_SUB_FORM_URL` is configured
-- reusing the same backend origin for runtime translation of English blog articles and non-simplified-Chinese record details
+- reusing the same backend origin for runtime translation of English blog articles and record details in non-`zh-CN` languages
 
 The root project no longer ships:
 
@@ -40,7 +41,7 @@ Related sibling projects:
 
 - [`../NCT_old`](../NCT_old): legacy `Express + EJS + Workers`
 - [`../nct-api-sql`](../nct-api-sql): main database, public JSON, admin console, push/pull sync
-- [`../nct-api-sql-sub`](../nct-api-sql-sub): standalone form page, No-Torsion backend APIs, translation, service reporting
+- [`../nct-api-sql-sub`](../nct-api-sql-sub): standalone form page, `NCT_frontend` backend APIs, translation, service reporting
 
 ## Current Capabilities
 
@@ -48,25 +49,26 @@ Related sibling projects:
 | --- | --- |
 | Home / portal | SPA shell for navigation, language switching, and route resolution |
 | Map browsing | Reads the public dataset from `VITE_NCT_API_SQL_PUBLIC_DATA_URL`, falling back to `public/content/map-data.json` |
-| Blog content | Converts Markdown into static JSON / HTML during the build |
+| Blog content | Converts Markdown into static JSON payloads with pre-rendered HTML during the build |
 | Multilingual UI | Uses `site-bootstrap.json` for messages, supported languages, and defaults |
-| Form entry | `/form` is an entry route only; it redirects to `nct-api-sql-sub` when `VITE_NCT_SUB_FORM_URL` is set |
-| Runtime translation | Enabled only when `VITE_NCT_SUB_FORM_URL` is configured |
+| Form entry | `/form` is always a frontend gateway page; when `VITE_NCT_SUB_FORM_URL` is set it redirects to `nct-api-sql-sub`, otherwise it shows `api-only` guidance |
+| Runtime translation | Requires `VITE_NCT_SUB_FORM_URL`; English blog articles get article translation, and non-`zh-CN` record details get field translation |
 
 ## Compatibility Notes
 
 The repo still contains some migration-phase frontend code for compatibility, but there is an important boundary:
 
-- `/form` is no longer a local submission flow
-- the institution correction UI still exists in the frontend router
-- the institution correction flow expects same-origin endpoints such as `/api/frontend-runtime`, `/map/correction/submit`, or `/correction/submit`
+- `/form` is no longer a local submission flow; it is now a redirect / explanation page
+- the repo still contains compatibility components for institution correction and the old submission preview / confirm / result flows
+- those compatibility pages are normally reused through backend-provided non-`frontend-router` bootstrap payloads (`pageType` / `pageProps`); a pure static deployment does not resolve routes such as `/map/correction` by itself
+- those flows still expect same-origin endpoints such as `/api/frontend-runtime`, `/map/correction/submit`, or `/correction/submit`
 - those endpoints are not implemented in this project
 
-So for a direct static deployment of `No-Torsion`:
+So for a direct static deployment of `NCT_frontend`:
 
-- map pages, blog pages, privacy pages, and article detail pages work on their own
-- `/form` only becomes useful when `VITE_NCT_SUB_FORM_URL` is configured
-- institution correction submissions still require a compatible backend or proxy, or the legacy `NCT_old` stack
+- map pages, blog pages, privacy pages, article detail pages, and the `/form` gateway page work on their own
+- `/form` only auto-redirects and appears in primary navigation when `VITE_NCT_SUB_FORM_URL` is configured
+- institution correction and other legacy submission flows still require a compatible backend or proxy, or the legacy `NCT_old` stack
 
 ## Tech Stack
 
@@ -83,7 +85,7 @@ So for a direct static deployment of `No-Torsion`:
 ```text
 .
 ├── frontend/src/              # React entry, router, and page logic
-├── public/content/            # Build-time generated static snapshots
+├── public/content/            # Build-time snapshots plus the versioned map-data.json
 ├── blog/                      # Markdown article sources
 ├── config/                    # i18n, area options, runtime config
 ├── scripts/                   # Content generation and config helpers
@@ -131,7 +133,7 @@ Additional notes:
 ## Quick Start
 
 ```bash
-cd No-Torsion
+cd <project-root>
 npm install
 cp .env.example .env
 npm run dev
@@ -163,13 +165,13 @@ Notes:
 
 ## Build-Time Static Content
 
-`npm run frontend:prepare-content` generates:
+`npm run frontend:prepare-content` writes or updates:
 
 - `public/content/site-bootstrap.json`
 - `public/content/area-selector.json`
 - `public/content/blog/index.json`
 - `public/content/blog/articles/*.json`
-- `public/content/map-data.json` when a remote snapshot source is configured, or when an existing checked-in snapshot is reused
+- `public/content/map-data.json` is not regenerated by the script; the build only validates and reuses the checked-in snapshot, and fails if it is missing
 
 This is what lets the frontend render:
 
@@ -202,4 +204,7 @@ The repo already includes:
 
 ## README Audit Result
 
-After checking the code and scripts, the README was updated to match the current frontend-only role of `No-Torsion`. Older descriptions of `Express`, `EJS`, `Workers`, and D1-backed routes no longer describe the root project accurately.
+After checking the code and scripts, the README was aligned with the current frontend-only role of `NCT_frontend`. In particular:
+
+- `frontend:prepare-content` does not fetch or regenerate `map-data.json`; it only reuses and validates the checked-in snapshot
+- correction and legacy submission pages still exist as compatibility components, but pure static `frontend-router` deployments do not expose those routes directly

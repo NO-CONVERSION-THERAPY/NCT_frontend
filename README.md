@@ -1,7 +1,8 @@
-# N·C·T
+# NCT_frontend
 
 <div align="center">
-  <p><strong>NO CONVERSION THERAPY</strong></p>
+  <p><strong>NCT_frontend</strong></p>
+  <p>NO CONVERSION THERAPY frontend</p>
   <p>用于记录、整理与公开展示“扭转治疗”相关机构与经历信息的多语言站点前端。</p>
   <p>
     <a href="./README.md"><strong>简体中文</strong></a> ·
@@ -16,17 +17,17 @@
   </p>
 </div>
 
-> 更新说明（2026-04-23）：当前根目录 `No-Torsion` 已经是独立的 `Vite + React` 静态前端项目。旧版 `Express + EJS + Workers` 已迁到同级 `../NCT_old`；表单、翻译、数据写入等后端能力请配合同级 `../nct-api-sql` 与 `../nct-api-sql-sub` 使用。
+> 更新说明（2026-04-25）：当前 `NCT_frontend` 项目根目录已经是独立的 `Vite + React` 静态前端项目。旧版 `Express + EJS + Workers` 已迁到同级 `../NCT_old`；表单、翻译、数据写入等后端能力请配合同级 `../nct-api-sql` 与 `../nct-api-sql-sub` 使用。
 
 ## 项目定位
 
-`No-Torsion` 现在负责的是“前端展示壳层”，不是后端服务：
+`NCT_frontend` 现在负责的是“前端展示壳层”，不是后端服务：
 
-- 渲染 `/`、`/map`、`/blog`、`/port/:id`、`/privacy` 等前端路由
-- 在构建阶段生成 `public/content/*` 静态快照
-- 读取公开地图数据并在浏览器中展示
+- 渲染 `/`、`/map`、`/blog`、`/port/:id`、`/privacy`、`/form` 等静态前端路由
+- 在构建阶段生成 `site-bootstrap.json`、`area-selector.json` 和博客文章快照
+- 复用仓库内的 `public/content/map-data.json` 静态快照，并在运行时按需读取公开地图数据
 - 在配置 `VITE_NCT_SUB_FORM_URL` 时，把 `/form` 入口跳转到 `nct-api-sql-sub` 的独立表单页
-- 在配置 `VITE_NCT_SUB_FORM_URL` 时，复用同一后端的 `/api/no-torsion/translate-text` 处理英文博客正文和非简中记录详情的运行时翻译
+- 在配置 `VITE_NCT_SUB_FORM_URL` 时，复用同一后端的 `/api/no-torsion/translate-text` 处理英文博客正文，以及非 `zh-CN` 语言下记录详情的运行时翻译
 
 当前根目录 **不再** 提供下列能力：
 
@@ -40,7 +41,7 @@
 
 - [`../NCT_old`](../NCT_old)：旧版 `Express + EJS + Workers`
 - [`../nct-api-sql`](../nct-api-sql)：主库、公开 JSON、管理台、主推/回拉同步
-- [`../nct-api-sql-sub`](../nct-api-sql-sub)：独立表单页、No-Torsion 后端 API、翻译与上报
+- [`../nct-api-sql-sub`](../nct-api-sql-sub)：独立表单页、`NCT_frontend` 后端 API、翻译与上报
 
 ## 当前功能
 
@@ -48,25 +49,26 @@
 | --- | --- |
 | 首页 / 门户 | 单页前端壳层，负责导航、语言切换与页面路由 |
 | 地图浏览 | 读取 `VITE_NCT_API_SQL_PUBLIC_DATA_URL` 指向的公开 JSON；默认回退到仓库内 `public/content/map-data.json` |
-| 博客内容 | 构建时把 Markdown 转成静态 JSON / HTML，前端按需加载 |
+| 博客内容 | 构建时把 Markdown 转成包含预渲染 HTML 的静态 JSON，前端按需加载 |
 | 多语言 | 通过 `site-bootstrap.json` 下发词条、语言选项和默认语言 |
-| 表单入口 | `/form` 仅作为入口页；当配置了 `VITE_NCT_SUB_FORM_URL` 时，会跳转到 `nct-api-sql-sub` 的独立表单页 |
-| 运行时翻译 | 仅在配置了 `VITE_NCT_SUB_FORM_URL` 时启用，并复用其同源翻译 API |
+| 表单入口 | `/form` 始终是前端入口页；配置 `VITE_NCT_SUB_FORM_URL` 后会自动跳转到 `nct-api-sql-sub` 的独立表单页，否则显示 `api-only` 说明 |
+| 运行时翻译 | 需配置 `VITE_NCT_SUB_FORM_URL`；英文博客启用文章翻译，非 `zh-CN` 记录详情启用字段翻译 |
 
 ## 兼容说明
 
 仓库里仍保留了部分迁移期前端逻辑，方便与旧链路兼容，但要注意：
 
-- `/form` 在当前项目里不是本地提交流程，而是前往外部后端表单页的跳转入口
-- 前端仍保留了机构修正页面 UI
-- 机构修正页面提交时依赖同源的 `/api/frontend-runtime`、`/map/correction/submit` 或 `/correction/submit`
+- `/form` 在当前项目里不是本地提交流程，而是一个跳转 / 说明页
+- 仓库仍保留了机构修正、提交预览 / 确认 / 结果页等兼容组件
+- 这些兼容页面通常依赖后端以非 `frontend-router` 的 `pageType` / `pageProps` 注入方式复用；纯静态部署不会自行解析 `/map/correction` 之类路径
+- 相关提交仍依赖同源的 `/api/frontend-runtime`、`/map/correction/submit` 或 `/correction/submit`
 - 这些接口 **并不在当前项目中实现**
 
-也就是说，直接把 `No-Torsion` 当作“纯静态站点”部署时：
+也就是说，直接把 `NCT_frontend` 当作“纯静态站点”部署时：
 
-- 地图、博客、隐私页、文章详情页可以正常工作
-- `/form` 只有在配置 `VITE_NCT_SUB_FORM_URL` 后才会变成可用入口
-- 机构修正提交流程需要额外提供兼容后端，或者继续使用 `NCT_old`
+- 地图、博客、隐私页、文章详情页，以及 `/form` 的说明 / 跳转页可以正常工作
+- `/form` 只有在配置 `VITE_NCT_SUB_FORM_URL` 后才会自动跳转，并出现在主导航中
+- 机构修正与旧提交流程需要额外提供兼容后端，或者继续使用 `NCT_old`
 
 ## 技术栈
 
@@ -83,7 +85,7 @@
 ```text
 .
 ├── frontend/src/              # React 前端入口、路由与页面逻辑
-├── public/content/            # 构建期生成的静态快照
+├── public/content/            # 构建期快照与受版本控制的 map-data.json
 ├── blog/                      # Markdown 博客源文件
 ├── config/                    # i18n、地区选项、运行时配置
 ├── scripts/                   # 构建期内容生成与配置工具
@@ -129,7 +131,7 @@ cp .env.example .env
 ## 快速开始
 
 ```bash
-cd No-Torsion
+cd <project-root>
 npm install
 cp .env.example .env
 npm run dev
@@ -161,13 +163,13 @@ npm run dev
 
 ## 构建期静态内容
 
-`npm run frontend:prepare-content` 会生成这些文件：
+`npm run frontend:prepare-content` 会写入 / 更新这些文件：
 
 - `public/content/site-bootstrap.json`
 - `public/content/area-selector.json`
 - `public/content/blog/index.json`
 - `public/content/blog/articles/*.json`
-- `public/content/map-data.json`（仅在配置远端快照源，或仓库内已有现成快照时使用）
+- `public/content/map-data.json`（不会由脚本重新生成；脚本只会校验并复用仓库内已有快照，缺失时构建失败）
 
 这让前端在“无自带后端”的前提下，仍然可以直接展示：
 
@@ -200,6 +202,6 @@ dist/
 
 本次核对后确认：
 
-- `No-Torsion` 的实际职责是“静态前端壳层”，不是旧版全栈服务
-- 旧 README 中大量 `Express / EJS / Workers / D1` 说明已经不再适用于当前根目录
-- 当前文档已按现有代码、脚本与环境变量更新为前端项目视角
+- `NCT_frontend` 的实际职责是“静态前端壳层”，不是旧版全栈服务
+- `frontend:prepare-content` 不会抓取或重新生成 `map-data.json`，只会复用并校验仓库内快照
+- 机构修正等兼容页面仍在代码里，但纯静态 `frontend-router` 部署不会直接暴露这些路由

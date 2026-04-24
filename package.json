@@ -1,5 +1,5 @@
 {
-  "name": "no-torsion",
+  "name": "nct_frontend",
   "version": "1.0.0",
   "description": "",
   "main": "index.html",
@@ -14,8 +14,8 @@
     "test": "npm run test:unit && npm run frontend:build",
     "test:unit": "node --test tests/*.test.js",
     "playwright:install": "npx playwright install chromium",
-    "dev:workers": "echo \"No-Torsion root is now frontend-only. Run nct-api-sql-sub separately for the Hono backend.\"",
-    "deploy:workers": "echo \"No-Torsion root no longer deploys a Worker backend. Deploy nct-api-sql-sub for Hono mode.\""
+    "dev:workers": "echo \"NCT_frontend root is now frontend-only. Run nct-api-sql-sub separately for the Hono backend.\"",
+    "deploy:workers": "echo \"NCT_frontend root no longer deploys a Worker backend. Deploy nct-api-sql-sub for Hono mode.\""
   },
   "keywords": [],
   "author": "",
