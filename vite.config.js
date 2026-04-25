@@ -6,6 +6,14 @@ module.exports = defineConfig({
     'process.env.NODE_ENV': JSON.stringify('production')
   },
   plugins: [react()],
+  server: {
+    host: '0.0.0.0',
+    port: 5173
+  },
+  preview: {
+    host: '0.0.0.0',
+    port: 4173
+  },
   build: {
     emptyOutDir: true,
     outDir: 'dist',
