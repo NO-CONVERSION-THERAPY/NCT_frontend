@@ -1,4 +1,4 @@
-从现在开始他妈的任何人都不准用vibe coding!!!
+从现在开始他妈的任何人都不准用vibe coding!!!  
 ——HosinoNeko
 
 <div align="center">
