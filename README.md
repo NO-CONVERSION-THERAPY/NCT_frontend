@@ -1,4 +1,5 @@
- NCT_frontend
+从现在开始他妈的任何人都不准用vibe coding!!!
+——HosinoNeko
 
 <div align="center">
   <p><strong>NCT_frontend</strong></p>
